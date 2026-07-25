@@ -139,8 +139,7 @@ export function LiveEventFeed() {
       at: payload.emittedAt,
       zone: payload.command.zoneId.slice(0, 8),
       message: `${payload.command.type.replace(/_/g, " ").toLowerCase()} (${payload.command.source.replace(/_/g, " ").toLowerCase()})`,
-      severity:
-        payload.command.type === "ACTIVATE_RELAY" ? "warn" : "info",
+      severity: payload.command.type === "ACTIVATE_RELAY" ? "warn" : "info",
     })
   })
 
@@ -183,7 +182,10 @@ export function LiveEventFeed() {
               key={entry.id}
               className="flex items-start gap-2 px-4 py-2 text-xs"
             >
-              <Icon aria-hidden className={cn("mt-0.5 size-3.5 shrink-0", className)} />
+              <Icon
+                aria-hidden
+                className={cn("mt-0.5 size-3.5 shrink-0", className)}
+              />
               <span className="shrink-0 font-mono text-[11px] text-muted-foreground tabular-nums">
                 {new Date(entry.at).toLocaleTimeString([], { hour12: false })}
               </span>

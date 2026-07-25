@@ -39,7 +39,9 @@ async function login(): Promise<string> {
     body: JSON.stringify({ email: admin.email, password: admin.password }),
   })
   if (!response.ok) {
-    throw new Error(`Login failed (HTTP ${response.status}). Is the backend running?`)
+    throw new Error(
+      `Login failed (HTTP ${response.status}). Is the backend running?`
+    )
   }
   const body = (await response.json()) as { data: { token: string } }
   return body.data.token
@@ -165,28 +167,34 @@ async function main(): Promise<void> {
       submitted += 1
 
       try {
-        const response = await fetch(`${BASE}/ingestion/zones/${zone.id}/readings`, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "x-zone-api-key": zone.apiKey,
-          },
-          body: JSON.stringify({
-            readingId: `${zone.code}-${sequence}`,
-            sequenceNumber: sequence,
-            capturedAt: new Date().toISOString(),
-            sensors: {
-              fireDetected: false,
-              gasLevel: Math.round(Math.random() * 30) / 100,
-              occupancyDetected: Math.random() > 0.5,
+        const response = await fetch(
+          `${BASE}/ingestion/zones/${zone.id}/readings`,
+          {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              "x-zone-api-key": zone.apiKey,
             },
-          }),
-        })
+            body: JSON.stringify({
+              readingId: `${zone.code}-${sequence}`,
+              sequenceNumber: sequence,
+              capturedAt: new Date().toISOString(),
+              sensors: {
+                fireDetected: false,
+                gasLevel: Math.round(Math.random() * 30) / 100,
+                occupancyDetected: Math.random() > 0.5,
+              },
+            }),
+          }
+        )
 
         if (response.ok) accepted += 1
         else {
           rejected += 1
-          rejections.set(response.status, (rejections.get(response.status) ?? 0) + 1)
+          rejections.set(
+            response.status,
+            (rejections.get(response.status) ?? 0) + 1
+          )
         }
         await response.arrayBuffer()
       } catch {

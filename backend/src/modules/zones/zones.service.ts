@@ -24,7 +24,9 @@ export async function getAllZoneStatuses(
   return zones.map(toZoneSummary)
 }
 
-export async function getZoneDetail(identifier: string): Promise<ZoneDetailDto> {
+export async function getZoneDetail(
+  identifier: string
+): Promise<ZoneDetailDto> {
   const zone = await findZoneByIdOrCode(identifier)
   if (!zone) throw new NotFoundError("Zone not found.")
   return toZoneDetail(zone)
@@ -51,10 +53,13 @@ export function toReadingDto(reading: SensorReading): SensorReadingDto {
     riskScore: reading.riskScore,
     calculatedState: reading.calculatedState,
     contributions:
-      typeof reading.contributions === "object" && reading.contributions !== null
+      typeof reading.contributions === "object" &&
+      reading.contributions !== null
         ? (reading.contributions as SensorReadingDto["contributions"])
         : { fire: 0, gas: 0, water: 0, occupancy: 0 },
-    reasons: Array.isArray(reading.reasons) ? (reading.reasons as string[]) : [],
+    reasons: Array.isArray(reading.reasons)
+      ? (reading.reasons as string[])
+      : [],
     isDuplicate: reading.isDuplicate,
     validationStatus: reading.validationStatus,
   }

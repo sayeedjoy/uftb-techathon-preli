@@ -59,4 +59,7 @@ export const ROUTE_GUARD_MATRIX = {
   "GET /simulator/*": "ADMIN",
   "POST /simulator/*": "ADMIN",
   "PATCH /simulator/*": "ADMIN",
-} as const satisfies Record<string, "public" | "authenticated" | "zone-api-key" | UserRole>
+} as const satisfies Record<
+  string,
+  "public" | "authenticated" | "zone-api-key" | UserRole
+>

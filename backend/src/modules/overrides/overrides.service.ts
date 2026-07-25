@@ -134,7 +134,10 @@ export async function applyOverride(
           ...(input.sensorId ? { sensorId: input.sensorId } : {}),
         },
       },
-      include: { user: { select: { name: true } }, zone: { select: { code: true } } },
+      include: {
+        user: { select: { name: true } },
+        zone: { select: { code: true } },
+      },
     })
 
     await writeAuditLog(

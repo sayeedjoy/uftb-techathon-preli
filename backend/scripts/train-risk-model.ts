@@ -126,11 +126,7 @@ function train(samples: Sample[]) {
   return { weights, intercept }
 }
 
-function evaluate(
-  samples: Sample[],
-  weights: number[],
-  intercept: number
-) {
+function evaluate(samples: Sample[], weights: number[], intercept: number) {
   let truePositive = 0
   let falsePositive = 0
   let trueNegative = 0
@@ -153,12 +149,13 @@ function evaluate(
     else trueNegative += 1
   }
 
-  const accuracy =
-    (truePositive + trueNegative) / Math.max(1, samples.length)
+  const accuracy = (truePositive + trueNegative) / Math.max(1, samples.length)
   const precision = truePositive / Math.max(1, truePositive + falsePositive)
   const recall = truePositive / Math.max(1, truePositive + falseNegative)
   const f1 =
-    precision + recall === 0 ? 0 : (2 * precision * recall) / (precision + recall)
+    precision + recall === 0
+      ? 0
+      : (2 * precision * recall) / (precision + recall)
 
   // AUC by rank statistic (Mann–Whitney U), so no threshold sweep is needed.
   scored.sort((a, b) => a.score - b.score)
@@ -225,10 +222,7 @@ function main(): void {
     },
   }
 
-  const modelPath = path.join(
-    BACKEND_ROOT,
-    "src/modules/prediction/model.json"
-  )
+  const modelPath = path.join(BACKEND_ROOT, "src/modules/prediction/model.json")
   writeFileSync(modelPath, `${JSON.stringify(model, null, 2)}\n`, "utf8")
 
   console.log("\nHeld-out metrics")

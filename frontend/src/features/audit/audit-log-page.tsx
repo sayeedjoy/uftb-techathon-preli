@@ -78,7 +78,9 @@ export function AuditLogPage() {
             {logs.data?.data.logs.map((log) => (
               <tr key={log.id}>
                 <td className="px-4 py-2 text-xs">
-                  {new Date(log.createdAt).toLocaleString([], { hour12: false })}
+                  {new Date(log.createdAt).toLocaleString([], {
+                    hour12: false,
+                  })}
                 </td>
                 <td className="px-4 py-2">{log.userName ?? "system"}</td>
                 <td className="px-4 py-2 font-mono text-xs">{log.action}</td>

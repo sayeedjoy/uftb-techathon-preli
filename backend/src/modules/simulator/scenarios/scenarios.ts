@@ -97,8 +97,7 @@ export const SCENARIOS: Scenario[] = [
   {
     id: 1,
     name: "Normal idle state",
-    description:
-      "All zones stream benign readings. Nothing should escalate.",
+    description: "All zones stream benign readings. Nothing should escalate.",
     demonstrates: "All zones SAFE, no incidents, no actuation",
     estimatedDurationMs: 6_000,
     steps: [
@@ -115,12 +114,20 @@ export const SCENARIOS: Scenario[] = [
       {
         atMs: 100,
         zoneCode: "server-room",
-        patch: { fireDetected: false, waterLevel: 0.02, occupancyDetected: false },
+        patch: {
+          fireDetected: false,
+          waterLevel: 0.02,
+          occupancyDetected: false,
+        },
       },
       {
         atMs: 100,
         zoneCode: "robotics-lab",
-        patch: { fireDetected: false, gasLevel: 0.05, occupancyDetected: false },
+        patch: {
+          fireDetected: false,
+          gasLevel: 0.05,
+          occupancyDetected: false,
+        },
       },
       { atMs: 5_500, action: "STOP_ALL" },
     ],
@@ -187,8 +194,10 @@ export const SCENARIOS: Scenario[] = [
     ],
     assertions: [
       {
-        description: "IoT Lab recovered to SAFE or WARNING after the fire cleared",
-        check: (snapshot) => expectState(snapshot, "iot-lab", ["SAFE", "WARNING"]),
+        description:
+          "IoT Lab recovered to SAFE or WARNING after the fire cleared",
+        check: (snapshot) =>
+          expectState(snapshot, "iot-lab", ["SAFE", "WARNING"]),
       },
       {
         description: "Exactly one incident was created for IoT Lab",
@@ -230,7 +239,8 @@ export const SCENARIOS: Scenario[] = [
     assertions: [
       {
         description: "Robotics Lab reached CRITICAL",
-        check: (snapshot) => expectState(snapshot, "robotics-lab", ["CRITICAL"]),
+        check: (snapshot) =>
+          expectState(snapshot, "robotics-lab", ["CRITICAL"]),
       },
       {
         description: "The ranking explains the gas contribution",
@@ -261,7 +271,11 @@ export const SCENARIOS: Scenario[] = [
       {
         atMs: 200,
         zoneCode: "server-room",
-        patch: { waterLevel: 0.02, occupancyDetected: false, fireDetected: false },
+        patch: {
+          waterLevel: 0.02,
+          occupancyDetected: false,
+          fireDetected: false,
+        },
       },
       { atMs: 4_000, zoneCode: "server-room", patch: { waterLevel: 0.3 } },
       { atMs: 8_000, zoneCode: "server-room", patch: { waterLevel: 0.7 } },
@@ -285,7 +299,8 @@ export const SCENARIOS: Scenario[] = [
     name: "Simultaneous multi-zone incident",
     description:
       "Two zones go critical seconds apart. Both are scored, both actuate independently, and the queue ranks and explains them.",
-    demonstrates: "Independent actuation, deterministic ranking, visible rationale",
+    demonstrates:
+      "Independent actuation, deterministic ranking, visible rationale",
     estimatedDurationMs: 20_000,
     steps: [
       { atMs: 0, action: "START_ALL" },
@@ -297,7 +312,11 @@ export const SCENARIOS: Scenario[] = [
       {
         atMs: 200,
         zoneCode: "server-room",
-        patch: { fireDetected: false, waterLevel: 0.05, occupancyDetected: false },
+        patch: {
+          fireDetected: false,
+          waterLevel: 0.05,
+          occupancyDetected: false,
+        },
       },
       {
         atMs: 3_000,
@@ -353,7 +372,9 @@ export const SCENARIOS: Scenario[] = [
           // Compare the two zones this scenario drives, rather than positions
           // 1 and 2, so an unrelated incident cannot mask the result.
           const ranked = snapshot.queue
-            .filter((entry) => ["iot-lab", "server-room"].includes(entry.zoneCode))
+            .filter((entry) =>
+              ["iot-lab", "server-room"].includes(entry.zoneCode)
+            )
             .sort((a, b) => a.rank - b.rank)
           const [first, second] = ranked
 
@@ -399,7 +420,9 @@ export const SCENARIOS: Scenario[] = [
           const results = snapshot.faultResults.filter((result) =>
             result.label.startsWith("acknowledge")
           )
-          const ok = results.filter((result) => result.statusCode === 200).length
+          const ok = results.filter(
+            (result) => result.statusCode === 200
+          ).length
           const conflict = results.filter(
             (result) => result.statusCode === 409
           ).length
@@ -537,7 +560,8 @@ export const SCENARIOS: Scenario[] = [
       },
       {
         description: "The zone did not escalate on the rejected data",
-        check: (snapshot) => expectState(snapshot, "iot-lab", ["SAFE", "WARNING"]),
+        check: (snapshot) =>
+          expectState(snapshot, "iot-lab", ["SAFE", "WARNING"]),
       },
     ],
   },

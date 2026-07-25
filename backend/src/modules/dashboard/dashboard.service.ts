@@ -1,4 +1,8 @@
-import { ZONE_STATES, type DashboardSummaryDto, type ZoneStateCounts } from "@scsrg/shared"
+import {
+  ZONE_STATES,
+  type DashboardSummaryDto,
+  type ZoneStateCounts,
+} from "@scsrg/shared"
 
 import { prisma } from "../../database/prisma.js"
 import {

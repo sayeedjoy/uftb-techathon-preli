@@ -2,10 +2,10 @@
 
 ## Two credential types, deliberately non-interchangeable
 
-| Credential | Who holds it | Reaches |
-|---|---|---|
-| JWT (`Authorization: Bearer`) | Dashboard users | Everything except `/ingestion/*` |
-| Zone API key (`X-Zone-API-Key`) | Sensor nodes | `/ingestion/*`, **for that zone only** |
+| Credential                      | Who holds it    | Reaches                                |
+| ------------------------------- | --------------- | -------------------------------------- |
+| JWT (`Authorization: Bearer`)   | Dashboard users | Everything except `/ingestion/*`       |
+| Zone API key (`X-Zone-API-Key`) | Sensor nodes    | `/ingestion/*`, **for that zone only** |
 
 A JWT can never satisfy the zone-key middleware, and a zone key can never
 satisfy a JWT-guarded route. Both directions are asserted by integration tests.
@@ -17,21 +17,21 @@ resolved from the route parameter, not from the key.
 Enforced in `authorization.middleware.ts` on every admin route. Hiding a nav
 item is a courtesy; the backend refusing the call is the mechanism.
 
-| Capability | `SECURITY_STAFF` | `ADMIN` |
-|---|---|---|
-| Log in, view profile | ✅ | ✅ |
-| View zones, priority queue, incidents, history | ✅ | ✅ |
-| Acknowledge incidents | ✅ | ✅ |
-| Submit a field report | ✅ | ✅ |
-| Confirm a field report | ❌ 403 | ✅ |
-| Manual overrides | ❌ 403 | ✅ |
-| System health | ❌ 403 | ✅ |
-| Create / edit zones and sensors | ❌ 403 | ✅ |
-| Rotate a zone API key | ❌ 403 | ✅ |
-| Raw historical readings | ❌ 403 | ✅ |
-| Manage users and roles | ❌ 403 | ✅ |
-| Audit logs | ❌ 403 | ✅ |
-| Simulator | ❌ 403 | ✅ |
+| Capability                                     | `SECURITY_STAFF` | `ADMIN` |
+| ---------------------------------------------- | ---------------- | ------- |
+| Log in, view profile                           | ✅               | ✅      |
+| View zones, priority queue, incidents, history | ✅               | ✅      |
+| Acknowledge incidents                          | ✅               | ✅      |
+| Submit a field report                          | ✅               | ✅      |
+| Confirm a field report                         | ❌ 403           | ✅      |
+| Manual overrides                               | ❌ 403           | ✅      |
+| System health                                  | ❌ 403           | ✅      |
+| Create / edit zones and sensors                | ❌ 403           | ✅      |
+| Rotate a zone API key                          | ❌ 403           | ✅      |
+| Raw historical readings                        | ❌ 403           | ✅      |
+| Manage users and roles                         | ❌ 403           | ✅      |
+| Audit logs                                     | ❌ 403           | ✅      |
+| Simulator                                      | ❌ 403           | ✅      |
 
 `admin-rbac.test.ts` asserts a `SECURITY_STAFF` token receives `403` on every one
 of these, including the zone-scoped routes, even though the UI hides them.
@@ -76,14 +76,14 @@ and does not change:
 
 ## Transport and request hardening
 
-| Control | Setting |
-|---|---|
-| Helmet | Enabled with a CSP that permits Swagger UI's inline assets and nothing else. |
-| CORS | Explicit allowlist from `CORS_ORIGINS`. A wildcard is never combined with credentials. |
-| Body size | 1 MB, JSON and urlencoded. Oversized bodies become `413 PAYLOAD_TOO_LARGE`. |
-| Rate limits | auth 5/min/IP · dashboard API 300/min/IP · ingestion 1 200/min **per zone**. |
-| Error responses | Envelope only. Stack traces never leave the process in production. |
-| `x-powered-by` | Disabled. |
+| Control         | Setting                                                                                |
+| --------------- | -------------------------------------------------------------------------------------- |
+| Helmet          | Enabled with a CSP that permits Swagger UI's inline assets and nothing else.           |
+| CORS            | Explicit allowlist from `CORS_ORIGINS`. A wildcard is never combined with credentials. |
+| Body size       | 1 MB, JSON and urlencoded. Oversized bodies become `413 PAYLOAD_TOO_LARGE`.            |
+| Rate limits     | auth 5/min/IP · dashboard API 300/min/IP · ingestion 1 200/min **per zone**.           |
+| Error responses | Envelope only. Stack traces never leave the process in production.                     |
+| `x-powered-by`  | Disabled.                                                                              |
 
 Ingestion is rate-limited per zone rather than per IP: thirty nodes behind one
 campus NAT sharing a single bucket would throttle each other, which is the wrong

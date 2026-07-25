@@ -124,7 +124,8 @@ describe("loginSchema", () => {
 describe("overrideSchema", () => {
   it("requires a reason of at least five characters", () => {
     expect(
-      overrideSchema.safeParse({ action: "SILENCE_BUZZER", reason: "x" }).success
+      overrideSchema.safeParse({ action: "SILENCE_BUZZER", reason: "x" })
+        .success
     ).toBe(false)
     expect(
       overrideSchema.safeParse({
@@ -145,7 +146,9 @@ describe("paginationSchema", () => {
   })
 
   it("caps the page size", () => {
-    expect(paginationSchema.safeParse({ pageSize: "100000" }).success).toBe(false)
+    expect(paginationSchema.safeParse({ pageSize: "100000" }).success).toBe(
+      false
+    )
   })
 })
 

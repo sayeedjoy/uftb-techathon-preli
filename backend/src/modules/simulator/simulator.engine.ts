@@ -163,7 +163,11 @@ class SimulatorEngine {
     const streamer = this.get(zoneId)
     const original = { ...streamer.state }
 
-    streamer.patch({ gasLevel: 0, fireDetected: false, occupancyDetected: true })
+    streamer.patch({
+      gasLevel: 0,
+      fireDetected: false,
+      occupancyDetected: true,
+    })
     await streamer.tick()
 
     streamer.patch({ gasLevel: 0.8 })

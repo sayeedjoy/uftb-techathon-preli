@@ -54,11 +54,11 @@ flowchart LR
 
 ## Packages
 
-| Package | Responsibility |
-|---|---|
+| Package                             | Responsibility                                                                                                                                                   |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/shared` (`@scsrg/shared`) | The wire contract: domain enums, Zod schemas, `ApiResponse<T>`, the Socket.IO event map. Both apps typecheck against it, so a DTO cannot drift on one side only. |
-| `backend` | Express 5 + Prisma + Socket.IO. The sole authority for every computed value. |
-| `frontend` | React 19 + Vite + Tailwind 4 + shadcn/ui. A view over the backend; it computes no hazard state of its own. |
+| `backend`                           | Express 5 + Prisma + Socket.IO. The sole authority for every computed value.                                                                                     |
+| `frontend`                          | React 19 + Vite + Tailwind 4 + shadcn/ui. A view over the backend; it computes no hazard state of its own.                                                       |
 
 ## Data flow for one reading
 
@@ -98,7 +98,7 @@ sequenceDiagram
 Steps 9–14 are one transaction on purpose. A crash between "reading stored" and
 "transition written" would leave the database asserting two different things
 about the same moment; wrapping them means the alternative is that neither
-happened. The broadcast sits deliberately *outside* the transaction, so a
+happened. The broadcast sits deliberately _outside_ the transaction, so a
 rolled-back write never announces itself and no socket write holds a row lock.
 
 ## Backend layering

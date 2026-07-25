@@ -71,7 +71,9 @@ export function explain(
   }
 
   for (const missing of context.sensorNotConfigured ?? []) {
-    reasons.push(`No ${missing} sensor configured for this zone — contributes 0`)
+    reasons.push(
+      `No ${missing} sensor configured for this zone — contributes 0`
+    )
   }
 
   if (reasons.length === 0) {

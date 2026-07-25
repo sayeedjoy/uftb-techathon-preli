@@ -53,7 +53,12 @@ export function IncidentDrawer({
               {incidentId}
             </p>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            aria-label="Close"
+          >
             <X aria-hidden className="size-4" />
           </Button>
         </header>
@@ -91,14 +96,18 @@ export function IncidentDrawer({
                 <dt className="text-[11px] text-muted-foreground uppercase">
                   Zone state
                 </dt>
-                <dd className="font-medium">{detail.zoneState.toLowerCase()}</dd>
+                <dd className="font-medium">
+                  {detail.zoneState.toLowerCase()}
+                </dd>
               </div>
               <div>
                 <dt className="text-[11px] text-muted-foreground uppercase">
                   Started
                 </dt>
                 <dd className="text-xs">
-                  {new Date(detail.startedAt).toLocaleString([], { hour12: false })}
+                  {new Date(detail.startedAt).toLocaleString([], {
+                    hour12: false,
+                  })}
                 </dd>
               </div>
               <div>
@@ -129,10 +138,9 @@ export function IncidentDrawer({
                   Acknowledged by {detail.acknowledgment.userName}
                 </p>
                 <p className="text-xs text-info/80">
-                  {new Date(detail.acknowledgment.acknowledgedAt).toLocaleString(
-                    [],
-                    { hour12: false }
-                  )}
+                  {new Date(
+                    detail.acknowledgment.acknowledgedAt
+                  ).toLocaleString([], { hour12: false })}
                   {detail.acknowledgment.note
                     ? ` — “${detail.acknowledgment.note}”`
                     : ""}
@@ -183,7 +191,9 @@ export function IncidentDrawer({
                           hour12: false,
                         })}
                       </span>
-                      <span>{command.type.replace(/_/g, " ").toLowerCase()}</span>
+                      <span>
+                        {command.type.replace(/_/g, " ").toLowerCase()}
+                      </span>
                       <span
                         className={
                           command.source === "MANUAL_OVERRIDE"

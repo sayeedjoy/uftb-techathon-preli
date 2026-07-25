@@ -6,7 +6,9 @@ import { renderWithProviders } from "@/test/render"
 import { RouteErrorBoundary } from "./error-boundary"
 
 function Exploding(): never {
-  throw new Error("Cannot read properties of undefined (reading 'contributions')")
+  throw new Error(
+    "Cannot read properties of undefined (reading 'contributions')"
+  )
 }
 
 describe("route error boundary", () => {

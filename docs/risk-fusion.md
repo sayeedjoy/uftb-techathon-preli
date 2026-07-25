@@ -11,11 +11,11 @@ riskScore = 40·fireSignal
 
 Clamped to `[0, 100]`, rounded to two decimals.
 
-| Classification | Score |
-|---|---|
-| `SAFE` | 0 – 29.99 |
-| `WARNING` | 30 – 64.99 |
-| `CRITICAL` | 65 – 100 |
+| Classification | Score      |
+| -------------- | ---------- |
+| `SAFE`         | 0 – 29.99  |
+| `WARNING`      | 30 – 64.99 |
+| `CRITICAL`     | 65 – 100   |
 
 Weights and thresholds live in [`backend/src/config/risk.config.ts`](../backend/src/config/risk.config.ts)
 and are overridable by environment variable. The engine itself
@@ -36,7 +36,7 @@ vague sense of severity.
   matches a confirmed-flame policy: flame plus anything means cut the power.
 - **Gas = 25.** Gas at 100 % plus a full room (40) stays `WARNING`. A saturated
   gas reading without flame is an evacuate-and-ventilate event, not a
-  cut-the-power event. Gas 100 % *with* confirmed flame is exactly 65 —
+  cut-the-power event. Gas 100 % _with_ confirmed flame is exactly 65 —
   `CRITICAL` at the boundary, by construction.
 - **Water = 20.** Below gas because water damages equipment on a slower clock
   than fumes injure people. Full water plus flame is 60 — `WARNING` — and only
@@ -62,7 +62,7 @@ Worked example from the specification:
 ```
 
 Reasons are produced by a pure `explain()` function, one rule per contributing
-signal, so the dashboard never has to reconstruct *why* a zone is in its state.
+signal, so the dashboard never has to reconstruct _why_ a zone is in its state.
 
 ## Sensor processing rules
 
@@ -76,7 +76,7 @@ consecutive positive readings. It returns to 0 only after
 `FIRE_CLEAR_CONSECUTIVE` (default 5) consecutive negatives.
 
 The asymmetry is the point. Confirming slowly stops a flicker raising an alarm;
-clearing slowly stops a momentary sensor dropout *during a real fire* silencing
+clearing slowly stops a momentary sensor dropout _during a real fire_ silencing
 one. The cost of a missed fire is not the cost of a spurious one, so the two
 directions are not treated alike.
 
@@ -101,12 +101,12 @@ cold sensor again.
 Derived from the same normalised value the engine weighs; it changes
 presentation and hazard classification, never the arithmetic.
 
-| Phase | Level |
-|---|---|
-| `DRY` | < 0.15 |
-| `RISING` | 0.15 – 0.59 |
-| `CRITICAL` | ≥ 0.6 |
-| `RESET` | falls below 0.1 *after* having risen |
+| Phase      | Level                                |
+| ---------- | ------------------------------------ |
+| `DRY`      | < 0.15                               |
+| `RISING`   | 0.15 – 0.59                          |
+| `CRITICAL` | ≥ 0.6                                |
+| `RESET`    | falls below 0.1 _after_ having risen |
 
 A permanently dry probe reads `DRY`, not `RESET` — `RESET` means "it receded",
 which is different from "it was never wet".
@@ -119,10 +119,10 @@ and conflating them is how a control room decides not to send anyone.
 
 Unknown occupancy therefore has two different answers depending on the question:
 
-| Question | Answer | Why |
-|---|---|---|
-| How much risk does it add? | **0** | The system does not fabricate hazard from missing data. |
-| Should we treat the room as occupied when dispatching? | **Yes** | Dispatch fails safe. |
+| Question                                               | Answer  | Why                                                     |
+| ------------------------------------------------------ | ------- | ------------------------------------------------------- |
+| How much risk does it add?                             | **0**   | The system does not fabricate hazard from missing data. |
+| Should we treat the room as occupied when dispatching? | **Yes** | Dispatch fails safe.                                    |
 
 Both halves appear in the reading's reasons:
 
@@ -148,12 +148,12 @@ readings and asserts **one** incident row.
 `risk-engine` and `priority-engine` are gated at ≥ 90 % lines and branches.
 The boundaries are asserted exactly:
 
-| Input | Score | State |
-|---|---|---|
-| occupancy + water 0.7495 | 29.99 | `SAFE` |
-| occupancy + water 0.75 | 30 | `WARNING` |
-| fire + gas 0.9996 | 64.99 | `WARNING` |
-| fire + gas 1.0 | 65 | `CRITICAL` |
+| Input                    | Score | State      |
+| ------------------------ | ----- | ---------- |
+| occupancy + water 0.7495 | 29.99 | `SAFE`     |
+| occupancy + water 0.75   | 30    | `WARNING`  |
+| fire + gas 0.9996        | 64.99 | `WARNING`  |
+| fire + gas 1.0           | 65    | `CRITICAL` |
 
 There is no `sleep()` anywhere in the unit suite. Every timing rule takes an
 injected clock and the tests advance it explicitly.

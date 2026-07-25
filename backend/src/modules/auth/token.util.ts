@@ -26,7 +26,8 @@ export function signAccessToken(claims: AccessTokenClaims): string {
 
 function isUserRole(value: unknown): value is UserRole {
   return (
-    typeof value === "string" && (USER_ROLES as readonly string[]).includes(value)
+    typeof value === "string" &&
+    (USER_ROLES as readonly string[]).includes(value)
   )
 }
 
@@ -64,9 +65,7 @@ export function verifyAccessToken(token: string): AccessTokenClaims {
 }
 
 /** Extracts the bearer token from an Authorization header, if present. */
-export function extractBearerToken(
-  header: string | undefined
-): string | null {
+export function extractBearerToken(header: string | undefined): string | null {
   if (!header) return null
   const [scheme, value] = header.split(" ")
   if (!value || scheme?.toLowerCase() !== "bearer") return null

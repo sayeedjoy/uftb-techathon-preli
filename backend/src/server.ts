@@ -1,11 +1,18 @@
 import { createServer } from "node:http"
 
+import { logAiProviderChain } from "./ai/index.js"
 import { createApp } from "./app.js"
 import { env } from "./config/env.js"
 import { logger } from "./config/logger.js"
 import { disconnectDatabase } from "./database/prisma.js"
-import { runBootstrap, stopBackgroundJobs } from "./bootstrap/bootstrap.service.js"
-import { createSocketServer, closeSocketServer } from "./realtime/socket-server.js"
+import {
+  runBootstrap,
+  stopBackgroundJobs,
+} from "./bootstrap/bootstrap.service.js"
+import {
+  createSocketServer,
+  closeSocketServer,
+} from "./realtime/socket-server.js"
 
 /**
  * Startup order matters: state is fully reconstructed from Postgres *before*
@@ -19,6 +26,7 @@ async function main(): Promise<void> {
   createSocketServer(httpServer)
 
   await runBootstrap()
+  logAiProviderChain()
 
   httpServer.listen(env.PORT, () => {
     logger.info(

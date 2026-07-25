@@ -23,10 +23,7 @@ adminRouter.use(requireAuthentication, requireAdmin)
 
 adminRouter.post("/zones", asyncHandler(createZoneController))
 adminRouter.patch("/zones/:zoneId", asyncHandler(updateZoneController))
-adminRouter.post(
-  "/zones/:zoneId/overrides",
-  asyncHandler(overrideController)
-)
+adminRouter.post("/zones/:zoneId/overrides", asyncHandler(overrideController))
 adminRouter.post(
   "/zones/:zoneId/credentials",
   asyncHandler(rotateZoneKeyController)

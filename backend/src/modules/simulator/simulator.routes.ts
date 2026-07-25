@@ -21,8 +21,14 @@ simulatorRouter.use(requireAuthentication, requireAdmin)
 simulatorRouter.get("/status", asyncHandler(statusController))
 simulatorRouter.post("/zones/:zoneId/start", asyncHandler(startController))
 simulatorRouter.post("/zones/:zoneId/stop", asyncHandler(stopController))
-simulatorRouter.patch("/zones/:zoneId/state", asyncHandler(patchStateController))
-simulatorRouter.post("/zones/:zoneId/fault", asyncHandler(injectFaultController))
+simulatorRouter.patch(
+  "/zones/:zoneId/state",
+  asyncHandler(patchStateController)
+)
+simulatorRouter.post(
+  "/zones/:zoneId/fault",
+  asyncHandler(injectFaultController)
+)
 simulatorRouter.post("/stop-all", asyncHandler(stopAllController))
 simulatorRouter.post(
   "/scenarios/:scenarioId/run",

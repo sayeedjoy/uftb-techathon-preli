@@ -34,7 +34,7 @@ Every term is configurable in
   outrank a fresh, worse one.
 - **Asset importance (0–8).** Configuration, not code. The server room is 8; the
   IoT lab is 5.
-- **Multi-hazard (+5).** Fire *and* gas is qualitatively worse than either
+- **Multi-hazard (+5).** Fire _and_ gas is qualitatively worse than either
   alone, and needs a different response.
 - **Acknowledged (−15).** Someone is already on their way. This deliberately
   sinks acknowledged incidents below unacknowledged ones of similar risk, so the
@@ -42,7 +42,7 @@ Every term is configurable in
   "highest risk always first", make this a tie-break instead of a score term —
   it is one config value.
 - **Human report (≤ +5).** Bonus 3. Only a report an administrator has
-  *confirmed* contributes anything, and its influence is bounded.
+  _confirmed_ contributes anything, and its influence is bounded.
 
 ## Determinism
 
@@ -69,15 +69,15 @@ queue.
 
 Two zones go critical seconds apart (demonstration scenario 5):
 
-| | IoT Lab | Server Room |
-|---|---|---|
-| risk | 77.5 | 73 |
-| occupancy | +10 | +10 |
-| duration | +2 | +1 |
-| asset | +5 | +8 |
-| multi-hazard | +5 | +5 |
-| acknowledged | 0 | 0 |
-| **priority** | **99.5** | **97** |
+|              | IoT Lab  | Server Room |
+| ------------ | -------- | ----------- |
+| risk         | 77.5     | 73          |
+| occupancy    | +10      | +10         |
+| duration     | +2       | +1          |
+| asset        | +5       | +8          |
+| multi-hazard | +5       | +5          |
+| acknowledged | 0        | 0           |
+| **priority** | **99.5** | **97**      |
 
 IoT Lab leads on live risk; Server Room claws back three points on asset value
 but not enough to overtake. The dashboard renders exactly this breakdown as
@@ -91,8 +91,13 @@ a detail view:
   "riskScore": 77.5,
   "priorityScore": 99.5,
   "breakdown": {
-    "risk": 77.5, "occupancy": 10, "duration": 2,
-    "asset": 5, "multiHazard": 5, "acknowledged": 0, "humanReport": 0
+    "risk": 77.5,
+    "occupancy": 10,
+    "duration": 2,
+    "asset": 5,
+    "multiHazard": 5,
+    "acknowledged": 0,
+    "humanReport": 0
   },
   "reasons": [
     "Live risk score 77.5",

@@ -1,6 +1,9 @@
 import type { PrismaClient, Prisma, ZoneState } from "@prisma/client"
 
-import { computeRisk, dominantHazards } from "../../src/modules/risk-engine/risk.service.js"
+import {
+  computeRisk,
+  dominantHazards,
+} from "../../src/modules/risk-engine/risk.service.js"
 import { riskConfig } from "../../src/config/risk.config.js"
 
 /**
@@ -113,7 +116,8 @@ export async function seedHistory(
           sensorHealth: {},
           riskScore: computation.riskScore,
           calculatedState: computation.state as ZoneState,
-          contributions: computation.contributions as unknown as Prisma.InputJsonValue,
+          contributions:
+            computation.contributions as unknown as Prisma.InputJsonValue,
           reasons: computation.reasons as unknown as Prisma.InputJsonValue,
           isDuplicate: false,
           validationStatus: "ACCEPTED",
@@ -144,9 +148,14 @@ export async function seedHistory(
   for (const [zoneIndex, zone] of zones.entries()) {
     for (let i = 0; i < resolvedIncidentsPerZone; i += 1) {
       const startedAt = new Date(
-        now - windowMs + (zoneIndex + 1) * 3 * 60 * 60 * 1000 + i * 9 * 60 * 60 * 1000
+        now -
+          windowMs +
+          (zoneIndex + 1) * 3 * 60 * 60 * 1000 +
+          i * 9 * 60 * 60 * 1000
       )
-      const resolvedAt = new Date(startedAt.getTime() + (4 + random() * 20) * 60_000)
+      const resolvedAt = new Date(
+        startedAt.getTime() + (4 + random() * 20) * 60_000
+      )
       const peak = round2(68 + random() * 30)
 
       const contributions = {
@@ -197,7 +206,8 @@ export async function seedHistory(
           {
             incidentId: incident.id,
             eventType: "ACTUATION_ISSUED",
-            message: "Actuation issued: SET_LED, ACTIVATE_BUZZER, ACTIVATE_RELAY",
+            message:
+              "Actuation issued: SET_LED, ACTIVATE_BUZZER, ACTIVATE_RELAY",
             createdAt: new Date(startedAt.getTime() + 400),
           },
           {

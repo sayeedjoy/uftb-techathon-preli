@@ -47,8 +47,15 @@ export function RiskHistoryChart({
   return (
     <div style={{ height }} className="w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.12} />
+        <LineChart
+          data={data}
+          margin={{ top: 8, right: 8, bottom: 0, left: -16 }}
+        >
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="currentColor"
+            opacity={0.12}
+          />
           <XAxis
             dataKey="time"
             tick={{ fontSize: 10 }}

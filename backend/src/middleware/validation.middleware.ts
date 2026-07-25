@@ -35,7 +35,9 @@ export function validate(targets: ValidationTargets): RequestHandler {
         next(
           new ValidationError(
             "The request payload is invalid.",
-            zodIssuesToDetails(error as Parameters<typeof zodIssuesToDetails>[0])
+            zodIssuesToDetails(
+              error as Parameters<typeof zodIssuesToDetails>[0]
+            )
           )
         )
         return

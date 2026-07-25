@@ -27,7 +27,9 @@ describe("incident lifecycle", () => {
     const result = await driveToCritical(seeded)
 
     expect(result?.computation.state).toBe("CRITICAL")
-    expect(await prisma.incident.count({ where: { zoneId: seeded.zone.id } })).toBe(1)
+    expect(
+      await prisma.incident.count({ where: { zoneId: seeded.zone.id } })
+    ).toBe(1)
 
     const incident = await prisma.incident.findFirstOrThrow({
       where: { zoneId: seeded.zone.id },
@@ -44,7 +46,9 @@ describe("incident lifecycle", () => {
       occupancyDetected: true,
     })
 
-    expect(await prisma.incident.count({ where: { zoneId: seeded.zone.id } })).toBe(1)
+    expect(
+      await prisma.incident.count({ where: { zoneId: seeded.zone.id } })
+    ).toBe(1)
   })
 
   it("creates exactly one incident across a threshold oscillation", async () => {
@@ -64,7 +68,9 @@ describe("incident lifecycle", () => {
       })
     }
 
-    expect(await prisma.incident.count({ where: { zoneId: seeded.zone.id } })).toBe(1)
+    expect(
+      await prisma.incident.count({ where: { zoneId: seeded.zone.id } })
+    ).toBe(1)
   })
 
   it("keeps the maximum risk score as a monotonic high-water mark", async () => {
@@ -113,8 +119,16 @@ describe("incident lifecycle", () => {
     })
 
     // Two calm readings is one short of the configured three.
-    await pushReading(seeded, { fireDetected: false, gasLevel: 0, occupancyDetected: false })
-    await pushReading(seeded, { fireDetected: false, gasLevel: 0, occupancyDetected: false })
+    await pushReading(seeded, {
+      fireDetected: false,
+      gasLevel: 0,
+      occupancyDetected: false,
+    })
+    await pushReading(seeded, {
+      fireDetected: false,
+      gasLevel: 0,
+      occupancyDetected: false,
+    })
 
     const stillOpen = await prisma.incident.findUniqueOrThrow({
       where: { id: incident.id },
@@ -190,12 +204,16 @@ describe("incident lifecycle", () => {
     })
     const maintained = {
       ...seeded,
-      zone: await prisma.zone.findUniqueOrThrow({ where: { id: seeded.zone.id } }),
+      zone: await prisma.zone.findUniqueOrThrow({
+        where: { id: seeded.zone.id },
+      }),
     }
 
     await driveToCritical(maintained)
 
-    expect(await prisma.incident.count({ where: { zoneId: seeded.zone.id } })).toBe(0)
+    expect(
+      await prisma.incident.count({ where: { zoneId: seeded.zone.id } })
+    ).toBe(0)
     expect(await prisma.actuationCommand.count()).toBe(0)
   })
 

@@ -69,7 +69,12 @@ export function validateReadingSemantics(
       throw new UnprocessableReadingError(
         ERROR_CODE.SENSOR_NOT_CONFIGURED,
         `This zone has no ${sensorType} sensor configured, so \`${field}\` cannot be reported.`,
-        [{ path: `sensors.${field}`, message: "Sensor not configured for zone" }]
+        [
+          {
+            path: `sensors.${field}`,
+            message: "Sensor not configured for zone",
+          },
+        ]
       )
     }
   }

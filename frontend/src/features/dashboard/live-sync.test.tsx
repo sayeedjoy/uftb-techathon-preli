@@ -109,9 +109,9 @@ describe("live cache sync", () => {
       )
     })
 
-    const cached = queryClient.getQueryData<{ zones: Array<{ state: string }> }>(
-      queryKeys.zones.list()
-    )
+    const cached = queryClient.getQueryData<{
+      zones: Array<{ state: string }>
+    }>(queryKeys.zones.list())
     expect(cached?.zones[0]?.state).toBe("CRITICAL")
   })
 })

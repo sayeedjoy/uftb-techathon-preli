@@ -43,7 +43,8 @@ export async function sweepOfflineZones(now = new Date()): Promise<string[]> {
         newState: ZONE_STATE.OFFLINE,
         riskScore: fresh.currentRiskScore,
         contributions:
-          typeof fresh.contributions === "object" && fresh.contributions !== null
+          typeof fresh.contributions === "object" &&
+          fresh.contributions !== null
             ? (fresh.contributions as {
                 fire: number
                 gas: number
@@ -179,7 +180,10 @@ export function startHeartbeatMonitor(): void {
 
   timer.unref()
   logger.info(
-    { sweepMs: env.ZONE_OFFLINE_SWEEP_MS, timeoutMs: env.ZONE_OFFLINE_TIMEOUT_MS },
+    {
+      sweepMs: env.ZONE_OFFLINE_SWEEP_MS,
+      timeoutMs: env.ZONE_OFFLINE_TIMEOUT_MS,
+    },
     "Heartbeat monitor started"
   )
 }

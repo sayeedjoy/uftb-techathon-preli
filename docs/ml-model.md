@@ -7,7 +7,7 @@
 
 ## What it predicts
 
-*P(this zone reaches CRITICAL within the next 60 seconds)*, served per zone at
+_P(this zone reaches CRITICAL within the next 60 seconds)_, served per zone at
 `GET /api/v1/prediction/:zoneId`.
 
 ## Hard safety boundary
@@ -40,15 +40,15 @@ no Python, no service call.
 
 ### Features
 
-| Feature | Scaling | Rationale |
-|---|---|---|
-| `currentRisk` | ÷ 100 | Where the zone is now |
-| `fireStreak` | ÷ 10 | Consecutive flame positives — momentum toward confirmation |
-| `gasSlope` | clamped ±1 | Gas change per second |
-| `waterSlope` | clamped ±1 | Water change per second |
-| `occupancy` | 0 or 1 | Unknown counts as occupied, same fail-safe rule as priority |
-| `secondsSinceTransition` | ÷ 300 | A zone stable for minutes is less likely to tip |
-| `assetImportance` | ÷ 8 | Zone configuration |
+| Feature                  | Scaling    | Rationale                                                   |
+| ------------------------ | ---------- | ----------------------------------------------------------- |
+| `currentRisk`            | ÷ 100      | Where the zone is now                                       |
+| `fireStreak`             | ÷ 10       | Consecutive flame positives — momentum toward confirmation  |
+| `gasSlope`               | clamped ±1 | Gas change per second                                       |
+| `waterSlope`             | clamped ±1 | Water change per second                                     |
+| `occupancy`              | 0 or 1     | Unknown counts as occupied, same fail-safe rule as priority |
+| `secondsSinceTransition` | ÷ 300      | A zone stable for minutes is less likely to tip             |
+| `assetImportance`        | ÷ 8        | Zone configuration                                          |
 
 Everything is scaled into roughly `[0, 1]` so one learning rate suits them all
 and the coefficients stay comparable to each other.
@@ -71,23 +71,23 @@ Training is reproducible: the same seed produces identical coefficients.
 
 80/20 split, 9 600 training samples, 2 400 held out.
 
-| Metric | Value |
-|---|---|
-| Accuracy | 0.845 |
+| Metric    | Value |
+| --------- | ----- |
+| Accuracy  | 0.845 |
 | Precision | 0.897 |
-| Recall | 0.762 |
-| F1 | 0.824 |
-| AUC | 0.893 |
+| Recall    | 0.762 |
+| F1        | 0.824 |
+| AUC       | 0.893 |
 
 ### Confusion matrix (held out)
 
-| | Predicted escalation | Predicted calm |
-|---|---|---|
-| **Actually escalated** | 875 | 273 |
-| **Actually calm** | 100 | 1152 |
+|                        | Predicted escalation | Predicted calm |
+| ---------------------- | -------------------- | -------------- |
+| **Actually escalated** | 875                  | 273            |
+| **Actually calm**      | 100                  | 1152           |
 
 Precision above recall is the right shape here even for an advisory signal: a
-panel that cries wolf gets ignored, and the *real* alarm path is the deterministic
+panel that cries wolf gets ignored, and the _real_ alarm path is the deterministic
 risk engine, which is not probabilistic at all. Missing an escalation in the
 prediction panel costs nothing that matters — the fusion engine still fires when
 the hazard actually crosses the threshold.

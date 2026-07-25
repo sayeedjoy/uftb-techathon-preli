@@ -77,7 +77,11 @@ class ErrorBoundaryInner extends React.Component<Props, State> {
 }
 
 /** Resets itself whenever the route changes, so an error is never sticky. */
-export function RouteErrorBoundary({ children }: { children: React.ReactNode }) {
+export function RouteErrorBoundary({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const location = useLocation()
   const navigate = useNavigate()
 

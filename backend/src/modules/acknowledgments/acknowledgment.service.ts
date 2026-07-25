@@ -13,7 +13,10 @@ import {
   findIncidentById,
 } from "../incidents/incident.repository.js"
 import { appendTimelineEvent } from "../incidents/timeline.repository.js"
-import { publishIncidentEvent, publishPriorityQueue } from "../../realtime/domain-events.js"
+import {
+  publishIncidentEvent,
+  publishPriorityQueue,
+} from "../../realtime/domain-events.js"
 
 export type AcknowledgeInput = {
   incidentId: string

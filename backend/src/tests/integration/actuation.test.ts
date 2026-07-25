@@ -33,9 +33,9 @@ describe("actuation", () => {
     expect(
       commands.filter((command) => command.type === "ACTIVATE_RELAY")
     ).toHaveLength(1)
-    expect(commands.every((command) => command.source === "SENSOR_TRIGGERED")).toBe(
-      true
-    )
+    expect(
+      commands.every((command) => command.source === "SENSOR_TRIGGERED")
+    ).toBe(true)
   })
 
   it("creates the CRITICAL command within a second of the reading arriving", async () => {

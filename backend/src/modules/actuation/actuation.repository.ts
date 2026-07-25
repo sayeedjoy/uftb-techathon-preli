@@ -43,10 +43,7 @@ export function findPendingCommands(
   })
 }
 
-export function markDispatched(
-  ids: string[],
-  db: DbHandle = prisma
-) {
+export function markDispatched(ids: string[], db: DbHandle = prisma) {
   return db.actuationCommand.updateMany({
     where: { id: { in: ids }, status: "PENDING" },
     data: { status: "DISPATCHED" },

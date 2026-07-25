@@ -55,7 +55,11 @@ reportsRouter.post(
   requireAdmin,
   asyncHandler(async (req, res) => {
     if (!req.user) throw new UnauthenticatedError()
-    const reportId = requiredPathParam(req, "reportId", "No report was specified.")
+    const reportId = requiredPathParam(
+      req,
+      "reportId",
+      "No report was specified."
+    )
 
     const body = confirmReportSchema.parse(req.body ?? {})
     const report = await confirmReport(
@@ -73,7 +77,11 @@ reportsRouter.post(
   requireAdmin,
   asyncHandler(async (req, res) => {
     if (!req.user) throw new UnauthenticatedError()
-    const reportId = requiredPathParam(req, "reportId", "No report was specified.")
+    const reportId = requiredPathParam(
+      req,
+      "reportId",
+      "No report was specified."
+    )
 
     ok(res, {
       report: await rejectReport(reportId, { id: req.user.id }, clientIp(req)),

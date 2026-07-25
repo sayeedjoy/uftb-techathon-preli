@@ -10,7 +10,10 @@ import {
 
 import { corsOrigins } from "../config/env.js"
 import { logger } from "../config/logger.js"
-import { extractBearerToken, verifyAccessToken } from "../modules/auth/token.util.js"
+import {
+  extractBearerToken,
+  verifyAccessToken,
+} from "../modules/auth/token.util.js"
 
 export type SocketData = {
   userId: string
@@ -102,7 +105,10 @@ export function createSocketServer(httpServer: HttpServer): TypedServer {
     })
 
     socket.on("disconnect", (reason) => {
-      logger.debug({ userId: socket.data.userId, reason }, "Socket disconnected")
+      logger.debug(
+        { userId: socket.data.userId, reason },
+        "Socket disconnected"
+      )
     })
   })
 

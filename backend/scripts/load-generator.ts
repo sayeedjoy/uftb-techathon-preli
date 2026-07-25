@@ -14,7 +14,10 @@ import { PrismaClient, type Prisma } from "@prisma/client"
 import "../src/config/env.js"
 
 import { riskConfig } from "../src/config/risk.config.js"
-import { computeRisk, dominantHazards } from "../src/modules/risk-engine/risk.service.js"
+import {
+  computeRisk,
+  dominantHazards,
+} from "../src/modules/risk-engine/risk.service.js"
 
 const prisma = new PrismaClient()
 
@@ -116,7 +119,8 @@ async function main(): Promise<void> {
         sensorHealth: {},
         riskScore: computation.riskScore,
         calculatedState: computation.state,
-        contributions: computation.contributions as unknown as Prisma.InputJsonValue,
+        contributions:
+          computation.contributions as unknown as Prisma.InputJsonValue,
         reasons: computation.reasons as unknown as Prisma.InputJsonValue,
         isDuplicate: false,
         validationStatus: "ACCEPTED",
@@ -141,7 +145,12 @@ async function main(): Promise<void> {
 
     const startedAt = new Date(now - Math.floor(random() * windowMs))
     const peak = round2(66 + random() * 33)
-    const contributions = { fire: 40, gas: round2(peak - 55), water: 0, occupancy: 15 }
+    const contributions = {
+      fire: 40,
+      gas: round2(peak - 55),
+      water: 0,
+      occupancy: 15,
+    }
 
     incidentRows.push({
       zoneId: zone.id,

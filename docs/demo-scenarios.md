@@ -32,6 +32,7 @@ empty priority queue.
 A brief flame flicker, then sustained flame, then the hazard clears.
 
 **Expect:**
+
 - the flicker (fewer than 5 consecutive positives) produces **no** incident and
   contributes 0 — the reading says so in its reasons;
 - sustained flame confirms, opens exactly **one** incident, and drives LED red,
@@ -74,7 +75,7 @@ IoT Lab and Server Room go critical seconds apart.
 
 **Expect:** both scored independently, both actuate independently (disjoint
 command sets), the queue ranks them deterministically, and the dashboard shows
-*why* rank 1 leads rank 2 — breakdown chips plus reason lines, no detail view
+_why_ rank 1 leads rank 2 — breakdown chips plus reason lines, no detail view
 needed.
 
 **Assertions:** both zones `CRITICAL` at the same time; both ranked with
@@ -192,14 +193,14 @@ dashboard stays clean.
 
 ## A seven-minute run
 
-| Time | Do | Point at |
-|---|---|---|
-| 0:00 | Log in as admin | Dark command centre, three zones, connection badge reads **Live** |
-| 0:30 | Simulator → scenario **2** | Flicker produces nothing; sustained flame opens one incident. Banner, toast, queue entry, actuator strip — no refresh |
-| 2:00 | Acknowledge from the banner | Attention cue stops, incident stays visible until resolved |
-| 2:30 | Scenario **5** | Two zones critical; read the ranking rationale straight off the screen |
-| 3:30 | Scenario **9** | Fault buttons return real 400 / 422 in the payload inspector |
-| 4:15 | Scenario **7** | Zone goes **Offline**, not Safe. Last-seen time visible |
-| 5:00 | `Ctrl-C` the backend, restart | Queue and banner return unchanged |
-| 6:00 | Incident History | Filter by date; open the drawer for the full timeline and risk chart |
-| 6:40 | `/api/v1/docs` | Swagger with real examples |
+| Time | Do                            | Point at                                                                                                              |
+| ---- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 0:00 | Log in as admin               | Dark command centre, three zones, connection badge reads **Live**                                                     |
+| 0:30 | Simulator → scenario **2**    | Flicker produces nothing; sustained flame opens one incident. Banner, toast, queue entry, actuator strip — no refresh |
+| 2:00 | Acknowledge from the banner   | Attention cue stops, incident stays visible until resolved                                                            |
+| 2:30 | Scenario **5**                | Two zones critical; read the ranking rationale straight off the screen                                                |
+| 3:30 | Scenario **9**                | Fault buttons return real 400 / 422 in the payload inspector                                                          |
+| 4:15 | Scenario **7**                | Zone goes **Offline**, not Safe. Last-seen time visible                                                               |
+| 5:00 | `Ctrl-C` the backend, restart | Queue and banner return unchanged                                                                                     |
+| 6:00 | Incident History              | Filter by date; open the drawer for the full timeline and risk chart                                                  |
+| 6:40 | `/api/v1/docs`                | Swagger with real examples                                                                                            |

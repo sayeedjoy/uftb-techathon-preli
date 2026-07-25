@@ -30,23 +30,23 @@ erDiagram
 
 ## Tables
 
-| Model | Purpose | Load-bearing constraints |
-|---|---|---|
-| `User` | Dashboard accounts | `UNIQUE(email)`; `passwordHash` bcrypt cost 12 |
-| `Zone` | Monitored area **and** its live projection | `UNIQUE(code)`; `assetImportance` 0–8; soft delete via `isActive` |
-| `ZoneCredential` | Per-zone API key | `apiKeyHash` bcrypt; nullable `revokedAt`; index `(zoneId, revokedAt)` |
-| `Sensor` | Per-zone sensor configuration | `UNIQUE(zoneId, type)`; `isCritical`; free-form `configuration` JSON |
-| `SensorReading` | Immutable raw + computed record | `UNIQUE(readingId)`, `UNIQUE(zoneId, sequenceNumber)`, FK → Zone `onDelete: Restrict` |
-| `ZoneStateTransition` | State-change audit | index `(zoneId, createdAt)` |
-| `Incident` | Hazard event | **partial `UNIQUE(zoneId) WHERE status IN ('OPEN','ACKNOWLEDGED')`**; FK → Zone `onDelete: Restrict` |
-| `Acknowledgment` | Who acknowledged, when | `UNIQUE(incidentId)` |
-| `IncidentTimelineEvent` | Ordered narrative | index `(incidentId, createdAt)` |
-| `ActuationCommand` | LED / buzzer / relay command log | indexes `(zoneId, requestedAt)`, `(status)` |
-| `ManualOverride` | Admin action record | FKs → Zone, User |
-| `AuditLog` | Security-relevant actions | indexes `(userId, createdAt)`, `(entityType, entityId)`, `(action)` |
-| `SystemEvent` | Health / validation / offline events | indexes `(createdAt)`, `(type, severity)` |
-| `IncidentReport` | Natural-language field report (bonus 3) | `status` PENDING / CONFIRMED / REJECTED |
-| `ReadingHourlyAggregate` | Retention rollup | `UNIQUE(zoneId, hour)` |
+| Model                    | Purpose                                    | Load-bearing constraints                                                                             |
+| ------------------------ | ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `User`                   | Dashboard accounts                         | `UNIQUE(email)`; `passwordHash` bcrypt cost 12                                                       |
+| `Zone`                   | Monitored area **and** its live projection | `UNIQUE(code)`; `assetImportance` 0–8; soft delete via `isActive`                                    |
+| `ZoneCredential`         | Per-zone API key                           | `apiKeyHash` bcrypt; nullable `revokedAt`; index `(zoneId, revokedAt)`                               |
+| `Sensor`                 | Per-zone sensor configuration              | `UNIQUE(zoneId, type)`; `isCritical`; free-form `configuration` JSON                                 |
+| `SensorReading`          | Immutable raw + computed record            | `UNIQUE(readingId)`, `UNIQUE(zoneId, sequenceNumber)`, FK → Zone `onDelete: Restrict`                |
+| `ZoneStateTransition`    | State-change audit                         | index `(zoneId, createdAt)`                                                                          |
+| `Incident`               | Hazard event                               | **partial `UNIQUE(zoneId) WHERE status IN ('OPEN','ACKNOWLEDGED')`**; FK → Zone `onDelete: Restrict` |
+| `Acknowledgment`         | Who acknowledged, when                     | `UNIQUE(incidentId)`                                                                                 |
+| `IncidentTimelineEvent`  | Ordered narrative                          | index `(incidentId, createdAt)`                                                                      |
+| `ActuationCommand`       | LED / buzzer / relay command log           | indexes `(zoneId, requestedAt)`, `(status)`                                                          |
+| `ManualOverride`         | Admin action record                        | FKs → Zone, User                                                                                     |
+| `AuditLog`               | Security-relevant actions                  | indexes `(userId, createdAt)`, `(entityType, entityId)`, `(action)`                                  |
+| `SystemEvent`            | Health / validation / offline events       | indexes `(createdAt)`, `(type, severity)`                                                            |
+| `IncidentReport`         | Natural-language field report (bonus 3)    | `status` PENDING / CONFIRMED / REJECTED                                                              |
+| `ReadingHourlyAggregate` | Retention rollup                           | `UNIQUE(zoneId, hour)`                                                                               |
 
 ## The two constraints Prisma's DSL cannot express
 
@@ -61,14 +61,14 @@ CREATE UNIQUE INDEX incident_one_active_per_zone
   WHERE "status" IN ('OPEN', 'ACKNOWLEDGED');
 ```
 
-This *is* the no-duplicate-incident guarantee. A score oscillating around the
+This _is_ the no-duplicate-incident guarantee. A score oscillating around the
 threshold, or two concurrent ingestion requests for the same zone, cannot create
 a second active incident because Postgres refuses the insert. The application
 catches the violation and treats it as "someone else already opened it" — it
 never re-implements the rule.
 
 `schema-constraints.test.ts` asserts the second insert fails, and that a new
-incident *is* allowed once the previous one is `RESOLVED`.
+incident _is_ allowed once the previous one is `RESOLVED`.
 
 ### Partial index for the active set
 
@@ -102,8 +102,8 @@ Two different things are easy to confuse here:
 
 ## Performance gate
 
-With 24 838 readings and 272 incidents seeded, the hot query — *all CRITICAL or
-active incidents from the last 24 hours across all zones* — must complete in
+With 24 838 readings and 272 incidents seeded, the hot query — _all CRITICAL or
+active incidents from the last 24 hours across all zones_ — must complete in
 under 50 ms using an index.
 
 ```text

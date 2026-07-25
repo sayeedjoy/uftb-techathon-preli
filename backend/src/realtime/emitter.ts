@@ -8,16 +8,13 @@ import { newEventId } from "../shared/id.js"
 import { getSocketServer } from "./socket-server.js"
 
 /** Payload type of a given server → client event, minus the envelope. */
-type PayloadOf<E extends keyof ServerToClientEvents> = Parameters<
-  ServerToClientEvents[E]
->[0] extends WithEnvelope<infer P>
-  ? P
-  : never
+type PayloadOf<E extends keyof ServerToClientEvents> =
+  Parameters<ServerToClientEvents[E]>[0] extends WithEnvelope<infer P>
+    ? P
+    : never
 
 export type EmitTarget =
-  | { room: "dashboard" }
-  | { room: "admin" }
-  | { room: "zone"; zoneId: string }
+  { room: "dashboard" } | { room: "admin" } | { room: "zone"; zoneId: string }
 
 function roomName(target: EmitTarget): string {
   switch (target.room) {

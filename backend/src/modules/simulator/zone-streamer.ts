@@ -11,7 +11,9 @@ export type StreamerZone = {
   name: string
 }
 
-export type StreamerPatch = Partial<Omit<StreamerState, "disconnectedSensors">> & {
+export type StreamerPatch = Partial<
+  Omit<StreamerState, "disconnectedSensors">
+> & {
   disconnectedSensors?: readonly string[]
 }
 
@@ -110,7 +112,9 @@ export class ZoneStreamer {
   }
 
   /** Builds the raw payload for the zone's *configured* sensors only. */
-  buildPayload(overrides: { sequenceNumber?: number; capturedAt?: string } = {}) {
+  buildPayload(
+    overrides: { sequenceNumber?: number; capturedAt?: string } = {}
+  ) {
     const sequenceNumber = overrides.sequenceNumber ?? ++this.sequenceNumber
     const sensors: Record<string, boolean | number | null> = {}
 
@@ -119,7 +123,10 @@ export class ZoneStreamer {
         ? false
         : this.state.fireDetected
     }
-    if (this.configuredSensors.has("GAS") && !this.state.disconnectedSensors.has("GAS")) {
+    if (
+      this.configuredSensors.has("GAS") &&
+      !this.state.disconnectedSensors.has("GAS")
+    ) {
       sensors.gasLevel = this.state.gasLevel
     }
     if (
@@ -130,7 +137,9 @@ export class ZoneStreamer {
     }
     if (this.configuredSensors.has("OCCUPANCY")) {
       // A disconnected occupancy sensor sends null — never `false`.
-      sensors.occupancyDetected = this.state.disconnectedSensors.has("OCCUPANCY")
+      sensors.occupancyDetected = this.state.disconnectedSensors.has(
+        "OCCUPANCY"
+      )
         ? null
         : this.state.occupancyDetected
     }
@@ -191,7 +200,10 @@ export class ZoneStreamer {
     } catch (error) {
       this.rejectedCount += 1
       this.lastStatusCode = 0
-      logger.warn({ err: error, zone: this.zone.code }, "Simulator request failed")
+      logger.warn(
+        { err: error, zone: this.zone.code },
+        "Simulator request failed"
+      )
 
       const body = { error: error instanceof Error ? error.message : "unknown" }
       emitToAdmins("simulator:response", {

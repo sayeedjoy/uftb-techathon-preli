@@ -86,20 +86,61 @@ const envSchema = z
     TREND_WINDOW_READINGS: positiveInt.default(20),
     TREND_HORIZON_S: positiveInt.default(60),
     PREDICTION_ENABLED: booleanish.default(true),
-    AI_PROVIDER: z.enum(["none", "anthropic"]).default("none"),
-    ANTHROPIC_API_KEY: z.string().optional(),
+
+    // --- Natural-language extraction (bonus 3) -----------------------------
+    // `none` keeps the deterministic, offline extractor as the only path.
+    // Naming a provider makes it the *primary*; every other configured
+    // provider becomes a fallback, and the deterministic extractor is the
+    // final fallback in all cases. No key is ever required to run the system.
+    AI_PROVIDER: z.enum(["none", "openrouter", "groq"]).default("none"),
+    AI_REQUEST_TIMEOUT_MS: positiveInt.default(8_000),
+    AI_MAX_OUTPUT_TOKENS: positiveInt.default(400),
+    /** 0 keeps extraction as close to reproducible as a provider allows. */
+    AI_TEMPERATURE: z.coerce.number().min(0).max(2).default(0),
+
+    OPENROUTER_API_KEY: z.string().min(1).optional(),
+    OPENROUTER_MODEL: z
+      .string()
+      .min(1)
+      .default("meta-llama/llama-3.3-70b-instruct"),
+    OPENROUTER_BASE_URL: z
+      .string()
+      .url()
+      .default("https://openrouter.ai/api/v1"),
+    /** Optional attribution headers OpenRouter shows on its dashboard. */
+    OPENROUTER_SITE_URL: z.string().url().optional(),
+    OPENROUTER_APP_NAME: z.string().min(1).default("SCS-RG"),
+
+    GROQ_API_KEY: z.string().min(1).optional(),
+    GROQ_MODEL: z.string().min(1).default("llama-3.3-70b-versatile"),
+    GROQ_BASE_URL: z.string().url().default("https://api.groq.com/openai/v1"),
   })
   .refine(
     (value) => value.RISK_THRESHOLD_WARNING < value.RISK_THRESHOLD_CRITICAL,
     {
-      message:
-        "RISK_THRESHOLD_WARNING must be below RISK_THRESHOLD_CRITICAL",
+      message: "RISK_THRESHOLD_WARNING must be below RISK_THRESHOLD_CRITICAL",
       path: ["RISK_THRESHOLD_WARNING"],
     }
   )
+  .refine((value) => value.FIRE_DEBOUNCE_CONSECUTIVE >= 1, {
+    message: "FIRE_DEBOUNCE_CONSECUTIVE must be at least 1",
+  })
+  // Selecting a provider without its key is a configuration mistake, not a
+  // silent downgrade: fail at boot rather than during a demo report.
   .refine(
-    (value) => value.FIRE_DEBOUNCE_CONSECUTIVE >= 1,
-    { message: "FIRE_DEBOUNCE_CONSECUTIVE must be at least 1" }
+    (value) =>
+      value.AI_PROVIDER !== "openrouter" || Boolean(value.OPENROUTER_API_KEY),
+    {
+      message: "AI_PROVIDER=openrouter requires OPENROUTER_API_KEY",
+      path: ["OPENROUTER_API_KEY"],
+    }
+  )
+  .refine(
+    (value) => value.AI_PROVIDER !== "groq" || Boolean(value.GROQ_API_KEY),
+    {
+      message: "AI_PROVIDER=groq requires GROQ_API_KEY",
+      path: ["GROQ_API_KEY"],
+    }
   )
 
 export type Env = z.infer<typeof envSchema>

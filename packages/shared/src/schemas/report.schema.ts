@@ -27,6 +27,14 @@ export const extractionResultSchema = z.object({
   estimatedSeverity: z.number().int().min(1).max(5),
   confidence: z.number().min(0).max(1),
   confirmationMessage: z.string().trim().min(1).max(400),
+  /**
+   * The place the reporter named when it is *not* a monitored zone, so the
+   * reply can say "'Canteen' is not a monitored zone" instead of a shrug.
+   *
+   * Display text only. It is sanitised to letters, digits, spaces and hyphens,
+   * is never resolved to a zone, and is null whenever `zoneCode` is set.
+   */
+  unmatchedZoneLabel: z.string().trim().max(40).nullable().default(null),
 })
 export type ExtractionResult = z.infer<typeof extractionResultSchema>
 

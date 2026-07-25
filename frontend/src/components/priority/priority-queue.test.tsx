@@ -38,7 +38,11 @@ const LOWER = priorityEntryFixture({
 describe("flow 2 · priority ordering matches the API rank", () => {
   it("renders rows in the API's order and never re-sorts them", () => {
     render(
-      <PriorityQueuePanel queue={[HIGHER, LOWER]} isLoading={false} error={null} />
+      <PriorityQueuePanel
+        queue={[HIGHER, LOWER]}
+        isLoading={false}
+        error={null}
+      />
     )
 
     const rows = screen.getAllByTestId(/^rank-row-/)
@@ -65,7 +69,11 @@ describe("flow 2 · priority ordering matches the API rank", () => {
 describe("flow 3 · the ranking explanation is visible", () => {
   it("shows why rank 1 outranks rank 2 without opening a detail view", () => {
     render(
-      <PriorityQueuePanel queue={[HIGHER, LOWER]} isLoading={false} error={null} />
+      <PriorityQueuePanel
+        queue={[HIGHER, LOWER]}
+        isLoading={false}
+        error={null}
+      />
     )
 
     const first = screen.getByTestId("rank-row-1")
@@ -81,7 +89,9 @@ describe("flow 3 · the ranking explanation is visible", () => {
   })
 
   it("shows the risk, priority, occupancy, duration and hazard for each row", () => {
-    render(<PriorityQueuePanel queue={[HIGHER]} isLoading={false} error={null} />)
+    render(
+      <PriorityQueuePanel queue={[HIGHER]} isLoading={false} error={null} />
+    )
 
     const row = screen.getByTestId("rank-row-1")
     expect(within(row).getAllByText(/risk 92/).length).toBeGreaterThan(0)
@@ -140,12 +150,16 @@ describe("flow 4 · acknowledgment interaction", () => {
     expect(
       screen.queryByRole("button", { name: "Acknowledge" })
     ).not.toBeInTheDocument()
-    expect(screen.getByText(/acknowledged by Noel Ferreira/)).toBeInTheDocument()
+    expect(
+      screen.getByText(/acknowledged by Noel Ferreira/)
+    ).toBeInTheDocument()
   })
 
   it("states plainly when nothing is critical", () => {
     render(<PriorityQueuePanel queue={[]} isLoading={false} error={null} />)
 
-    expect(screen.getByText("No active critical incidents.")).toBeInTheDocument()
+    expect(
+      screen.getByText("No active critical incidents.")
+    ).toBeInTheDocument()
   })
 })

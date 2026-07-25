@@ -80,7 +80,10 @@ export async function createZoneController(
         })),
       },
       credentials: {
-        create: { apiKeyHash: await hashApiKey(apiKey), label: "created-by-admin" },
+        create: {
+          apiKeyHash: await hashApiKey(apiKey),
+          label: "created-by-admin",
+        },
       },
     },
   })
@@ -136,7 +139,11 @@ export async function updateSensorController(
   res: Response
 ): Promise<void> {
   const user = requireUser(req)
-  const sensorId = requiredPathParam(req, "sensorId", "No sensor was specified.")
+  const sensorId = requiredPathParam(
+    req,
+    "sensorId",
+    "No sensor was specified."
+  )
 
   const input = updateSensorSchema.parse(req.body)
   const sensor = await prisma.sensor.findUnique({ where: { id: sensorId } })

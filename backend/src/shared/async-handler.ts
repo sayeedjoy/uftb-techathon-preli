@@ -5,11 +5,7 @@ import type { NextFunction, Request, RequestHandler, Response } from "express"
  * intent explicit and satisfies `no-floating-promises` at every call site.
  */
 export function asyncHandler(
-  handler: (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => Promise<unknown>
+  handler: (req: Request, res: Response, next: NextFunction) => Promise<unknown>
 ): RequestHandler {
   return (req, res, next) => {
     handler(req, res, next).catch(next)

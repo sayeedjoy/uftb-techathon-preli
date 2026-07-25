@@ -15,7 +15,10 @@ import { Slider } from "@/components/ui/slider"
 import { ApiError, apiGet, apiPatch, apiPost } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
 import { useSocketEvent } from "@/hooks/use-socket"
-import { PayloadInspector, type InspectorEntry } from "@/components/simulator/payload-inspector"
+import {
+  PayloadInspector,
+  type InspectorEntry,
+} from "@/components/simulator/payload-inspector"
 
 /** The slider reports either a scalar or a range depending on its mode. */
 function firstSliderValue(value: number | readonly number[]): number {
@@ -81,7 +84,8 @@ function ZoneSimulatorCard({
           {zone.running ? `streaming every ${zone.intervalMs}ms` : "stopped"} ·
           sent {zone.sentCount} · accepted {zone.acceptedCount} · rejected{" "}
           {zone.rejectedCount}
-          {zone.lastStatusCode !== null && ` · last HTTP ${zone.lastStatusCode}`}
+          {zone.lastStatusCode !== null &&
+            ` · last HTTP ${zone.lastStatusCode}`}
         </span>
       </div>
 
@@ -265,7 +269,13 @@ export function SimulatorPage() {
     onSuccess: invalidate,
   })
   const fault = useMutation({
-    mutationFn: ({ zoneId, faultName }: { zoneId: string; faultName: string }) =>
+    mutationFn: ({
+      zoneId,
+      faultName,
+    }: {
+      zoneId: string
+      faultName: string
+    }) =>
       apiPost<{ statusCode: number; description: string }>(
         `/simulator/zones/${zoneId}/fault`,
         { fault: faultName }
@@ -305,7 +315,10 @@ export function SimulatorPage() {
   })
 
   const busy =
-    start.isPending || stop.isPending || fault.isPending || runScenario.isPending
+    start.isPending ||
+    stop.isPending ||
+    fault.isPending ||
+    runScenario.isPending
 
   return (
     <div className="flex flex-col gap-4">
@@ -335,21 +348,20 @@ export function SimulatorPage() {
           ))}
         </div>
 
-        {status.data?.activeScenario && !status.data.activeScenario.finished && (
-          <p className="text-xs text-warning">
-            Running “{status.data.activeScenario.name}” —{" "}
-            {status.data.activeScenario.progress}% complete.
-          </p>
-        )}
+        {status.data?.activeScenario &&
+          !status.data.activeScenario.finished && (
+            <p className="text-xs text-warning">
+              Running “{status.data.activeScenario.name}” —{" "}
+              {status.data.activeScenario.progress}% complete.
+            </p>
+          )}
 
         {scenarioResult && (
           <div className="rounded border border-border/60 p-3 text-xs">
             <p className="font-medium">
               {scenarioResult.name} ·{" "}
               <span
-                className={
-                  scenarioResult.passed ? "text-safe" : "text-warning"
-                }
+                className={scenarioResult.passed ? "text-safe" : "text-warning"}
               >
                 {scenarioResult.passed ? "passed" : "needs review"}
               </span>
@@ -358,9 +370,7 @@ export function SimulatorPage() {
               {scenarioResult.assertions.map((assertion) => (
                 <li key={assertion.description}>
                   <span
-                    className={
-                      assertion.passed ? "text-safe" : "text-critical"
-                    }
+                    className={assertion.passed ? "text-safe" : "text-critical"}
                   >
                     {assertion.passed ? "✓" : "✗"}
                   </span>{" "}

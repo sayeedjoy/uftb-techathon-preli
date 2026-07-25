@@ -71,7 +71,8 @@ export function readingPayload(
   } = {}
 ) {
   return {
-    readingId: overrides.readingId ?? `reading-${Math.random().toString(36).slice(2)}`,
+    readingId:
+      overrides.readingId ?? `reading-${Math.random().toString(36).slice(2)}`,
     sequenceNumber: overrides.sequenceNumber ?? 1,
     capturedAt: overrides.capturedAt ?? new Date().toISOString(),
     sensors: overrides.sensors ?? {

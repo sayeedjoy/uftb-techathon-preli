@@ -9,7 +9,9 @@ export function requestContext(
 ): void {
   const incoming = req.headers["x-request-id"]
   const requestId =
-    typeof incoming === "string" && incoming.length > 0 ? incoming : randomUUID()
+    typeof incoming === "string" && incoming.length > 0
+      ? incoming
+      : randomUUID()
 
   res.setHeader("x-request-id", requestId)
   req.requestId = requestId

@@ -2,7 +2,10 @@ import type { Request, Response } from "express"
 
 import { NotFoundError } from "../../shared/errors.js"
 import { ok } from "../../shared/response.js"
-import { getSystemHealth, getZoneSystemHealth } from "./system-health.service.js"
+import {
+  getSystemHealth,
+  getZoneSystemHealth,
+} from "./system-health.service.js"
 import { requiredPathParam } from "../../shared/params.js"
 
 export async function systemHealthController(

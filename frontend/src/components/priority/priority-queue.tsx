@@ -149,7 +149,10 @@ export function RankRow({
 
           <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
             <span
-              className={cn("inline-flex items-center gap-1", occupancy.className)}
+              className={cn(
+                "inline-flex items-center gap-1",
+                occupancy.className
+              )}
             >
               <occupancy.Icon aria-hidden className="size-3" />
               {occupancy.label}

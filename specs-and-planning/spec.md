@@ -44,12 +44,12 @@ and resolve incidents.
 
 ### Who the users are
 
-| User | Role | Primary need |
-|---|---|---|
-| Campus security officer | `SECURITY_STAFF` | See the most urgent hazard within ~2 seconds and acknowledge it. |
-| Safety systems admin | `ADMIN` | Configure zones/sensors, issue manual overrides, inspect system health and audit trail. |
-| Sensor node (zone) | machine | Push raw readings and heartbeats; pull actuation commands. |
-| Demo operator | `ADMIN` | Drive scripted hazard scenarios without physical hardware. |
+| User                    | Role             | Primary need                                                                            |
+| ----------------------- | ---------------- | --------------------------------------------------------------------------------------- |
+| Campus security officer | `SECURITY_STAFF` | See the most urgent hazard within ~2 seconds and acknowledge it.                        |
+| Safety systems admin    | `ADMIN`          | Configure zones/sensors, issue manual overrides, inspect system health and audit trail. |
+| Sensor node (zone)      | machine          | Push raw readings and heartbeats; pull actuation commands.                              |
+| Demo operator           | `ADMIN`          | Drive scripted hazard scenarios without physical hardware.                              |
 
 ### What success looks like
 
@@ -72,13 +72,13 @@ Killing and restarting the backend mid-incident loses nothing.
 
 ### Verified environment
 
-| Tool | Version present |
-|---|---|
-| Node | v24.16.0 |
-| pnpm | 11.5.2 |
-| Docker / Compose | 29.6.1 / v5.2.0 |
-| psql (host) | 18.4 — **host port 5432 may be occupied, so Docker Postgres binds 5433** |
-| git | repo initialised, one commit (`e93752b First`) |
+| Tool             | Version present                                                          |
+| ---------------- | ------------------------------------------------------------------------ |
+| Node             | v24.16.0                                                                 |
+| pnpm             | 11.5.2                                                                   |
+| Docker / Compose | 29.6.1 / v5.2.0                                                          |
+| psql (host)      | 18.4 — **host port 5432 may be occupied, so Docker Postgres binds 5433** |
+| git              | repo initialised, one commit (`e93752b First`)                           |
 
 ### Existing frontend — inspected, will be extended, never reinitialised
 
@@ -93,23 +93,23 @@ Killing and restarting the backend mid-incident loses nothing.
 
 ### Decisions taken (confirmed with the human)
 
-| # | Decision | Rationale |
-|---|---|---|
-| D1 | **pnpm workspace with a shared package** — `packages/shared` (`@scsrg/shared`) holds Zod schemas, domain enums, the API envelope type, and the Socket.IO event map. | One source of truth for everything that crosses the wire; frontend and backend cannot drift. |
-| D2 | **Simulator engine runs in the backend**, driven by admin-authenticated control endpoints from the frontend Simulator page. Zone API keys never reach the browser; the engine POSTs over real HTTP to `/api/v1/ingestion/...`. | Keeps secrets server-side while genuinely exercising the ingestion path. Raw payload + backend response are streamed back over Socket.IO for demo transparency. |
-| D3 | **All three bonus features are in scope** (risk trend, ML predicted risk, natural-language incident report), sequenced strictly after core acceptance criteria pass. | Human requested full scope. Phase gating protects the core demo. |
+| #   | Decision                                                                                                                                                                                                                       | Rationale                                                                                                                                                       |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | **pnpm workspace with a shared package** — `packages/shared` (`@scsrg/shared`) holds Zod schemas, domain enums, the API envelope type, and the Socket.IO event map.                                                            | One source of truth for everything that crosses the wire; frontend and backend cannot drift.                                                                    |
+| D2  | **Simulator engine runs in the backend**, driven by admin-authenticated control endpoints from the frontend Simulator page. Zone API keys never reach the browser; the engine POSTs over real HTTP to `/api/v1/ingestion/...`. | Keeps secrets server-side while genuinely exercising the ingestion path. Raw payload + backend response are streamed back over Socket.IO for demo transparency. |
+| D3  | **All three bonus features are in scope** (risk trend, ML predicted risk, natural-language incident report), sequenced strictly after core acceptance criteria pass.                                                           | Human requested full scope. Phase gating protects the core demo.                                                                                                |
 
 ### Additional decisions taken by default (flag now if wrong)
 
-| # | Decision | Rationale |
-|---|---|---|
-| D4 | **Vitest** for backend *and* frontend; Supertest for HTTP integration. | ESM-native, one mental model, shared config idioms. Prompt allowed either. |
-| D5 | **Zod v4** in the shared package, used for runtime validation *and* OpenAPI generation via `zod-openapi`. | Avoids maintaining schemas twice. Fallback: hand-authored OpenAPI YAML (see Risk R3 in the plan). |
-| D6 | **JWT access token (60 min) returned by `POST /auth/login`, stored in `localStorage`**, sent as `Authorization: Bearer`. Socket.IO authenticates with the same token in the handshake. | The prompt's API surface defines only `login` + `me` — no refresh endpoint. Tradeoff (XSS exposure vs. an httpOnly refresh-cookie rotation) is documented in `docs/security.md`. |
-| D7 | **PostgreSQL 18 via Docker Compose on host port 5433**; `DATABASE_URL` remains swappable for hosted Postgres. | Host already runs psql 18 which likely owns 5432. |
-| D8 | **Backend on port 4000**, frontend dev server on 5173 with a `/api` + `/socket.io` proxy to 4000. | Same-origin in dev removes CORS friction; CORS is still configured and tested for the deployed case. |
-| D9 | **A single backend process** owns the heartbeat sweeper, the simulator engine and the HTTP/Socket server. | Prototype scale. `docs/resilience.md` documents what changes at multi-instance scale (advisory locks / a dedicated worker). |
-| D10 | **Money-free AI**: bonus 3 defaults to a deterministic rule-based extractor (`AI_PROVIDER=none`). An LLM provider is opt-in and never required. | Prompt mandates a deterministic fallback. |
+| #   | Decision                                                                                                                                                                               | Rationale                                                                                                                                                                        |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D4  | **Vitest** for backend _and_ frontend; Supertest for HTTP integration.                                                                                                                 | ESM-native, one mental model, shared config idioms. Prompt allowed either.                                                                                                       |
+| D5  | **Zod v4** in the shared package, used for runtime validation _and_ OpenAPI generation via `zod-openapi`.                                                                              | Avoids maintaining schemas twice. Fallback: hand-authored OpenAPI YAML (see Risk R3 in the plan).                                                                                |
+| D6  | **JWT access token (60 min) returned by `POST /auth/login`, stored in `localStorage`**, sent as `Authorization: Bearer`. Socket.IO authenticates with the same token in the handshake. | The prompt's API surface defines only `login` + `me` — no refresh endpoint. Tradeoff (XSS exposure vs. an httpOnly refresh-cookie rotation) is documented in `docs/security.md`. |
+| D7  | **PostgreSQL 18 via Docker Compose on host port 5433**; `DATABASE_URL` remains swappable for hosted Postgres.                                                                          | Host already runs psql 18 which likely owns 5432.                                                                                                                                |
+| D8  | **Backend on port 4000**, frontend dev server on 5173 with a `/api` + `/socket.io` proxy to 4000.                                                                                      | Same-origin in dev removes CORS friction; CORS is still configured and tested for the deployed case.                                                                             |
+| D9  | **A single backend process** owns the heartbeat sweeper, the simulator engine and the HTTP/Socket server.                                                                              | Prototype scale. `docs/resilience.md` documents what changes at multi-instance scale (advisory locks / a dedicated worker).                                                      |
+| D10 | **Money-free AI**: bonus 3 defaults to a deterministic rule-based extractor (`AI_PROVIDER=none`). An LLM provider is opt-in and never required.                                        | Prompt mandates a deterministic fallback.                                                                                                                                        |
 
 ---
 
@@ -121,21 +121,21 @@ TypeScript 5.9+/6, Zod 4. Zero runtime dependencies beyond Zod. Built with `tsc`
 
 ### Backend — `backend/`
 
-| Concern | Choice |
-|---|---|
-| Runtime | Node 24 (ESM, `"type": "module"`) |
-| HTTP | Express 5 |
-| Language | TypeScript (strict) |
-| Realtime | Socket.IO 4 |
-| Database | PostgreSQL 18 |
-| ORM | Prisma 6 |
-| Validation | Zod 4 (via `@scsrg/shared`) |
-| Auth | `jsonwebtoken`, `bcrypt` |
-| Logging | `pino` + `pino-http` (+ `pino-pretty` in dev), with redaction |
-| Docs | `zod-openapi` + `swagger-ui-express` at `/api/v1/docs` |
-| Security | `helmet`, `cors`, `express-rate-limit`, body-size limits |
-| Testing | Vitest + Supertest |
-| Dev runner | `tsx watch` |
+| Concern    | Choice                                                        |
+| ---------- | ------------------------------------------------------------- |
+| Runtime    | Node 24 (ESM, `"type": "module"`)                             |
+| HTTP       | Express 5                                                     |
+| Language   | TypeScript (strict)                                           |
+| Realtime   | Socket.IO 4                                                   |
+| Database   | PostgreSQL 18                                                 |
+| ORM        | Prisma 6                                                      |
+| Validation | Zod 4 (via `@scsrg/shared`)                                   |
+| Auth       | `jsonwebtoken`, `bcrypt`                                      |
+| Logging    | `pino` + `pino-http` (+ `pino-pretty` in dev), with redaction |
+| Docs       | `zod-openapi` + `swagger-ui-express` at `/api/v1/docs`        |
+| Security   | `helmet`, `cors`, `express-rate-limit`, body-size limits      |
+| Testing    | Vitest + Supertest                                            |
+| Dev runner | `tsx watch`                                                   |
 
 ### Frontend — `frontend/` (extended, not replaced)
 
@@ -368,7 +368,10 @@ export type RiskResult = {
  * Pure: no clock, no I/O, no Prisma. Weights and thresholds arrive via config
  * so they can be tuned per deployment without touching this function.
  */
-export function computeRisk(inputs: RiskInputs, config: RiskConfig): RiskResult {
+export function computeRisk(
+  inputs: RiskInputs,
+  config: RiskConfig
+): RiskResult {
   const contributions = {
     fire: config.weights.fire * inputs.fireSignal,
     gas: config.weights.gas * clamp01(inputs.normalizedGasLevel),
@@ -414,13 +417,38 @@ import { cn } from "@/lib/utils"
 import type { ZoneState } from "@scsrg/shared"
 
 const STATE_PRESENTATION = {
-  SAFE: { label: "Safe", Icon: CheckCircle2, className: "border-emerald-600/40 bg-emerald-950/40 text-emerald-300" },
-  WARNING: { label: "Warning", Icon: AlertTriangle, className: "border-amber-500/50 bg-amber-950/40 text-amber-300" },
-  CRITICAL: { label: "Critical", Icon: Siren, className: "border-red-500/60 bg-red-950/50 text-red-300" },
-  OFFLINE: { label: "Offline", Icon: HelpCircle, className: "border-zinc-600/50 bg-zinc-900/60 text-zinc-400" },
-} as const satisfies Record<ZoneState, { label: string; Icon: typeof Siren; className: string }>
+  SAFE: {
+    label: "Safe",
+    Icon: CheckCircle2,
+    className: "border-emerald-600/40 bg-emerald-950/40 text-emerald-300",
+  },
+  WARNING: {
+    label: "Warning",
+    Icon: AlertTriangle,
+    className: "border-amber-500/50 bg-amber-950/40 text-amber-300",
+  },
+  CRITICAL: {
+    label: "Critical",
+    Icon: Siren,
+    className: "border-red-500/60 bg-red-950/50 text-red-300",
+  },
+  OFFLINE: {
+    label: "Offline",
+    Icon: HelpCircle,
+    className: "border-zinc-600/50 bg-zinc-900/60 text-zinc-400",
+  },
+} as const satisfies Record<
+  ZoneState,
+  { label: string; Icon: typeof Siren; className: string }
+>
 
-export function StateBadge({ state, className }: { state: ZoneState; className?: string }) {
+export function StateBadge({
+  state,
+  className,
+}: {
+  state: ZoneState
+  className?: string
+}) {
   const { label, Icon, className: stateClassName } = STATE_PRESENTATION[state]
 
   return (
@@ -454,14 +482,14 @@ export function StateBadge({ state, className }: { state: ZoneState; className?:
 
 ### Framework & layout
 
-| Layer | Tool | Location |
-|---|---|---|
-| Backend unit | Vitest (node env) | colocated `src/modules/**/*.test.ts` |
-| Backend integration | Vitest + Supertest | `src/tests/integration/*.test.ts` |
-| Backend concurrency | Vitest + Supertest + `Promise.all` | `src/tests/integration/acknowledgment-race.test.ts` |
-| Frontend unit/component | Vitest + jsdom + React Testing Library | colocated `*.test.tsx` |
-| Frontend network mocks | MSW | `src/test/msw/` |
-| Frontend socket mocks | in-repo fake `Socket` emitter | `src/test/socket-double.ts` |
+| Layer                   | Tool                                   | Location                                            |
+| ----------------------- | -------------------------------------- | --------------------------------------------------- |
+| Backend unit            | Vitest (node env)                      | colocated `src/modules/**/*.test.ts`                |
+| Backend integration     | Vitest + Supertest                     | `src/tests/integration/*.test.ts`                   |
+| Backend concurrency     | Vitest + Supertest + `Promise.all`     | `src/tests/integration/acknowledgment-race.test.ts` |
+| Frontend unit/component | Vitest + jsdom + React Testing Library | colocated `*.test.tsx`                              |
+| Frontend network mocks  | MSW                                    | `src/test/msw/`                                     |
+| Frontend socket mocks   | in-repo fake `Socket` emitter          | `src/test/socket-double.ts`                         |
 
 Integration tests run against a **dedicated database** (`scsrg_test` on the same container). `src/tests/setup.ts` applies migrations once, then truncates all tables between suites inside a transaction-per-test where possible. Tests never share mutable state and must pass when run in any order.
 
@@ -495,7 +523,7 @@ Zone status rendering for all four states · priority queue ordering matches API
 
 - Validate every external input with a Zod schema from `@scsrg/shared` at the trust boundary.
 - Compute risk, state, priority and incident status **on the backend only**.
-- Enforce RBAC in backend middleware *and* mirror it in the UI (backend is authoritative).
+- Enforce RBAC in backend middleware _and_ mirror it in the UI (backend is authoritative).
 - Write an `AuditLog` row for every state-changing admin action and every acknowledgment.
 - Run `pnpm typecheck && pnpm lint && pnpm test` before declaring a task complete.
 - Keep the application runnable at the end of every task.
@@ -534,11 +562,11 @@ Zone status rendering for all four states · priority queue ordering matches API
 
 Seeded zones (the system must accept new zones with **no code change** — all behaviour derives from zone + sensor configuration rows):
 
-| Code | Name | Sensors | Asset importance (0–8) | Hazard profile |
-|---|---|---|---|---|
-| `iot-lab` | IoT Lab | flame, gas, occupancy | 5 | Soldering/wiring fire, fumes, high occupancy |
-| `server-room` | Server Room | flame, water, occupancy | 8 | Electrical fire, condensate leak, low occupancy, high asset value |
-| `robotics-lab` | Robotics Lab | flame, gas, occupancy | 6 | Battery off-gassing, fabrication fire, moderate occupancy |
+| Code           | Name         | Sensors                 | Asset importance (0–8) | Hazard profile                                                    |
+| -------------- | ------------ | ----------------------- | ---------------------- | ----------------------------------------------------------------- |
+| `iot-lab`      | IoT Lab      | flame, gas, occupancy   | 5                      | Soldering/wiring fire, fumes, high occupancy                      |
+| `server-room`  | Server Room  | flame, water, occupancy | 8                      | Electrical fire, condensate leak, low occupancy, high asset value |
+| `robotics-lab` | Robotics Lab | flame, gas, occupancy   | 6                      | Battery off-gassing, fabrication fire, moderate occupancy         |
 
 A sensor type absent from a zone's configuration contributes **0** to that zone's risk, and a reading that supplies it is rejected as `SENSOR_NOT_CONFIGURED` (422).
 
@@ -571,12 +599,12 @@ Steps 9–14 execute inside **one database transaction** so a crash cannot leave
 type ZoneState = "SAFE" | "WARNING" | "CRITICAL" | "OFFLINE"
 ```
 
-| State | Entry condition | LED | Buzzer | Relay cutoff | Incident |
-|---|---|---|---|---|---|
-| `SAFE` | riskScore 0–29.99, all critical sensors reporting | GREEN | OFF | OFF | none |
-| `WARNING` | riskScore 30–64.99 | YELLOW | OFF | OFF | none |
-| `CRITICAL` | riskScore ≥ 65 | RED | ON | ON | open one |
-| `OFFLINE` | no accepted reading or heartbeat within `ZONE_OFFLINE_TIMEOUT_MS`, **or** any sensor marked `isCritical` (flame) reports unavailable | AMBER-PULSE (distinct from WARNING; icon + label carry the meaning) | unchanged | unchanged | existing incidents stay open |
+| State      | Entry condition                                                                                                                      | LED                                                                 | Buzzer    | Relay cutoff | Incident                     |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- | --------- | ------------ | ---------------------------- |
+| `SAFE`     | riskScore 0–29.99, all critical sensors reporting                                                                                    | GREEN                                                               | OFF       | OFF          | none                         |
+| `WARNING`  | riskScore 30–64.99                                                                                                                   | YELLOW                                                              | OFF       | OFF          | none                         |
+| `CRITICAL` | riskScore ≥ 65                                                                                                                       | RED                                                                 | ON        | ON           | open one                     |
+| `OFFLINE`  | no accepted reading or heartbeat within `ZONE_OFFLINE_TIMEOUT_MS`, **or** any sensor marked `isCritical` (flame) reports unavailable | AMBER-PULSE (distinct from WARNING; icon + label carry the meaning) | unchanged | unchanged    | existing incidents stay open |
 
 `OFFLINE` is never treated as `SAFE`, never silently closes an incident, always records a `ZoneStateTransition` and a `SystemEvent` (`ZONE_OFFLINE`, severity `WARN`), and always surfaces `lastSeenAt` in the UI.
 
@@ -605,7 +633,7 @@ Stored per reading: `riskScore`, `calculatedState`, and a `contributions` JSON:
 }
 ```
 
-Reason strings are generated by a pure `explain()` function with one rule per contributing signal, so the UI never has to reconstruct *why*.
+Reason strings are generated by a pure `explain()` function with one rule per contributing signal, so the UI never has to reconstruct _why_.
 
 **Weight justification** (documented in `docs/risk-fusion.md`): fire is the only signal that alone crosses into WARNING territory and, combined with any second hazard, reaches CRITICAL — matching a confirmed-flame response policy. Gas at 100 % plus occupancy (40) stays WARNING because a saturated gas reading without flame is an evacuate-and-ventilate event, not a cutoff event; gas 100 % + fire = 65 = CRITICAL exactly at the boundary. Occupancy alone (15) never leaves SAFE — people are a severity multiplier, not a hazard.
 
@@ -621,7 +649,7 @@ Reason strings are generated by a pure `explain()` function with one rule per co
 
 ### 9.6 Priority ranking engine
 
-Separate from risk. Answers *"which critical zone first?"*, computed over **active (OPEN or ACKNOWLEDGED) incidents** only.
+Separate from risk. Answers _"which critical zone first?"_, computed over **active (OPEN or ACKNOWLEDGED) incidents** only.
 
 ```text
 priorityScore = riskScore
@@ -643,7 +671,14 @@ Each ranked entry carries a human-readable explanation:
   "zoneName": "IoT Lab",
   "riskScore": 84,
   "priorityScore": 101,
-  "breakdown": { "risk": 84, "occupancy": 10, "duration": 2, "asset": 5, "multiHazard": 5, "acknowledged": 0 },
+  "breakdown": {
+    "risk": 84,
+    "occupancy": 10,
+    "duration": 2,
+    "asset": 5,
+    "multiHazard": 5,
+    "acknowledged": 0
+  },
   "reasons": [
     "Highest live risk score (84)",
     "Zone is occupied (+10)",
@@ -654,7 +689,7 @@ Each ranked entry carries a human-readable explanation:
 }
 ```
 
-The dashboard must render enough of this to make *why rank 1 beats rank 2* legible without opening a detail view.
+The dashboard must render enough of this to make _why rank 1 beats rank 2_ legible without opening a detail view.
 
 ### 9.7 Incident lifecycle
 
@@ -712,7 +747,12 @@ The backend never assumes zones are SAFE after restart. Verified by an integrati
 ### 9.12 Actuation model
 
 ```ts
-type ActuationType = "SET_LED" | "ACTIVATE_BUZZER" | "DEACTIVATE_BUZZER" | "ACTIVATE_RELAY" | "DEACTIVATE_RELAY"
+type ActuationType =
+  | "SET_LED"
+  | "ACTIVATE_BUZZER"
+  | "DEACTIVATE_BUZZER"
+  | "ACTIVATE_RELAY"
+  | "DEACTIVATE_RELAY"
 ```
 
 Desired actuator state is a **pure function of zone state** (table in §9.3). A resolver diffs desired versus last-known actuator state per zone and emits commands **only on change** — so a zone sitting in CRITICAL for a minute produces one buzzer command, not three hundred. Each `ActuationCommand` records `source` (`SENSOR_TRIGGERED` | `MANUAL_OVERRIDE` | `SYSTEM_RECOVERY`), `status` (`PENDING` → `DISPATCHED` → `COMPLETED` | `FAILED` | `EXPIRED`), `requestedAt`, `executedAt`, and its originating `incidentId` where applicable. Zones actuate independently — commands are keyed per zone and two simultaneous critical zones never share state. CRITICAL commands are created inside the ingestion transaction, so the request→command latency is milliseconds and provably < 1 s.
@@ -723,18 +763,18 @@ Desired actuator state is a **pure function of zone state** (table in §9.3). A 
 type UserRole = "SECURITY_STAFF" | "ADMIN"
 ```
 
-| Capability | SECURITY_STAFF | ADMIN |
-|---|---|---|
-| Log in, view profile | ✅ | ✅ |
-| View zones, priority queue, incidents, incident history | ✅ | ✅ |
-| Acknowledge incidents | ✅ | ✅ |
-| Submit natural-language report (bonus 3) | ✅ | ✅ |
-| Manual overrides | ❌ 403 | ✅ |
-| System health page/API | ❌ 403 | ✅ |
-| Create/edit zones & sensors | ❌ 403 | ✅ |
-| Raw historical readings | ❌ 403 | ✅ |
-| Manage users / roles | ❌ 403 | ✅ |
-| Audit logs | ❌ 403 | ✅ |
+| Capability                                              | SECURITY_STAFF | ADMIN |
+| ------------------------------------------------------- | -------------- | ----- |
+| Log in, view profile                                    | ✅             | ✅    |
+| View zones, priority queue, incidents, incident history | ✅             | ✅    |
+| Acknowledge incidents                                   | ✅             | ✅    |
+| Submit natural-language report (bonus 3)                | ✅             | ✅    |
+| Manual overrides                                        | ❌ 403         | ✅    |
+| System health page/API                                  | ❌ 403         | ✅    |
+| Create/edit zones & sensors                             | ❌ 403         | ✅    |
+| Raw historical readings                                 | ❌ 403         | ✅    |
+| Manage users / roles                                    | ❌ 403         | ✅    |
+| Audit logs                                              | ❌ 403         | ✅    |
 
 Enforced by `authorization.middleware.ts` on every admin route. A direct API call from a `SECURITY_STAFF` token must return `403` even though the frontend hides the button — asserted by integration tests for every admin endpoint. Sensor nodes authenticate separately with `X-Zone-API-Key` (bcrypt-hashed at rest, plaintext only at seed time) and can reach **only** `/ingestion/*`.
 
@@ -748,32 +788,32 @@ Actions: `FORCE_MAINTENANCE_MODE`, `CLEAR_MAINTENANCE_MODE`, `TEST_ACTUATION`, `
 
 Normalised PostgreSQL schema via Prisma. Full ERD in `docs/database-schema.md`.
 
-| Model | Purpose | Key constraints |
-|---|---|---|
-| `User` | Dashboard accounts | `UNIQUE(email)`; `passwordHash` bcrypt cost 12 |
-| `Zone` | Monitored area + live projection | `UNIQUE(code)`; `assetImportance` 0–8; soft-delete via `isActive` |
-| `ZoneCredential` | Per-zone API key | `apiKeyHash` bcrypt; `revokedAt` nullable; index `(zoneId, revokedAt)` |
-| `Sensor` | Per-zone sensor config | `UNIQUE(zoneId, type)`; `isCritical` flag; `configuration` JSON |
-| `SensorReading` | Immutable raw + computed record | `UNIQUE(readingId)`, `UNIQUE(zoneId, sequenceNumber)`, FK → Zone |
-| `ZoneStateTransition` | State change audit | FK → Zone; index `(zoneId, createdAt)` |
-| `Incident` | Hazard event | **partial `UNIQUE(zoneId) WHERE status IN ('OPEN','ACKNOWLEDGED')`** |
-| `Acknowledgment` | Who acknowledged | `UNIQUE(incidentId)`; FKs → Incident, User |
-| `IncidentTimelineEvent` | Ordered narrative | FK → Incident; index `(incidentId, createdAt)` |
-| `ActuationCommand` | LED/buzzer/relay command log | FKs → Zone, Incident?; index `(zoneId, requestedAt)`, `(status)` |
-| `ManualOverride` | Admin action record | FKs → Zone, User |
-| `AuditLog` | Security-relevant actions | index `(userId, createdAt)`, `(entityType, entityId)` |
-| `SystemEvent` | Health/validation/offline events | index `(createdAt)`, `(type, severity)` |
-| `IncidentReport` *(bonus 3)* | NL report + extraction result | FKs → User, Zone?; `status` PENDING/CONFIRMED/REJECTED |
+| Model                        | Purpose                          | Key constraints                                                        |
+| ---------------------------- | -------------------------------- | ---------------------------------------------------------------------- |
+| `User`                       | Dashboard accounts               | `UNIQUE(email)`; `passwordHash` bcrypt cost 12                         |
+| `Zone`                       | Monitored area + live projection | `UNIQUE(code)`; `assetImportance` 0–8; soft-delete via `isActive`      |
+| `ZoneCredential`             | Per-zone API key                 | `apiKeyHash` bcrypt; `revokedAt` nullable; index `(zoneId, revokedAt)` |
+| `Sensor`                     | Per-zone sensor config           | `UNIQUE(zoneId, type)`; `isCritical` flag; `configuration` JSON        |
+| `SensorReading`              | Immutable raw + computed record  | `UNIQUE(readingId)`, `UNIQUE(zoneId, sequenceNumber)`, FK → Zone       |
+| `ZoneStateTransition`        | State change audit               | FK → Zone; index `(zoneId, createdAt)`                                 |
+| `Incident`                   | Hazard event                     | **partial `UNIQUE(zoneId) WHERE status IN ('OPEN','ACKNOWLEDGED')`**   |
+| `Acknowledgment`             | Who acknowledged                 | `UNIQUE(incidentId)`; FKs → Incident, User                             |
+| `IncidentTimelineEvent`      | Ordered narrative                | FK → Incident; index `(incidentId, createdAt)`                         |
+| `ActuationCommand`           | LED/buzzer/relay command log     | FKs → Zone, Incident?; index `(zoneId, requestedAt)`, `(status)`       |
+| `ManualOverride`             | Admin action record              | FKs → Zone, User                                                       |
+| `AuditLog`                   | Security-relevant actions        | index `(userId, createdAt)`, `(entityType, entityId)`                  |
+| `SystemEvent`                | Health/validation/offline events | index `(createdAt)`, `(type, severity)`                                |
+| `IncidentReport` _(bonus 3)_ | NL report + extraction result    | FKs → User, Zone?; `status` PENDING/CONFIRMED/REJECTED                 |
 
 **Referential integrity.** Zones are never hard-deleted while incidents reference them — `onDelete: Restrict` on `Incident.zoneId` and `SensorReading.zoneId`, with deactivation (`isActive = false`) as the supported path. An integration test asserts the delete attempt fails.
 
-**`isDuplicate` semantics.** Exact duplicates (same `readingId`, or same `(zoneId, sequenceNumber)`) are rejected at the unique constraint with `409` and logged as a `SystemEvent` — they never create a second row, so a duplicate can never be counted twice. The `isDuplicate` column marks an *accepted* reading whose sensor payload was byte-identical to the immediately preceding accepted reading for that zone; it is a real signal ("nothing changed") used to suppress redundant timeline noise.
+**`isDuplicate` semantics.** Exact duplicates (same `readingId`, or same `(zoneId, sequenceNumber)`) are rejected at the unique constraint with `409` and logged as a `SystemEvent` — they never create a second row, so a duplicate can never be counted twice. The `isDuplicate` column marks an _accepted_ reading whose sensor payload was byte-identical to the immediately preceding accepted reading for that zone; it is a real signal ("nothing changed") used to suppress redundant timeline noise.
 
 ### Required indexes
 
 `Incident(status, createdAt)` · `Incident(zoneId, startedAt)` · `SensorReading(zoneId, capturedAt DESC)` · `SensorReading(readingId)` · `SensorReading(zoneId, sequenceNumber)` · `Zone(state)` · `Zone(lastSeenAt)` · `IncidentTimelineEvent(incidentId, createdAt)` · `ZoneStateTransition(zoneId, createdAt)` · `ActuationCommand(zoneId, requestedAt)` · `SystemEvent(createdAt)`.
 
-**Performance gate.** With ≥ 10 000 seeded readings and ≥ 200 incidents, the query *"all CRITICAL or active incidents from the last 24 hours across all zones"* must complete in **< 50 ms** and use `Incident(status, createdAt)` — verified by `pnpm db:explain`, which fails the build on a sequential scan.
+**Performance gate.** With ≥ 10 000 seeded readings and ≥ 200 incidents, the query _"all CRITICAL or active incidents from the last 24 hours across all zones"_ must complete in **< 50 ms** and use `Incident(status, createdAt)` — verified by `pnpm db:explain`, which fails the build on a sequential scan.
 
 ### Seed data
 
@@ -792,40 +832,47 @@ Base path `/api/v1`. Every response uses the envelope:
 ```
 
 ```json
-{ "success": false, "error": { "code": "VALIDATION_ERROR", "message": "The sensor payload is invalid.", "details": [] } }
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "The sensor payload is invalid.",
+    "details": []
+  }
+}
 ```
 
 **Status codes:** `200` ok · `201` created · `400` malformed input · `401` unauthenticated · `403` unauthorised · `404` not found · `409` conflict (duplicate reading, already acknowledged) · `422` valid shape but impossible values · `429` rate limited · `500` unexpected.
 
 **Error codes:** `VALIDATION_ERROR`, `UNAUTHENTICATED`, `INVALID_CREDENTIALS`, `FORBIDDEN`, `NOT_FOUND`, `DUPLICATE_READING`, `ALREADY_ACKNOWLEDGED`, `VALUE_OUT_OF_RANGE`, `SENSOR_NOT_CONFIGURED`, `INVALID_TIMESTAMP`, `ZONE_INACTIVE`, `INVALID_ZONE_KEY`, `RATE_LIMITED`, `INTERNAL_ERROR`.
 
-| Method & path | Auth | Notes |
-|---|---|---|
-| `POST /auth/login` | public | Rate-limited 5/min/IP. Returns token + user. |
-| `GET /auth/me` | JWT | Current user + role. |
-| `GET /zones` | JWT | **All** current zone statuses in one request. |
-| `GET /zones/:zoneId` | JWT | Detail incl. contributions, sensor health, actuator state, config. |
-| `GET /zones/:zoneId/readings` | JWT (raw history = ADMIN) | Paginated, date-filterable. |
-| `GET /zones/:zoneId/timeline` | JWT | State transitions + incidents merged. |
-| `GET /zones/:zoneId/system-health` | ADMIN | Sensor connectivity, last reading, failures. |
-| `POST /ingestion/zones/:zoneId/readings` | Zone API key | The pipeline in §9.2. |
-| `POST /ingestion/zones/:zoneId/heartbeat` | Zone API key | Updates `lastSeenAt` without a reading. |
-| `GET /ingestion/zones/:zoneId/commands` | Zone API key | Pending actuation commands. |
-| `POST /ingestion/zones/:zoneId/commands/:commandId/complete` | Zone API key | Marks `COMPLETED`/`FAILED`. |
-| `GET /incidents` | JWT | Filters: `from`, `to`, `zoneId`, `status`, `hazardType`, `acknowledgedBy`; paginated. |
-| `GET /incidents/:incidentId` | JWT | `404` on unknown id. |
-| `GET /incidents/:incidentId/timeline` | JWT | Ordered events. |
-| `POST /incidents/:incidentId/acknowledge` | JWT | `200` / `409` per §9.8. Optional `note`. |
-| `GET /priority-queue` | JWT | Rank, incident, zone, risk, priority, occupancy, critical duration, explanation. |
-| `GET /dashboard/summary` | JWT | Totals per state, active/unacknowledged counts, top incident, health summary. |
-| `POST /admin/zones` · `PATCH /admin/zones/:zoneId` · `PATCH /admin/sensors/:sensorId` | ADMIN | Config management. |
-| `POST /admin/zones/:zoneId/overrides` | ADMIN | §9.14. |
-| `GET /admin/system-health` | ADMIN | §13 System Health page data. |
-| `GET /admin/audit-logs` | ADMIN | Paginated, filterable. |
-| `GET /admin/users` · `PATCH /admin/users/:userId/role` | ADMIN | Role management. |
-| `POST /simulator/zones/:zoneId/start` · `/stop` · `PATCH /simulator/zones/:zoneId/state` · `POST /simulator/scenarios/:scenarioId/run` · `GET /simulator/status` | ADMIN | §14. |
-| `POST /reports/natural-language` · `POST /reports/:reportId/confirm` | JWT / confirm = ADMIN | Bonus 3, §15.3. |
-| `GET /health` · `GET /health/ready` | public | Liveness/readiness, no sensitive data. |
+| Method & path                                                                                                                                                    | Auth                      | Notes                                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------- |
+| `POST /auth/login`                                                                                                                                               | public                    | Rate-limited 5/min/IP. Returns token + user.                                          |
+| `GET /auth/me`                                                                                                                                                   | JWT                       | Current user + role.                                                                  |
+| `GET /zones`                                                                                                                                                     | JWT                       | **All** current zone statuses in one request.                                         |
+| `GET /zones/:zoneId`                                                                                                                                             | JWT                       | Detail incl. contributions, sensor health, actuator state, config.                    |
+| `GET /zones/:zoneId/readings`                                                                                                                                    | JWT (raw history = ADMIN) | Paginated, date-filterable.                                                           |
+| `GET /zones/:zoneId/timeline`                                                                                                                                    | JWT                       | State transitions + incidents merged.                                                 |
+| `GET /zones/:zoneId/system-health`                                                                                                                               | ADMIN                     | Sensor connectivity, last reading, failures.                                          |
+| `POST /ingestion/zones/:zoneId/readings`                                                                                                                         | Zone API key              | The pipeline in §9.2.                                                                 |
+| `POST /ingestion/zones/:zoneId/heartbeat`                                                                                                                        | Zone API key              | Updates `lastSeenAt` without a reading.                                               |
+| `GET /ingestion/zones/:zoneId/commands`                                                                                                                          | Zone API key              | Pending actuation commands.                                                           |
+| `POST /ingestion/zones/:zoneId/commands/:commandId/complete`                                                                                                     | Zone API key              | Marks `COMPLETED`/`FAILED`.                                                           |
+| `GET /incidents`                                                                                                                                                 | JWT                       | Filters: `from`, `to`, `zoneId`, `status`, `hazardType`, `acknowledgedBy`; paginated. |
+| `GET /incidents/:incidentId`                                                                                                                                     | JWT                       | `404` on unknown id.                                                                  |
+| `GET /incidents/:incidentId/timeline`                                                                                                                            | JWT                       | Ordered events.                                                                       |
+| `POST /incidents/:incidentId/acknowledge`                                                                                                                        | JWT                       | `200` / `409` per §9.8. Optional `note`.                                              |
+| `GET /priority-queue`                                                                                                                                            | JWT                       | Rank, incident, zone, risk, priority, occupancy, critical duration, explanation.      |
+| `GET /dashboard/summary`                                                                                                                                         | JWT                       | Totals per state, active/unacknowledged counts, top incident, health summary.         |
+| `POST /admin/zones` · `PATCH /admin/zones/:zoneId` · `PATCH /admin/sensors/:sensorId`                                                                            | ADMIN                     | Config management.                                                                    |
+| `POST /admin/zones/:zoneId/overrides`                                                                                                                            | ADMIN                     | §9.14.                                                                                |
+| `GET /admin/system-health`                                                                                                                                       | ADMIN                     | §13 System Health page data.                                                          |
+| `GET /admin/audit-logs`                                                                                                                                          | ADMIN                     | Paginated, filterable.                                                                |
+| `GET /admin/users` · `PATCH /admin/users/:userId/role`                                                                                                           | ADMIN                     | Role management.                                                                      |
+| `POST /simulator/zones/:zoneId/start` · `/stop` · `PATCH /simulator/zones/:zoneId/state` · `POST /simulator/scenarios/:scenarioId/run` · `GET /simulator/status` | ADMIN                     | §14.                                                                                  |
+| `POST /reports/natural-language` · `POST /reports/:reportId/confirm`                                                                                             | JWT / confirm = ADMIN     | Bonus 3, §15.3.                                                                       |
+| `GET /health` · `GET /health/ready`                                                                                                                              | public                    | Liveness/readiness, no sensitive data.                                                |
 
 Swagger UI at `/api/v1/docs`, generated from the shared Zod schemas, with example request/response bodies for every endpoint.
 
@@ -835,7 +882,7 @@ Swagger UI at `/api/v1/docs`, generated from the shared Zod schemas, with exampl
 
 Socket.IO, JWT-authenticated in the handshake (`auth.token`), rejected connections close with `UNAUTHENTICATED`. Rooms: `dashboard` (all authenticated clients) and `zone:<zoneId>` (detail views). Admin-only payloads are emitted to an `admin` room.
 
-Server → client events: `zone:updated` · `zone:state-changed` · `incident:created` · `incident:updated` · `incident:acknowledged` · `incident:resolved` · `priority:updated` · `sensor:offline` · `system:health` · `actuation:command` · `simulator:payload` · `simulator:response` · `report:created` *(bonus 3)* · `trend:updated` *(bonus 1)* · `prediction:updated` *(bonus 2)*.
+Server → client events: `zone:updated` · `zone:state-changed` · `incident:created` · `incident:updated` · `incident:acknowledged` · `incident:resolved` · `priority:updated` · `sensor:offline` · `system:health` · `actuation:command` · `simulator:payload` · `simulator:response` · `report:created` _(bonus 3)_ · `trend:updated` _(bonus 1)_ · `prediction:updated` _(bonus 2)_.
 
 Every payload carries `{ eventId: string, emittedAt: string, ...data }`.
 
@@ -852,7 +899,7 @@ Every payload carries `{ eventId: string, emittedAt: string, ...data }`.
 
 Desktop-first, responsive, light and dark supported with the **command-centre view optimised for dark**. Uses the existing shadcn/ui v4 (`base-maia`) setup and existing theme tokens. Status palette: emerald = SAFE, amber = WARNING, red = CRITICAL, zinc = OFFLINE — **always paired with an icon, a text label and a distinct border weight** so no meaning depends on colour.
 
-**Navigation** (admin-only items hidden for `SECURITY_STAFF`, and their routes still guarded): Live Command Center · Incident History · Zone Details · System Health *(admin)* · Administration *(admin)* · Simulator *(admin)* · Audit Logs *(admin)* · User Profile.
+**Navigation** (admin-only items hidden for `SECURITY_STAFF`, and their routes still guarded): Live Command Center · Incident History · Zone Details · System Health _(admin)_ · Administration _(admin)_ · Simulator _(admin)_ · Audit Logs _(admin)_ · User Profile.
 
 ### Command Center (`/`) — the primary page
 
@@ -914,19 +961,19 @@ Browser renders raw payload, backend response, and the resulting live state
 
 ### Demonstration scenarios (one click each)
 
-| # | Scenario | Demonstrates |
-|---|---|---|
-| 1 | Normal idle | All zones SAFE, no incidents, no actuation |
-| 2 | Fire debounce | Flicker → no incident; sustained → CRITICAL; cleared → recovery to SAFE |
-| 3 | Rising gas | Proportional contribution, SAFE → WARNING → CRITICAL |
-| 4 | Server room water leak | Rising water → WARNING → CRITICAL |
-| 5 | Simultaneous multi-zone | Two zones critical seconds apart; both scored; queue ranks and explains; independent actuation |
-| 6 | Acknowledgment race | Two concurrent acknowledgments; one `200`, one `409` |
-| 7 | Sensor offline | Zone/sensor shows OFFLINE, never SAFE or empty |
-| 8 | Dashboard reconnection | Socket dropped, incident raised, reconnect catches up with no duplicate alerts |
-| 9 | Invalid sensor value | Negative water / gas > 1 rejected with 422; no risk computed from bad data |
-| 10 | Backend restart recovery | Active incident persists; state and queue rebuilt from Postgres |
-| 11 | Load handling | ≥ 30 simulated zones / high-frequency readings; responsive; no lost or duplicated accepted readings |
+| #   | Scenario                 | Demonstrates                                                                                        |
+| --- | ------------------------ | --------------------------------------------------------------------------------------------------- |
+| 1   | Normal idle              | All zones SAFE, no incidents, no actuation                                                          |
+| 2   | Fire debounce            | Flicker → no incident; sustained → CRITICAL; cleared → recovery to SAFE                             |
+| 3   | Rising gas               | Proportional contribution, SAFE → WARNING → CRITICAL                                                |
+| 4   | Server room water leak   | Rising water → WARNING → CRITICAL                                                                   |
+| 5   | Simultaneous multi-zone  | Two zones critical seconds apart; both scored; queue ranks and explains; independent actuation      |
+| 6   | Acknowledgment race      | Two concurrent acknowledgments; one `200`, one `409`                                                |
+| 7   | Sensor offline           | Zone/sensor shows OFFLINE, never SAFE or empty                                                      |
+| 8   | Dashboard reconnection   | Socket dropped, incident raised, reconnect catches up with no duplicate alerts                      |
+| 9   | Invalid sensor value     | Negative water / gas > 1 rejected with 422; no risk computed from bad data                          |
+| 10  | Backend restart recovery | Active incident persists; state and queue rebuilt from Postgres                                     |
+| 11  | Load handling            | ≥ 30 simulated zones / high-frequency readings; responsive; no lost or duplicated accepted readings |
 
 Scenarios are declarative step lists (`{ atMs, zoneCode, patch }`) in `simulator/scenarios/`, runnable from the UI **and** headlessly via `pnpm sim:scenario -- --id N` so they can be asserted in tests.
 
@@ -942,7 +989,7 @@ Over the last `TREND_WINDOW_READINGS` (default 20) accepted readings per zone, c
 
 ### 15.2 Bonus 2 — ML predicted risk
 
-A separate `modules/prediction/` module predicting *P(zone reaches CRITICAL within the next 60 s)*.
+A separate `modules/prediction/` module predicting _P(zone reaches CRITICAL within the next 60 s)_.
 
 - **Model:** logistic regression on engineered features (current risk, fire streak length, gas slope, water slope, occupancy, seconds since last transition, zone asset importance).
 - **Training data:** synthetic sequences generated by `scripts/train-risk-model.ts`, **explicitly documented as synthetic** in `docs/ml-model.md`.
@@ -952,7 +999,7 @@ A separate `modules/prediction/` module predicting *P(zone reaches CRITICAL with
 
 ### 15.3 Bonus 3 — Natural-language incident report
 
-`POST /reports/natural-language` accepts free text (e.g. *"Smell of gas near the IoT Lab bench, not sure how bad."*) and returns `{ zone, hazardType, estimatedSeverity, confidence, confirmationMessage }`.
+`POST /reports/natural-language` accepts free text (e.g. _"Smell of gas near the IoT Lab bench, not sure how bad."_) and returns `{ zone, hazardType, estimatedSeverity, confidence, confirmationMessage }`.
 
 - **Default extractor is deterministic** (`AI_PROVIDER=none`): zone-alias matching against the zone table, hazard keyword lexicon, severity/hedging lexicon → severity 1–5 with a confidence score. No paid service is ever required.
 - An LLM provider is opt-in via `AI_PROVIDER=anthropic` + `ANTHROPIC_API_KEY`; its output passes through **exactly the same** Zod schema + zone-existence + severity-clamp validation gate as the deterministic path.
@@ -963,16 +1010,16 @@ A separate `modules/prediction/` module predicting *P(zone reaches CRITICAL with
 
 ## 16. Non-Functional Requirements
 
-| Requirement | Target | Verification |
-|---|---|---|
-| CRITICAL → actuation command created | < 1 000 ms from reading receipt | Integration test asserts `requestedAt − receivedAt < 1000` |
-| Dashboard reflects a state change | < 1 s after the reading is accepted | Manual demo check + socket emit timing log |
-| 24h critical/active incident query | < 50 ms with ≥ 10 000 readings | `pnpm db:explain` fails on seq scan or > 50 ms |
-| Load handling | ≥ 30 zones @ ≥ 5 readings/s sustained, zero lost or duplicated accepted readings | `pnpm sim:load` + a reconciliation assertion on accepted counts |
-| Backend restart | Full state + priority queue reconstructed | Restart integration test |
-| Accessibility | No state conveyed by colour alone; keyboard-reachable acknowledge; visible focus rings; AA contrast in dark mode | Component tests + manual audit checklist |
-| Security | Helmet, CORS allowlist, 1 MB body limit, per-route rate limits, redacted logs, bcrypt cost 12, no secrets to the client | `docs/security.md` checklist + tests |
-| Data retention | Raw readings 90 days, then hourly aggregates; incidents retained longer; daily `pg_dump`; documented recovery + data-loss window | `docs/data-retention.md` + `scripts/backup.sh` |
+| Requirement                          | Target                                                                                                                           | Verification                                                    |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| CRITICAL → actuation command created | < 1 000 ms from reading receipt                                                                                                  | Integration test asserts `requestedAt − receivedAt < 1000`      |
+| Dashboard reflects a state change    | < 1 s after the reading is accepted                                                                                              | Manual demo check + socket emit timing log                      |
+| 24h critical/active incident query   | < 50 ms with ≥ 10 000 readings                                                                                                   | `pnpm db:explain` fails on seq scan or > 50 ms                  |
+| Load handling                        | ≥ 30 zones @ ≥ 5 readings/s sustained, zero lost or duplicated accepted readings                                                 | `pnpm sim:load` + a reconciliation assertion on accepted counts |
+| Backend restart                      | Full state + priority queue reconstructed                                                                                        | Restart integration test                                        |
+| Accessibility                        | No state conveyed by colour alone; keyboard-reachable acknowledge; visible focus rings; AA contrast in dark mode                 | Component tests + manual audit checklist                        |
+| Security                             | Helmet, CORS allowlist, 1 MB body limit, per-route rate limits, redacted logs, bcrypt cost 12, no secrets to the client          | `docs/security.md` checklist + tests                            |
+| Data retention                       | Raw readings 90 days, then hourly aggregates; incidents retained longer; daily `pg_dump`; documented recovery + data-loss window | `docs/data-retention.md` + `scripts/backup.sh`                  |
 
 ---
 
@@ -1050,38 +1097,38 @@ VITE_ALERT_SOUND_ENABLED=false
 
 Each maps to a verification. The build is **not** done until all 30 pass.
 
-| # | Criterion | Verified by |
-|---|---|---|
-| 1 | ≥ 3 zones monitored | Seed + `GET /zones` integration test |
-| 2 | Zones submit raw readings, never state | Ingestion schema rejects `riskScore`/`state` keys — unit test |
-| 3 | Backend validates and computes risk | Ingestion integration test asserts persisted score/state |
-| 4 | Fire debounce prevents brief false triggers | Unit test: 4 positives → no critical contribution; 5 → confirmed |
-| 5 | Gas and water contribute proportionally | Unit tests across 0.0/0.25/0.5/0.75/1.0 |
-| 6 | Gas warm-up prevents false alerts | Unit + scenario test during warm-up window |
-| 7 | Correct transitions among all four states | State-machine unit tests + scenarios 2/3/4/7 |
-| 8 | CRITICAL generates independent actuation commands | Integration test: two zones, disjoint command sets |
-| 9 | Multiple zones critical simultaneously | Scenario 5 integration test |
-| 10 | Priority queue ranks deterministically | Unit test: shuffled inputs → identical ordering; tie-break test |
-| 11 | Dashboard explains the ranking | Frontend test asserts breakdown + reasons rendered |
-| 12 | Real-time dashboard updates | Frontend socket test + manual demo |
-| 13 | Multiple alerts independently visible | Frontend stacked-alert test |
-| 14 | Acknowledgment concurrency-safe | 10-way concurrent race test: 1×200, 9×409, 1 row |
-| 15 | RBAC enforced by the backend | 403 test for every admin route with a staff token |
-| 16 | Incident history date filtering | Integration test on `from`/`to` |
-| 17 | Complete incident timeline | Integration test asserts the full event chain |
-| 18 | Duplicates not counted twice | 409 + row-count test |
-| 19 | Impossible readings rejected | 422 tests for negative and > 1 values |
-| 20 | Out-of-order readings don't corrupt live state | Integration test: stale reading stored, live state unchanged |
-| 21 | Dashboard reconnects to correct state | Scenario 8 + frontend refetch-on-reconnect test |
-| 22 | Backend reconstructs state after restart | Restart integration test |
-| 23 | Offline sensors never shown as SAFE | Scenario 7 + frontend test |
-| 24 | Normalised related tables | Schema review + `docs/database-schema.md` ERD |
-| 25 | Referential integrity blocks unsafe deletion | Integration test asserting the delete fails |
-| 26 | Indexed incident queries stay fast | `pnpm db:explain` gate (< 50 ms, index scan) |
-| 27 | Simulator scenarios demonstrate edge cases | All 11 runnable from UI and headlessly |
-| 28 | Frontend, backend and DB agree on zone state | Cross-check assertion at the end of each scenario run |
-| 29 | Swagger documentation available | `/api/v1/docs` renders every endpoint with examples |
-| 30 | README lets another developer run everything | Clean-clone walkthrough following only the README |
+| #   | Criterion                                         | Verified by                                                      |
+| --- | ------------------------------------------------- | ---------------------------------------------------------------- |
+| 1   | ≥ 3 zones monitored                               | Seed + `GET /zones` integration test                             |
+| 2   | Zones submit raw readings, never state            | Ingestion schema rejects `riskScore`/`state` keys — unit test    |
+| 3   | Backend validates and computes risk               | Ingestion integration test asserts persisted score/state         |
+| 4   | Fire debounce prevents brief false triggers       | Unit test: 4 positives → no critical contribution; 5 → confirmed |
+| 5   | Gas and water contribute proportionally           | Unit tests across 0.0/0.25/0.5/0.75/1.0                          |
+| 6   | Gas warm-up prevents false alerts                 | Unit + scenario test during warm-up window                       |
+| 7   | Correct transitions among all four states         | State-machine unit tests + scenarios 2/3/4/7                     |
+| 8   | CRITICAL generates independent actuation commands | Integration test: two zones, disjoint command sets               |
+| 9   | Multiple zones critical simultaneously            | Scenario 5 integration test                                      |
+| 10  | Priority queue ranks deterministically            | Unit test: shuffled inputs → identical ordering; tie-break test  |
+| 11  | Dashboard explains the ranking                    | Frontend test asserts breakdown + reasons rendered               |
+| 12  | Real-time dashboard updates                       | Frontend socket test + manual demo                               |
+| 13  | Multiple alerts independently visible             | Frontend stacked-alert test                                      |
+| 14  | Acknowledgment concurrency-safe                   | 10-way concurrent race test: 1×200, 9×409, 1 row                 |
+| 15  | RBAC enforced by the backend                      | 403 test for every admin route with a staff token                |
+| 16  | Incident history date filtering                   | Integration test on `from`/`to`                                  |
+| 17  | Complete incident timeline                        | Integration test asserts the full event chain                    |
+| 18  | Duplicates not counted twice                      | 409 + row-count test                                             |
+| 19  | Impossible readings rejected                      | 422 tests for negative and > 1 values                            |
+| 20  | Out-of-order readings don't corrupt live state    | Integration test: stale reading stored, live state unchanged     |
+| 21  | Dashboard reconnects to correct state             | Scenario 8 + frontend refetch-on-reconnect test                  |
+| 22  | Backend reconstructs state after restart          | Restart integration test                                         |
+| 23  | Offline sensors never shown as SAFE               | Scenario 7 + frontend test                                       |
+| 24  | Normalised related tables                         | Schema review + `docs/database-schema.md` ERD                    |
+| 25  | Referential integrity blocks unsafe deletion      | Integration test asserting the delete fails                      |
+| 26  | Indexed incident queries stay fast                | `pnpm db:explain` gate (< 50 ms, index scan)                     |
+| 27  | Simulator scenarios demonstrate edge cases        | All 11 runnable from UI and headlessly                           |
+| 28  | Frontend, backend and DB agree on zone state      | Cross-check assertion at the end of each scenario run            |
+| 29  | Swagger documentation available                   | `/api/v1/docs` renders every endpoint with examples              |
+| 30  | README lets another developer run everything      | Clean-clone walkthrough following only the README                |
 
 Plus bonus criteria: risk trend classified and displayed separately from state · ML prediction served, visually distinct, provably unable to actuate, metrics documented · NL report parsed deterministically, validation-gated, unable to actuate.
 
@@ -1091,12 +1138,12 @@ Plus bonus criteria: risk trend classified and displayed separately from state �
 
 None are blocking — each has a stated default that will be used unless overridden.
 
-1. **Alert sound** — default is *off* (`VITE_ALERT_SOUND_ENABLED=false`) so a demo room isn't startled. Should it default on for the hackathon run?
+1. **Alert sound** — default is _off_ (`VITE_ALERT_SOUND_ENABLED=false`) so a demo room isn't startled. Should it default on for the hackathon run?
 2. **Priority `acknowledgedPenalty` = −15** — this deliberately sinks acknowledged incidents below unacknowledged ones of similar risk. If the judging narrative prefers "highest risk always ranks first regardless of acknowledgment", say so and it becomes a tie-break instead of a score term.
 3. **Demo reading interval** — default `500 ms` (fire confirms in ~2.5 s, which reads well on camera). The prompt's example used 200 ms (~1 s). Either is a one-line config change.
 4. **`OFFLINE` visual treatment** — spec uses muted zinc + a distinct pulsing amber LED. Confirm the pulsing LED isn't confusable with WARNING on a projector.
 5. **Load scenario scale** — default is 30 simulated zones at 5 Hz in-process. If the demo machine struggles, the fallback is 30 zones at 2 Hz; both are config flags.
-6. **Retention automation** — the 90-day raw-reading purge and hourly aggregation are *documented and scripted* (`scripts/retention.ts`) but not scheduled by default. Confirm that's acceptable for a prototype.
+6. **Retention automation** — the 90-day raw-reading purge and hourly aggregation are _documented and scripted_ (`scripts/retention.ts`) but not scheduled by default. Confirm that's acceptable for a prototype.
 
 ---
 

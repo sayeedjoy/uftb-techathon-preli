@@ -2,14 +2,14 @@
 
 ## Policy
 
-| Data | Retention | Then |
-|---|---|---|
-| Raw sensor readings | 90 days | Rolled into hourly aggregates, raw rows purged |
-| Hourly aggregates | Indefinite | Small enough to keep; sufficient for trend charts |
+| Data                          | Retention  | Then                                                                    |
+| ----------------------------- | ---------- | ----------------------------------------------------------------------- |
+| Raw sensor readings           | 90 days    | Rolled into hourly aggregates, raw rows purged                          |
+| Hourly aggregates             | Indefinite | Small enough to keep; sufficient for trend charts                       |
 | Incidents and their timelines | Indefinite | This is the audit trail — the record of what happened and who responded |
-| Actuation commands | Indefinite | Paired with the incidents that caused them |
-| Audit logs | Indefinite | Security-relevant by definition |
-| System events | 90 days | Operational noise beyond that window |
+| Actuation commands            | Indefinite | Paired with the incidents that caused them                              |
+| Audit logs                    | Indefinite | Security-relevant by definition                                         |
+| System events                 | 90 days    | Operational noise beyond that window                                    |
 
 Raw readings dominate the volume — 30 zones at 5 Hz is roughly 13 million rows a
 day — and their value decays fast. An incident from last March still matters;
@@ -18,10 +18,10 @@ the timeline are recorded on the incident itself.
 
 ## Access
 
-| Role | Sees |
-|---|---|
-| `SECURITY_STAFF` | Incident summaries, timelines, zone state and history |
-| `ADMIN` | The above, plus raw historical readings, system health and audit logs |
+| Role             | Sees                                                                  |
+| ---------------- | --------------------------------------------------------------------- |
+| `SECURITY_STAFF` | Incident summaries, timelines, zone state and history                 |
+| `ADMIN`          | The above, plus raw historical readings, system health and audit logs |
 
 `GET /zones/:zoneId/readings` returns `403` for a staff token. The zone detail
 page shows staff the summarised view and says so, rather than rendering an empty

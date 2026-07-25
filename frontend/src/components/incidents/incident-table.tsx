@@ -42,7 +42,10 @@ export function IncidentTable({
 
   if (error != null) {
     return (
-      <Card role="alert" className="border-critical-border p-6 text-sm text-critical">
+      <Card
+        role="alert"
+        className="border-critical-border p-6 text-sm text-critical"
+      >
         Could not load incidents.
       </Card>
     )

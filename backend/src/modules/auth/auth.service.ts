@@ -2,7 +2,10 @@ import type { User } from "@prisma/client"
 import type { AuthUserDto, LoginInput, LoginResponseDto } from "@scsrg/shared"
 
 import { env } from "../../config/env.js"
-import { InvalidCredentialsError, UnauthenticatedError } from "../../shared/errors.js"
+import {
+  InvalidCredentialsError,
+  UnauthenticatedError,
+} from "../../shared/errors.js"
 import { findUserByEmail, findUserById } from "./auth.repository.js"
 import { fakeVerifyPassword, verifyPassword } from "./password.util.js"
 import { signAccessToken } from "./token.util.js"
@@ -33,7 +36,10 @@ export async function login(input: LoginInput): Promise<LoginResponseDto> {
     throw new InvalidCredentialsError()
   }
 
-  const passwordMatches = await verifyPassword(input.password, user.passwordHash)
+  const passwordMatches = await verifyPassword(
+    input.password,
+    user.passwordHash
+  )
   if (!passwordMatches) {
     throw new InvalidCredentialsError()
   }

@@ -49,7 +49,12 @@ describe("backend restart recovery", () => {
       incidents: await prisma.incident.findMany({
         where: { status: { in: ["OPEN", "ACKNOWLEDGED"] } },
         orderBy: { id: "asc" },
-        select: { id: true, zoneId: true, status: true, maximumRiskScore: true },
+        select: {
+          id: true,
+          zoneId: true,
+          status: true,
+          maximumRiskScore: true,
+        },
       }),
       queue: (await getPriorityQueue()).map((entry) => [
         entry.rank,
@@ -69,7 +74,12 @@ describe("backend restart recovery", () => {
       incidents: await prisma.incident.findMany({
         where: { status: { in: ["OPEN", "ACKNOWLEDGED"] } },
         orderBy: { id: "asc" },
-        select: { id: true, zoneId: true, status: true, maximumRiskScore: true },
+        select: {
+          id: true,
+          zoneId: true,
+          status: true,
+          maximumRiskScore: true,
+        },
       }),
       queue: (await getPriorityQueue()).map((entry) => [
         entry.rank,

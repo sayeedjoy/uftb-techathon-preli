@@ -59,8 +59,7 @@ export function isRedundantReading(
 ): boolean {
   if (!latestAccepted) return false
 
-  const same = (a: unknown, b: unknown) =>
-    (a ?? null) === (b ?? null)
+  const same = (a: unknown, b: unknown) => (a ?? null) === (b ?? null)
 
   return (
     same(payload.sensors.fireDetected, latestAccepted.fireDetected) &&

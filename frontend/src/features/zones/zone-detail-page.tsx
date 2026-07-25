@@ -71,12 +71,17 @@ export function ZoneDetailPage() {
   const current = live ?? zone.data
 
   if (zone.isLoading) {
-    return <Card className="p-6 text-sm text-muted-foreground">Loading zone…</Card>
+    return (
+      <Card className="p-6 text-sm text-muted-foreground">Loading zone…</Card>
+    )
   }
 
   if (zone.error != null || !zone.data || !current) {
     return (
-      <Card role="alert" className="border-critical-border p-6 text-sm text-critical">
+      <Card
+        role="alert"
+        className="border-critical-border p-6 text-sm text-critical"
+      >
         Could not load this zone.{" "}
         <Link to="/" className="underline">
           Back to the Command Center
@@ -114,7 +119,9 @@ export function ZoneDetailPage() {
           <p className="text-[11px] text-muted-foreground">
             Last seen{" "}
             {current.lastSeenAt
-              ? new Date(current.lastSeenAt).toLocaleString([], { hour12: false })
+              ? new Date(current.lastSeenAt).toLocaleString([], {
+                  hour12: false,
+                })
               : "never"}
           </p>
         </Card>
@@ -162,12 +169,10 @@ export function ZoneDetailPage() {
         <h2 className="mb-2 text-sm font-semibold">Recent risk history</h2>
         {isAdmin ? (
           <RiskHistoryChart
-            points={[...(readings.data ?? [])]
-              .reverse()
-              .map((reading) => ({
-                at: reading.capturedAt,
-                riskScore: reading.riskScore,
-              }))}
+            points={[...(readings.data ?? [])].reverse().map((reading) => ({
+              at: reading.capturedAt,
+              riskScore: reading.riskScore,
+            }))}
             height={240}
           />
         ) : (
@@ -187,7 +192,10 @@ export function ZoneDetailPage() {
         ) : (
           <ol className="flex flex-col gap-1.5 text-xs">
             {transitions.data?.map((transition) => (
-              <li key={transition.id} className="flex flex-wrap items-baseline gap-2">
+              <li
+                key={transition.id}
+                className="flex flex-wrap items-baseline gap-2"
+              >
                 <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
                   {new Date(transition.createdAt).toLocaleString([], {
                     hour12: false,
@@ -199,7 +207,9 @@ export function ZoneDetailPage() {
                 <span className="font-mono text-[11px] text-muted-foreground">
                   risk {transition.riskScore.toFixed(1)}
                 </span>
-                <span className="text-muted-foreground">{transition.reason}</span>
+                <span className="text-muted-foreground">
+                  {transition.reason}
+                </span>
               </li>
             ))}
           </ol>

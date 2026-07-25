@@ -50,8 +50,7 @@ export const handlers = [
       )
     }
 
-    const user =
-      body.email === ADMIN_USER.email ? ADMIN_USER : STAFF_USER
+    const user = body.email === ADMIN_USER.email ? ADMIN_USER : STAFF_USER
     authState.user = user
 
     return ok({ token: "test-token", expiresIn: "60m", user })
@@ -70,7 +69,9 @@ export const handlers = [
           state: "OFFLINE",
           currentRiskScore: 0,
           lastSeenAt: new Date(Date.now() - 120_000).toISOString(),
-          reasons: ["No reading or heartbeat since 12:00 — zone is offline, not safe"],
+          reasons: [
+            "No reading or heartbeat since 12:00 — zone is offline, not safe",
+          ],
           sensorValues: {
             fireDetected: null,
             fireSignal: 0,
@@ -86,16 +87,21 @@ export const handlers = [
 
   http.get(`${BASE}/dashboard/summary`, () => ok(summaryFixture())),
 
-  http.get(`${BASE}/priority-queue`, () => ok({ queue: [priorityEntryFixture()] })),
+  http.get(`${BASE}/priority-queue`, () =>
+    ok({ queue: [priorityEntryFixture()] })
+  ),
 
   http.get(`${BASE}/incidents`, () =>
-    ok({ incidents: [incidentFixture()] }, {
-      page: 1,
-      pageSize: 25,
-      total: 1,
-      totalPages: 1,
-      hasNextPage: false,
-    })
+    ok(
+      { incidents: [incidentFixture()] },
+      {
+        page: 1,
+        pageSize: 25,
+        total: 1,
+        totalPages: 1,
+        hasNextPage: false,
+      }
+    )
   ),
 
   http.post(`${BASE}/incidents/:incidentId/acknowledge`, () =>

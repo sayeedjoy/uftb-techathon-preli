@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest"
 
 import { prisma } from "../../database/prisma.js"
-import { createIncidentFixture, createZoneFixture } from "../fixtures/zone.fixture.js"
+import {
+  createIncidentFixture,
+  createZoneFixture,
+} from "../fixtures/zone.fixture.js"
 
 describe("database-enforced invariants", () => {
   it("rejects a second active incident for the same zone", async () => {
@@ -49,7 +52,9 @@ describe("database-enforced invariants", () => {
       prisma.zone.delete({ where: { id: zone.id } })
     ).rejects.toThrow()
 
-    expect(await prisma.zone.findUnique({ where: { id: zone.id } })).not.toBeNull()
+    expect(
+      await prisma.zone.findUnique({ where: { id: zone.id } })
+    ).not.toBeNull()
   })
 
   it("refuses to delete a zone that has readings", async () => {

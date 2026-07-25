@@ -64,7 +64,10 @@ export class FireDebounceService {
    * Rebuilds a zone's counters from its stored readings (oldest → newest).
    * Called at boot so a restart mid-fire does not reset the confirmation.
    */
-  rehydrate(zoneId: string, orderedReadings: Array<{ fireDetected: boolean | null }>): FireDebounceState {
+  rehydrate(
+    zoneId: string,
+    orderedReadings: Array<{ fireDetected: boolean | null }>
+  ): FireDebounceState {
     this.states.delete(zoneId)
     for (const reading of orderedReadings) {
       // A reading that did not report flame at all is not evidence of absence.

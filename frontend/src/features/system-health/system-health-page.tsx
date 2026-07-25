@@ -50,7 +50,10 @@ export function SystemHealthPage() {
 
   if (health.error != null || !health.data) {
     return (
-      <Card role="alert" className="border-critical-border p-6 text-sm text-critical">
+      <Card
+        role="alert"
+        className="border-critical-border p-6 text-sm text-critical"
+      >
         Could not load system health.
       </Card>
     )
@@ -77,7 +80,9 @@ export function SystemHealthPage() {
         <Stat
           Icon={Database}
           label={`Database${
-            data.databaseLatencyMs !== null ? ` · ${data.databaseLatencyMs}ms` : ""
+            data.databaseLatencyMs !== null
+              ? ` · ${data.databaseLatencyMs}ms`
+              : ""
           }`}
           value={data.databaseConnected ? "Connected" : "Down"}
           ok={data.databaseConnected}
@@ -112,7 +117,10 @@ export function SystemHealthPage() {
           </thead>
           <tbody className="divide-y divide-border/30">
             {data.zones.map((zone) => (
-              <tr key={zone.zoneId} className={zone.isOffline ? "bg-warning-surface" : ""}>
+              <tr
+                key={zone.zoneId}
+                className={zone.isOffline ? "bg-warning-surface" : ""}
+              >
                 <td className="px-4 py-2">{zone.zoneName}</td>
                 <td className="px-4 py-2">{zone.state.toLowerCase()}</td>
                 <td className="px-4 py-2 text-xs">
@@ -129,7 +137,10 @@ export function SystemHealthPage() {
                 </td>
                 <td className="px-4 py-2 text-xs">
                   {zone.sensors
-                    .map((sensor) => `${sensor.type.toLowerCase()}:${sensor.status.toLowerCase()}`)
+                    .map(
+                      (sensor) =>
+                        `${sensor.type.toLowerCase()}:${sensor.status.toLowerCase()}`
+                    )
                     .join(", ")}
                 </td>
               </tr>
@@ -192,7 +203,9 @@ export function SystemHealthPage() {
           {data.recentSystemEvents.map((event) => (
             <li key={event.id} className="flex items-start gap-2 px-4 py-2">
               <span className="font-mono text-[11px] text-muted-foreground">
-                {new Date(event.createdAt).toLocaleString([], { hour12: false })}
+                {new Date(event.createdAt).toLocaleString([], {
+                  hour12: false,
+                })}
               </span>
               <span
                 className={

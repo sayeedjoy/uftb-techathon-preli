@@ -26,7 +26,8 @@ export const queryKeys = {
     list: (filters: Record<string, unknown>) =>
       ["incidents", "list", filters] as const,
     active: () => ["incidents", "list", { active: true }] as const,
-    detail: (incidentId: string) => ["incidents", "detail", incidentId] as const,
+    detail: (incidentId: string) =>
+      ["incidents", "detail", incidentId] as const,
     timeline: (incidentId: string) =>
       ["incidents", "timeline", incidentId] as const,
   },

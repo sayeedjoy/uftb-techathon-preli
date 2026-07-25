@@ -18,7 +18,11 @@ export async function pushReading(
     waterLevel?: number
     occupancyDetected?: boolean | null
   },
-  options: { capturedAt?: Date; sequenceNumber?: number; readingId?: string } = {}
+  options: {
+    capturedAt?: Date
+    sequenceNumber?: number
+    readingId?: string
+  } = {}
 ) {
   sequence += 1
   const sequenceNumber = options.sequenceNumber ?? sequence
@@ -26,7 +30,9 @@ export async function pushReading(
   return ingestReading({
     zoneId: seeded.zone.id,
     payload: {
-      readingId: options.readingId ?? `seq-${seeded.zone.code}-${sequenceNumber}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      readingId:
+        options.readingId ??
+        `seq-${seeded.zone.code}-${sequenceNumber}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       sequenceNumber,
       capturedAt: (options.capturedAt ?? new Date()).toISOString(),
       sensors,

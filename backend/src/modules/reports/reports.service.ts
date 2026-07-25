@@ -4,16 +4,17 @@ import {
   type NaturalLanguageReportInput,
 } from "@scsrg/shared"
 
-import { env } from "../../config/env.js"
 import { prisma } from "../../database/prisma.js"
 import { ConflictError, NotFoundError } from "../../shared/errors.js"
 import { writeAuditLog } from "../audit/audit.service.js"
 import { recalculatePriorityQueue } from "../priority-engine/priority-queue.service.js"
 import { publishPriorityQueue } from "../../realtime/domain-events.js"
-import { extractDeterministic, type ZoneAlias } from "./extractor.deterministic.js"
-import { applyValidationGate } from "./validation-gate.js"
+import { extractReport } from "./extractor.js"
+import type { ZoneAlias } from "./extractor.deterministic.js"
 
-type ReportRow = Awaited<ReturnType<typeof prisma.incidentReport.findFirstOrThrow>> & {
+type ReportRow = Awaited<
+  ReturnType<typeof prisma.incidentReport.findFirstOrThrow>
+> & {
   user: { name: string }
   zone: { code: string } | null
 }
@@ -46,7 +47,10 @@ async function zoneAliases(): Promise<ZoneAlias[]> {
   return zones.map((zone) => ({
     code: zone.code,
     name: zone.name,
-    aliases: [zone.code.replace(/-/g, " "), ...(zone.location ? [zone.location] : [])],
+    aliases: [
+      zone.code.replace(/-/g, " "),
+      ...(zone.location ? [zone.location] : []),
+    ],
   }))
 }
 
@@ -62,11 +66,12 @@ export async function submitNaturalLanguageReport(
   ipAddress: string | null
 ): Promise<IncidentReportDto> {
   const zones = await zoneAliases()
-  const knownCodes = new Set(zones.map((zone) => zone.code))
 
-  // AI_PROVIDER=none is the default and needs no key, no network, no account.
-  const candidate = extractDeterministic(input.text, zones)
-  const extraction = applyValidationGate(candidate, knownCodes)
+  const {
+    result: extraction,
+    provider,
+    model,
+  } = await extractReport(input.text, zones)
 
   const zone = extraction.zoneCode
     ? await prisma.zone.findUnique({ where: { code: extraction.zoneCode } })
@@ -81,10 +86,13 @@ export async function submitNaturalLanguageReport(
       estimatedSeverity: extraction.estimatedSeverity,
       confidence: extraction.confidence,
       confirmationMessage: extraction.confirmationMessage,
-      extractorProvider: env.AI_PROVIDER,
+      extractorProvider: provider,
       status: REPORT_STATUS.PENDING,
     },
-    include: { user: { select: { name: true } }, zone: { select: { code: true } } },
+    include: {
+      user: { select: { name: true } },
+      zone: { select: { code: true } },
+    },
   })
 
   await writeAuditLog({
@@ -96,6 +104,9 @@ export async function submitNaturalLanguageReport(
       zoneCode: extraction.zoneCode,
       hazardType: extraction.hazardType,
       severity: extraction.estimatedSeverity,
+      // Which extractor produced this is part of the audit trail, not a detail.
+      extractorProvider: provider,
+      extractorModel: model,
     },
     ipAddress,
   })
@@ -108,7 +119,10 @@ export async function listReports(
 ): Promise<IncidentReportDto[]> {
   const rows = await prisma.incidentReport.findMany({
     where: status ? { status } : {},
-    include: { user: { select: { name: true } }, zone: { select: { code: true } } },
+    include: {
+      user: { select: { name: true } },
+      zone: { select: { code: true } },
+    },
     orderBy: { createdAt: "desc" },
     take: 100,
   })
@@ -146,7 +160,10 @@ export async function confirmReport(
       confirmedAt: new Date(),
       confirmedBy: actor.id,
     },
-    include: { user: { select: { name: true } }, zone: { select: { code: true } } },
+    include: {
+      user: { select: { name: true } },
+      zone: { select: { code: true } },
+    },
   })
 
   await writeAuditLog({
@@ -165,15 +182,36 @@ export async function confirmReport(
   return toDto(updated as ReportRow)
 }
 
+/**
+ * Rejects a report (ADMIN only).
+ *
+ * Guarded the same way as confirmation: a verdict is only ever cast on a
+ * `PENDING` report. Without this, a second administrator arriving late could
+ * flip an already-approved report to `REJECTED` while its bounded priority
+ * bonus stayed in the queue — a silent disagreement between the two.
+ */
 export async function rejectReport(
   reportId: string,
   actor: { id: string },
   ipAddress: string | null
 ): Promise<IncidentReportDto> {
+  const existing = await prisma.incidentReport.findUnique({
+    where: { id: reportId },
+  })
+  if (!existing) throw new NotFoundError("Report not found.")
+  if (existing.status !== REPORT_STATUS.PENDING) {
+    throw new ConflictError(
+      `This report has already been ${existing.status.toLowerCase()}.`
+    )
+  }
+
   const updated = await prisma.incidentReport.update({
     where: { id: reportId },
     data: { status: REPORT_STATUS.REJECTED },
-    include: { user: { select: { name: true } }, zone: { select: { code: true } } },
+    include: {
+      user: { select: { name: true } },
+      zone: { select: { code: true } },
+    },
   })
 
   await writeAuditLog({

@@ -81,7 +81,9 @@ async function main(): Promise<void> {
 
   if (indexName) console.log(`  Index used:     ${indexName}`)
   if (Number.isFinite(durationMs)) {
-    console.log(`  Execution time: ${durationMs.toFixed(2)} ms (budget ${MAX_DURATION_MS} ms)`)
+    console.log(
+      `  Execution time: ${durationMs.toFixed(2)} ms (budget ${MAX_DURATION_MS} ms)`
+    )
   }
 
   if (failures.length > 0) {

@@ -30,7 +30,10 @@ export class AppError extends Error {
 }
 
 export class ValidationError extends AppError {
-  constructor(message = "The request payload is invalid.", details?: ApiErrorDetail[]) {
+  constructor(
+    message = "The request payload is invalid.",
+    details?: ApiErrorDetail[]
+  ) {
     super(400, ERROR_CODE.VALIDATION_ERROR, message, details)
   }
 }
@@ -83,11 +86,7 @@ export class AlreadyAcknowledgedError extends AppError {
 
 /** 422: the shape is right but the values are impossible. */
 export class UnprocessableReadingError extends AppError {
-  constructor(
-    code: ErrorCode,
-    message: string,
-    details?: ApiErrorDetail[]
-  ) {
+  constructor(code: ErrorCode, message: string, details?: ApiErrorDetail[]) {
     super(422, code, message, details)
   }
 }

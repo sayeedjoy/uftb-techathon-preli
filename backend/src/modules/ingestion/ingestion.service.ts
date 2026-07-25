@@ -94,7 +94,11 @@ export async function ingestReading(
   const processed = processSensorSignals(zone, sensors, context.payload, clock)
 
   // 8. Risk fusion (pure).
-  const computation = computeRisk(processed.inputs, riskConfig, processed.context)
+  const computation = computeRisk(
+    processed.inputs,
+    riskConfig,
+    processed.context
+  )
 
   const validationStatus = ordering.outOfOrder
     ? VALIDATION_STATUS.ACCEPTED_OUT_OF_ORDER
@@ -254,7 +258,10 @@ function processSensorSignals(
   if (!configured.has(SENSOR_TYPE.FLAME)) {
     notConfigured.push("fire")
   } else if (flameReported) {
-    const state = fireDebounce.push(zone.id, payload.sensors.fireDetected === true)
+    const state = fireDebounce.push(
+      zone.id,
+      payload.sensors.fireDetected === true
+    )
     fireSignal = state.signal
     fireStreak = state.positiveStreak
   } else {
@@ -336,7 +343,11 @@ function processSensorSignals(
 }
 
 function readWarmupOverride(sensor: Sensor | undefined): number | undefined {
-  if (!sensor || typeof sensor.configuration !== "object" || sensor.configuration === null) {
+  if (
+    !sensor ||
+    typeof sensor.configuration !== "object" ||
+    sensor.configuration === null
+  ) {
     return undefined
   }
   const value = (sensor.configuration as Record<string, unknown>)

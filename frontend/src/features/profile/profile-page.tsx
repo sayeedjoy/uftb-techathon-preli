@@ -43,7 +43,9 @@ export function ProfilePage() {
         </div>
 
         <div>
-          <h2 className="mb-1.5 text-sm font-semibold">What this role can do</h2>
+          <h2 className="mb-1.5 text-sm font-semibold">
+            What this role can do
+          </h2>
           <ul className="flex flex-col gap-1 text-sm text-muted-foreground">
             {CAPABILITIES[user.role].map((capability) => (
               <li key={capability}>· {capability}</li>

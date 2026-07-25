@@ -61,7 +61,9 @@ describe("POST /api/v1/auth/login", () => {
 
     expect(unknownEmail.status).toBe(wrongPassword.status)
     expect(unknownEmail.body.error.code).toBe(wrongPassword.body.error.code)
-    expect(unknownEmail.body.error.message).toBe(wrongPassword.body.error.message)
+    expect(unknownEmail.body.error.message).toBe(
+      wrongPassword.body.error.message
+    )
   })
 
   it("rejects a malformed body with 400 and per-field details", async () => {

@@ -40,7 +40,9 @@ const AuthContext = React.createContext<AuthState | undefined>(undefined)
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient()
-  const [token, setToken] = React.useState<string | null>(() => getStoredToken())
+  const [token, setToken] = React.useState<string | null>(() =>
+    getStoredToken()
+  )
 
   const logout = React.useCallback(() => {
     clearSession()

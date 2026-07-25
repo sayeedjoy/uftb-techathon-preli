@@ -59,8 +59,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     // consumed the event and every other hook silently missed it.
     const handleAny = (event: string, payload: unknown) => {
       const envelope = payload as
-        | { eventId?: string; emittedAt?: string }
-        | undefined
+        { eventId?: string; emittedAt?: string } | undefined
 
       if (envelope?.eventId && !eventDedupe.register(envelope.eventId)) {
         return

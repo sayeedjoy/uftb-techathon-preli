@@ -1,4 +1,8 @@
-import { recoveryThreshold, riskConfig, type RiskConfig } from "../../config/risk.config.js"
+import {
+  recoveryThreshold,
+  riskConfig,
+  type RiskConfig,
+} from "../../config/risk.config.js"
 
 /**
  * Recovery hysteresis.

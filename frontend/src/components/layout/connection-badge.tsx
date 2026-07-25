@@ -25,14 +25,23 @@ const PRESENTATION = {
   },
 } as const satisfies Record<
   ConnectionStatus,
-  { label: string; Icon: typeof RadioTower; className: string; description: string }
+  {
+    label: string
+    Icon: typeof RadioTower
+    className: string
+    description: string
+  }
 >
 
 /** Icon **and** text — the state never depends on colour alone. */
 export function ConnectionBadge({ className }: { className?: string }) {
   const status = useConnectionStatus()
-  const { label, Icon, className: statusClassName, description } =
-    PRESENTATION[status]
+  const {
+    label,
+    Icon,
+    className: statusClassName,
+    description,
+  } = PRESENTATION[status]
 
   return (
     <span

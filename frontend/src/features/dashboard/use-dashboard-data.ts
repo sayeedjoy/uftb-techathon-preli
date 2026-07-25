@@ -29,7 +29,8 @@ export function useDashboardSummary() {
 export function usePriorityQueue() {
   return useQuery({
     queryKey: queryKeys.priorityQueue.all(),
-    queryFn: () => apiGet<{ queue: PriorityQueueEntryDto[] }>("/priority-queue"),
+    queryFn: () =>
+      apiGet<{ queue: PriorityQueueEntryDto[] }>("/priority-queue"),
     select: (data) => data.queue,
   })
 }

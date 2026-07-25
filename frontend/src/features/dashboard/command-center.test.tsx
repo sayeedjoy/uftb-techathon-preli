@@ -24,8 +24,9 @@ describe("flow 5 · socket events update the rendered zone", () => {
     renderCommandCenter()
 
     await screen.findByTestId("zone-card-iot-lab")
-    expect(within(screen.getByTestId("zone-card-iot-lab")).getByText("Safe"))
-      .toBeInTheDocument()
+    expect(
+      within(screen.getByTestId("zone-card-iot-lab")).getByText("Safe")
+    ).toBeInTheDocument()
 
     act(() => {
       socketDouble.server(
@@ -119,7 +120,9 @@ describe("flow 6 · multiple stacked alerts stay independently visible", () => {
 
     // Both alerts must survive — neither overwrites the other.
     expect(await screen.findByText(/CRITICAL · IoT Lab/)).toBeInTheDocument()
-    expect(await screen.findByText(/CRITICAL · Server Room/)).toBeInTheDocument()
+    expect(
+      await screen.findByText(/CRITICAL · Server Room/)
+    ).toBeInTheDocument()
   })
 
   it("raises no toast for an event that predates the connection", async () => {
@@ -142,7 +145,9 @@ describe("flow 6 · multiple stacked alerts stay independently visible", () => {
     })
 
     await waitFor(() =>
-      expect(screen.queryByText(/CRITICAL · Robotics Lab/)).not.toBeInTheDocument()
+      expect(
+        screen.queryByText(/CRITICAL · Robotics Lab/)
+      ).not.toBeInTheDocument()
     )
   })
 })

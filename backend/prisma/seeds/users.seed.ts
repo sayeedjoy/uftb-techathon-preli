@@ -30,7 +30,12 @@ export async function seedUsers(prisma: PrismaClient): Promise<void> {
     await prisma.user.upsert({
       where: { email: user.email },
       // Re-running the seed refreshes the password but never duplicates a row.
-      update: { name: user.name, role: user.role, passwordHash, isActive: true },
+      update: {
+        name: user.name,
+        role: user.role,
+        passwordHash,
+        isActive: true,
+      },
       create: {
         name: user.name,
         email: user.email,

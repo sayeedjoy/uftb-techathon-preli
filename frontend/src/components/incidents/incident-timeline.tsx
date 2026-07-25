@@ -39,7 +39,9 @@ export function IncidentTimeline({
         >
           <p className="flex flex-wrap items-baseline gap-2 text-xs">
             <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
-              {new Date(event.createdAt).toLocaleTimeString([], { hour12: false })}
+              {new Date(event.createdAt).toLocaleTimeString([], {
+                hour12: false,
+              })}
             </span>
             <span className="font-medium tracking-wide uppercase">
               {event.eventType.replace(/_/g, " ").toLowerCase()}

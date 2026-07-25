@@ -154,6 +154,7 @@ export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
 }
 
 export async function apiPatch<T>(path: string, body?: unknown): Promise<T> {
-  return (await request<T>(path, { method: "PATCH", ...(body ? { body } : {}) }))
-    .data
+  return (
+    await request<T>(path, { method: "PATCH", ...(body ? { body } : {}) })
+  ).data
 }

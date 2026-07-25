@@ -136,7 +136,9 @@ function explainPriority(
   }
 
   if (breakdown.duration > 0) {
-    reasons.push(`Critical for ${durationSeconds} seconds (+${breakdown.duration})`)
+    reasons.push(
+      `Critical for ${durationSeconds} seconds (+${breakdown.duration})`
+    )
   }
 
   if (breakdown.asset > 0) {
@@ -195,7 +197,11 @@ export function rankIncidents(
     }
     const startDelta = a.startedAt.getTime() - b.startedAt.getTime()
     if (startDelta !== 0) return startDelta
-    return a.incidentId < b.incidentId ? -1 : a.incidentId > b.incidentId ? 1 : 0
+    return a.incidentId < b.incidentId
+      ? -1
+      : a.incidentId > b.incidentId
+        ? 1
+        : 0
   })
 
   return scored.map((entry, index) => ({ ...entry, rank: index + 1 }))

@@ -39,7 +39,10 @@ export async function recalculatePriorityQueue(
     if (!report.zoneId) continue
     reportSeverityByZone.set(
       report.zoneId,
-      Math.max(reportSeverityByZone.get(report.zoneId) ?? 0, report.estimatedSeverity)
+      Math.max(
+        reportSeverityByZone.get(report.zoneId) ?? 0,
+        report.estimatedSeverity
+      )
     )
   }
 

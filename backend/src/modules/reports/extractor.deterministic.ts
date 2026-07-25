@@ -1,4 +1,8 @@
-import { HAZARD_TYPE, type ExtractionResult, type HazardType } from "@scsrg/shared"
+import {
+  HAZARD_TYPE,
+  type ExtractionResult,
+  type HazardType,
+} from "@scsrg/shared"
 
 /**
  * Deterministic natural-language extractor.
@@ -63,8 +67,14 @@ const HAZARD_LEXICON: Array<{ hazard: HazardType; terms: string[] }> = [
 
 /** Words that raise the estimated severity. */
 const SEVERITY_TERMS: Array<{ terms: string[]; severity: number }> = [
-  { terms: ["trapped", "explosion", "collapse", "casualty", "injured"], severity: 5 },
-  { terms: ["heavy", "thick", "spreading", "large", "everywhere", "strong"], severity: 4 },
+  {
+    terms: ["trapped", "explosion", "collapse", "casualty", "injured"],
+    severity: 5,
+  },
+  {
+    terms: ["heavy", "thick", "spreading", "large", "everywhere", "strong"],
+    severity: 4,
+  },
   { terms: ["noticeable", "clear", "definite", "steady"], severity: 3 },
   { terms: ["slight", "faint", "small", "minor", "little"], severity: 2 },
 ]
@@ -137,7 +147,8 @@ function estimateSeverity(text: string): number {
   return 3
 }
 
-function countHedges(text: string): number {
+/** Exported so the LLM path phrases uncertainty from the same signal. */
+export function countHedges(text: string): number {
   const haystack = normalise(text)
   return HEDGE_TERMS.filter((term) => haystack.includes(term)).length
 }
@@ -162,6 +173,9 @@ export function extractDeterministic(
 
   const confirmationMessage = buildConfirmation({
     zoneName: zoneName ?? null,
+    // Lexicon matching either finds a monitored zone or it does not; it has no
+    // way to tell an unrecognised place name from ordinary prose.
+    unmatchedZoneLabel: null,
     hazardType,
     severity,
     hedged: hedges > 0,
@@ -173,22 +187,43 @@ export function extractDeterministic(
     estimatedSeverity: severity,
     confidence,
     confirmationMessage,
+    unmatchedZoneLabel: null,
   }
 }
 
-function buildConfirmation(input: {
+/**
+ * Builds the message shown back to the reporter.
+ *
+ * Exported because the LLM extractor reuses it verbatim. A provider is never
+ * allowed to author this string: it is the sentence that tells a person what
+ * their report did and did not do, and a model that wrote "responders have been
+ * dispatched" would be lying on the system's behalf.
+ */
+export function buildConfirmation(input: {
   zoneName: string | null
+  /** Set only when the reporter named a place the system does not monitor. */
+  unmatchedZoneLabel: string | null
   hazardType: HazardType | null
   severity: number
   hedged: boolean
 }): string {
-  const where = input.zoneName ? `in the ${input.zoneName}` : "at an unidentified zone"
+  const where = input.zoneName
+    ? `in the ${input.zoneName}`
+    : "at an unidentified zone"
   const what = input.hazardType
     ? `a ${input.hazardType.toLowerCase()} hazard`
     : "an unclassified hazard"
+
+  // Naming the place the reporter used is the difference between a reply they
+  // can act on ("I typed the wrong building") and one they cannot.
+  const unmatched =
+    !input.zoneName && input.unmatchedZoneLabel
+      ? `“${input.unmatchedZoneLabel}” is not a monitored zone, so this report is filed without one. `
+      : ""
+
   const hedge = input.hedged
     ? " Your report was recorded as uncertain, which lowers its confidence."
     : ""
 
-  return `Recorded ${what} ${where} at estimated severity ${input.severity}/5. A supervisor must confirm this report before it can influence response priority; it cannot open an incident or trigger any actuator on its own.${hedge}`
+  return `${unmatched}Recorded ${what} ${where} at estimated severity ${input.severity}/5. A supervisor must confirm this report before it can influence response priority; it cannot open an incident or trigger any actuator on its own.${hedge}`
 }

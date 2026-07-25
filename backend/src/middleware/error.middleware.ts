@@ -1,6 +1,10 @@
 import type { NextFunction, Request, Response } from "express"
 import { ZodError } from "zod"
-import { ERROR_CODE, type ApiErrorBody, type ApiErrorDetail } from "@scsrg/shared"
+import {
+  ERROR_CODE,
+  type ApiErrorBody,
+  type ApiErrorDetail,
+} from "@scsrg/shared"
 
 import { logger } from "../config/logger.js"
 import { isProduction } from "../config/env.js"

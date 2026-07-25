@@ -44,12 +44,10 @@ advisoryRouter.get(
     })
 
     const result = computeTrend(
-      readings
-        .reverse()
-        .map((reading) => ({
-          riskScore: reading.riskScore,
-          at: reading.capturedAt.getTime(),
-        }))
+      readings.reverse().map((reading) => ({
+        riskScore: reading.riskScore,
+        at: reading.capturedAt.getTime(),
+      }))
     )
 
     const payload: TrendDto = {
@@ -88,7 +86,10 @@ advisoryRouter.get(
     const latest = ordered.at(-1)
     const spanSeconds =
       oldest && latest
-        ? Math.max(1, (latest.capturedAt.getTime() - oldest.capturedAt.getTime()) / 1000)
+        ? Math.max(
+            1,
+            (latest.capturedAt.getTime() - oldest.capturedAt.getTime()) / 1000
+          )
         : 1
 
     const lastTransition = await prisma.zoneStateTransition.findFirst({
@@ -106,7 +107,8 @@ advisoryRouter.get(
     const result = predict({
       currentRisk: zone.currentRiskScore,
       fireStreak,
-      gasSlope: ((latest?.gasLevel ?? 0) - (oldest?.gasLevel ?? 0)) / spanSeconds,
+      gasSlope:
+        ((latest?.gasLevel ?? 0) - (oldest?.gasLevel ?? 0)) / spanSeconds,
       waterSlope:
         ((latest?.waterLevel ?? 0) - (oldest?.waterLevel ?? 0)) / spanSeconds,
       // Unknown occupancy counts as occupied here for the same fail-safe reason

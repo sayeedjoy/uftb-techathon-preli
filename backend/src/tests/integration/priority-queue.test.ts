@@ -49,7 +49,9 @@ describe("GET /priority-queue", () => {
     expect(queue[0].zoneCode).toBe("queue-high")
     expect(queue[0].rank).toBe(1)
     expect(queue[1].rank).toBe(2)
-    expect(queue[0].priorityScore).toBeGreaterThanOrEqual(queue[1].priorityScore)
+    expect(queue[0].priorityScore).toBeGreaterThanOrEqual(
+      queue[1].priorityScore
+    )
 
     // The dashboard must be able to explain the ordering without a detail view.
     expect(queue[0].reasons.length).toBeGreaterThan(0)
@@ -181,7 +183,9 @@ describe("GET /incidents filters", () => {
     await pushReadings(other, 5, CRITICAL)
 
     const authorized = () =>
-      api().get("/api/v1/incidents").set("authorization", `Bearer ${user.token}`)
+      api()
+        .get("/api/v1/incidents")
+        .set("authorization", `Bearer ${user.token}`)
 
     const all = await authorized()
     expect(all.body.data.incidents).toHaveLength(2)

@@ -39,7 +39,9 @@ async function main(): Promise<void> {
   console.log(
     `\nRetention policy: raw readings older than ${RETENTION_DAYS} days (before ${cutoff.toISOString()})`
   )
-  console.log(apply ? "Mode: APPLY (rows will be deleted)\n" : "Mode: DRY RUN\n")
+  console.log(
+    apply ? "Mode: APPLY (rows will be deleted)\n" : "Mode: DRY RUN\n"
+  )
 
   const doomed = await prisma.sensorReading.count({
     where: { capturedAt: { lt: cutoff } },

@@ -100,7 +100,10 @@ describe("computeRisk", () => {
   })
 
   it("treats NaN as absent rather than propagating it", () => {
-    const result = computeRisk(inputs({ normalizedWaterLevel: Number.NaN }), config)
+    const result = computeRisk(
+      inputs({ normalizedWaterLevel: Number.NaN }),
+      config
+    )
 
     expect(Number.isNaN(result.riskScore)).toBe(false)
     expect(result.riskScore).toBe(0)
@@ -198,9 +201,10 @@ describe("proportionality", () => {
     [0.75, 18.75],
     [1, 25],
   ])("gas at %s contributes %s", (level, expected) => {
-    expect(computeRisk(inputs({ normalizedGasLevel: level }), config).contributions.gas).toBe(
-      expected
-    )
+    expect(
+      computeRisk(inputs({ normalizedGasLevel: level }), config).contributions
+        .gas
+    ).toBe(expected)
   })
 
   it.each([
@@ -211,7 +215,8 @@ describe("proportionality", () => {
     [1, 20],
   ])("water at %s contributes %s", (level, expected) => {
     expect(
-      computeRisk(inputs({ normalizedWaterLevel: level }), config).contributions.water
+      computeRisk(inputs({ normalizedWaterLevel: level }), config).contributions
+        .water
     ).toBe(expected)
   })
 
@@ -292,14 +297,18 @@ describe("hazard helpers", () => {
   })
 
   it("returns an empty list when nothing contributes", () => {
-    expect(dominantHazards({ fire: 0, gas: 0, water: 0, occupancy: 0 })).toEqual(
-      []
-    )
+    expect(
+      dominantHazards({ fire: 0, gas: 0, water: 0, occupancy: 0 })
+    ).toEqual([])
   })
 
   it("counts hazard signals excluding occupancy", () => {
-    expect(activeHazardCount({ fire: 40, gas: 5, water: 0, occupancy: 15 })).toBe(2)
-    expect(activeHazardCount({ fire: 0, gas: 0, water: 0, occupancy: 15 })).toBe(0)
+    expect(
+      activeHazardCount({ fire: 40, gas: 5, water: 0, occupancy: 15 })
+    ).toBe(2)
+    expect(
+      activeHazardCount({ fire: 0, gas: 0, water: 0, occupancy: 15 })
+    ).toBe(0)
   })
 })
 

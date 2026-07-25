@@ -157,7 +157,9 @@ describe("offline detection", () => {
     })
     expect(zone.state).toBe("SAFE")
     // A heartbeat updates liveness without inventing a reading.
-    expect(await prisma.sensorReading.count({ where: { zoneId: zone.id } })).toBe(1)
+    expect(
+      await prisma.sensorReading.count({ where: { zoneId: zone.id } })
+    ).toBe(1)
   })
 
   it("marks a zone OFFLINE when its critical sensor goes blind", async () => {

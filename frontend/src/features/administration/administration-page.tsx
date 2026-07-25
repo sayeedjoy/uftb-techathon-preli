@@ -1,7 +1,11 @@
 import * as React from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { OVERRIDE_ACTIONS, type ManualOverrideDto, type ZoneSummaryDto } from "@scsrg/shared"
+import {
+  OVERRIDE_ACTIONS,
+  type ManualOverrideDto,
+  type ZoneSummaryDto,
+} from "@scsrg/shared"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -58,9 +62,9 @@ function OverrideConsole({ zones }: { zones: ZoneSummaryDto[] }) {
       <div>
         <h2 className="text-sm font-semibold">Override console</h2>
         <p className="text-xs text-muted-foreground">
-          Every override is recorded with your name, the time, the reason and the
-          affected zone, and is tagged as a manual action so it is never confused
-          with a sensor-triggered response.
+          Every override is recorded with your name, the time, the reason and
+          the affected zone, and is tagged as a manual action so it is never
+          confused with a sensor-triggered response.
         </p>
       </div>
 
@@ -69,7 +73,9 @@ function OverrideConsole({ zones }: { zones: ZoneSummaryDto[] }) {
           id="override-zone"
           label="Zone"
           value={zoneId || UNSELECTED}
-          onValueChange={(value) => setZoneId(value === UNSELECTED ? "" : value)}
+          onValueChange={(value) =>
+            setZoneId(value === UNSELECTED ? "" : value)
+          }
           options={[
             { value: UNSELECTED, label: "Select a zone…" },
             ...zones.map((zone) => ({ value: zone.id, label: zone.name })),
@@ -118,7 +124,9 @@ function OverrideConsole({ zones }: { zones: ZoneSummaryDto[] }) {
         <p className="rounded border border-violet-500/40 bg-violet-950/20 px-3 py-2 text-xs text-violet-200">
           Recorded: {lastResult.action.replace(/_/g, " ").toLowerCase()} on{" "}
           {lastResult.zoneCode} by {lastResult.userName} at{" "}
-          {new Date(lastResult.createdAt).toLocaleTimeString([], { hour12: false })}
+          {new Date(lastResult.createdAt).toLocaleTimeString([], {
+            hour12: false,
+          })}
           . An audit entry was written.
         </p>
       )}

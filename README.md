@@ -14,11 +14,11 @@ with `400`, not quietly ignored.
 
 ## Prerequisites
 
-| Tool | Version |
-|---|---|
-| Node.js | 22+ (developed on 24) |
-| pnpm | 10+ (developed on 11.5) |
-| Docker Desktop | for PostgreSQL 18 |
+| Tool           | Version                 |
+| -------------- | ----------------------- |
+| Node.js        | 22+ (developed on 24)   |
+| pnpm           | 10+ (developed on 11.5) |
+| Docker Desktop | for PostgreSQL 18       |
 
 `psql` is optional but handy. **Docker Postgres binds host port 5433**, not 5432
 — a local PostgreSQL install usually owns 5432 and the two would collide.
@@ -52,9 +52,9 @@ Open **http://localhost:5173**.
 > ⚠️ **These are seeded for local demonstration only. Never use them anywhere
 > real.**
 
-| Role | Email | Password |
-|---|---|---|
-| `ADMIN` | `admin@scsrg.local` | `Admin123!` |
+| Role             | Email                  | Password       |
+| ---------------- | ---------------------- | -------------- |
+| `ADMIN`          | `admin@scsrg.local`    | `Admin123!`    |
 | `SECURITY_STAFF` | `security@scsrg.local` | `Security123!` |
 
 Sign in as the admin to reach the Simulator, System Health, Administration and
@@ -66,17 +66,17 @@ route guard and the backend.
 
 ## The seven-minute demo
 
-| Time | Do | Point at |
-|---|---|---|
-| 0:00 | Log in as admin | Three zones, connection badge reads **Live** |
-| 0:30 | Simulator → **2 · Fire debounce** | A flicker produces nothing; sustained flame opens exactly one incident. Banner, toast, queue entry and actuator strip appear with no refresh |
-| 2:00 | Acknowledge from the banner | The attention cue stops; the incident stays visible until it resolves |
-| 2:30 | Simulator → **5 · Simultaneous multi-zone** | Two zones critical at once. Read *why* rank 1 outranks rank 2 straight off the screen |
-| 3:30 | Simulator → **9 · Invalid sensor value** | The payload inspector shows the backend's real `400` and `422` |
-| 4:15 | Simulator → **7 · Sensor offline** | The zone reads **Offline**, never Safe, with its last-seen time |
-| 5:00 | `Ctrl-C` the backend, then restart it | The queue and banner come back unchanged — state was rebuilt from Postgres |
-| 6:00 | Incident History | Filter by date, open a row for the full timeline and risk chart |
-| 6:40 | `/api/v1/docs` | Swagger with real request/response examples |
+| Time | Do                                          | Point at                                                                                                                                     |
+| ---- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0:00 | Log in as admin                             | Three zones, connection badge reads **Live**                                                                                                 |
+| 0:30 | Simulator → **2 · Fire debounce**           | A flicker produces nothing; sustained flame opens exactly one incident. Banner, toast, queue entry and actuator strip appear with no refresh |
+| 2:00 | Acknowledge from the banner                 | The attention cue stops; the incident stays visible until it resolves                                                                        |
+| 2:30 | Simulator → **5 · Simultaneous multi-zone** | Two zones critical at once. Read _why_ rank 1 outranks rank 2 straight off the screen                                                        |
+| 3:30 | Simulator → **9 · Invalid sensor value**    | The payload inspector shows the backend's real `400` and `422`                                                                               |
+| 4:15 | Simulator → **7 · Sensor offline**          | The zone reads **Offline**, never Safe, with its last-seen time                                                                              |
+| 5:00 | `Ctrl-C` the backend, then restart it       | The queue and banner come back unchanged — state was rebuilt from Postgres                                                                   |
+| 6:00 | Incident History                            | Filter by date, open a row for the full timeline and risk chart                                                                              |
+| 6:40 | `/api/v1/docs`                              | Swagger with real request/response examples                                                                                                  |
 
 Every scenario also runs headlessly and fails the shell on a bad assertion:
 
@@ -167,7 +167,7 @@ docs/              Architecture, risk fusion, priority ranking, security,
   ([docs/risk-fusion.md](docs/risk-fusion.md))
 - **Sensor rules that matter** — asymmetric fire debounce (slow to confirm,
   slower to clear), gas warm-up suppression, water phases, and occupancy that
-  reports *unavailable* rather than pretending a room is empty.
+  reports _unavailable_ rather than pretending a room is empty.
 - **Incident lifecycle** with recovery hysteresis, so a score oscillating around
   the threshold produces one incident rather than a dozen. Enforced by a partial
   unique index in Postgres, never by application logic.
@@ -246,17 +246,17 @@ key. `JWT_SECRET` must be at least 32 characters.
 
 ## Documentation
 
-| Document | Covers |
-|---|---|
-| [architecture.md](docs/architecture.md) | System shape, data flow, layering, in-memory state |
-| [api.md](docs/api.md) | Every endpoint, envelope, status codes, socket events |
-| [database-schema.md](docs/database-schema.md) | ERD, constraints, indexes, the performance gate |
-| [risk-fusion.md](docs/risk-fusion.md) | The formula, **why these weights**, sensor rules |
-| [priority-ranking.md](docs/priority-ranking.md) | Priority formula, determinism, the race |
-| [security.md](docs/security.md) | Auth, RBAC, hashing, redaction, tradeoffs |
-| [resilience.md](docs/resilience.md) | Offline, restart, concurrency, load, scaling |
-| [demo-scenarios.md](docs/demo-scenarios.md) | All eleven scenarios and what to expect |
-| [data-retention.md](docs/data-retention.md) | Retention policy, backup, recovery window |
-| [ml-model.md](docs/ml-model.md) | Bonus 2 — model, synthetic data, metrics, boundary |
+| Document                                        | Covers                                                |
+| ----------------------------------------------- | ----------------------------------------------------- |
+| [architecture.md](docs/architecture.md)         | System shape, data flow, layering, in-memory state    |
+| [api.md](docs/api.md)                           | Every endpoint, envelope, status codes, socket events |
+| [database-schema.md](docs/database-schema.md)   | ERD, constraints, indexes, the performance gate       |
+| [risk-fusion.md](docs/risk-fusion.md)           | The formula, **why these weights**, sensor rules      |
+| [priority-ranking.md](docs/priority-ranking.md) | Priority formula, determinism, the race               |
+| [security.md](docs/security.md)                 | Auth, RBAC, hashing, redaction, tradeoffs             |
+| [resilience.md](docs/resilience.md)             | Offline, restart, concurrency, load, scaling          |
+| [demo-scenarios.md](docs/demo-scenarios.md)     | All eleven scenarios and what to expect               |
+| [data-retention.md](docs/data-retention.md)     | Retention policy, backup, recovery window             |
+| [ml-model.md](docs/ml-model.md)                 | Bonus 2 — model, synthetic data, metrics, boundary    |
 
 Interactive API docs: **`http://localhost:4000/api/v1/docs`**.

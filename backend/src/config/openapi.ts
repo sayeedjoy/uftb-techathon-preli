@@ -106,8 +106,14 @@ export function buildOpenApiDocument(): Record<string, unknown> {
     tags: [
       { name: "Auth", description: "Login and the current user" },
       { name: "Zones", description: "Live zone status, history and timeline" },
-      { name: "Ingestion", description: "Sensor-node endpoints (zone API key)" },
-      { name: "Incidents", description: "Incident lifecycle and acknowledgment" },
+      {
+        name: "Ingestion",
+        description: "Sensor-node endpoints (zone API key)",
+      },
+      {
+        name: "Incidents",
+        description: "Incident lifecycle and acknowledgment",
+      },
       { name: "Priority", description: "Deterministic response ranking" },
       { name: "Dashboard", description: "Summary aggregation" },
       { name: "Admin", description: "Administration, overrides and audit" },
@@ -257,7 +263,10 @@ export function buildOpenApiDocument(): Record<string, unknown> {
               description: "Zone id or code (`iot-lab` works too).",
             },
           ],
-          responses: { 200: { description: "Zone detail" }, ...commonResponses },
+          responses: {
+            200: { description: "Zone detail" },
+            ...commonResponses,
+          },
         },
       },
 
@@ -266,13 +275,37 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Zones"],
           summary: "Raw reading history (ADMIN only)",
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
-            { name: "page", in: "query", schema: { type: "integer", default: 1 } },
-            { name: "pageSize", in: "query", schema: { type: "integer", default: 25 } },
-            { name: "from", in: "query", schema: { type: "string", format: "date-time" } },
-            { name: "to", in: "query", schema: { type: "string", format: "date-time" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
+            {
+              name: "page",
+              in: "query",
+              schema: { type: "integer", default: 1 },
+            },
+            {
+              name: "pageSize",
+              in: "query",
+              schema: { type: "integer", default: 25 },
+            },
+            {
+              name: "from",
+              in: "query",
+              schema: { type: "string", format: "date-time" },
+            },
+            {
+              name: "to",
+              in: "query",
+              schema: { type: "string", format: "date-time" },
+            },
           ],
-          responses: { 200: { description: "Paginated readings" }, ...commonResponses },
+          responses: {
+            200: { description: "Paginated readings" },
+            ...commonResponses,
+          },
         },
       },
 
@@ -281,9 +314,17 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Zones"],
           summary: "State transitions and incidents, merged",
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
-          responses: { 200: { description: "Zone timeline" }, ...commonResponses },
+          responses: {
+            200: { description: "Zone timeline" },
+            ...commonResponses,
+          },
         },
       },
 
@@ -292,9 +333,17 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Zones"],
           summary: "Per-zone connectivity (ADMIN only)",
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
-          responses: { 200: { description: "Zone health" }, ...commonResponses },
+          responses: {
+            200: { description: "Zone health" },
+            ...commonResponses,
+          },
         },
       },
 
@@ -313,7 +362,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           ].join("\n"),
           security: [{ zoneApiKey: [] }],
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           requestBody: {
             required: true,
@@ -321,7 +375,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
               "application/json": {
                 schema: {
                   type: "object",
-                  required: ["readingId", "sequenceNumber", "capturedAt", "sensors"],
+                  required: [
+                    "readingId",
+                    "sequenceNumber",
+                    "capturedAt",
+                    "sensors",
+                  ],
                   properties: {
                     readingId: { type: "string" },
                     sequenceNumber: { type: "integer", minimum: 0 },
@@ -402,9 +461,17 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           summary: "Report liveness without a reading",
           security: [{ zoneApiKey: [] }],
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
-          responses: { 200: { description: "lastSeenAt updated" }, ...commonResponses },
+          responses: {
+            200: { description: "lastSeenAt updated" },
+            ...commonResponses,
+          },
         },
       },
 
@@ -414,9 +481,17 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           summary: "Pull pending actuation commands",
           security: [{ zoneApiKey: [] }],
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
-          responses: { 200: { description: "Pending commands" }, ...commonResponses },
+          responses: {
+            200: { description: "Pending commands" },
+            ...commonResponses,
+          },
         },
       },
 
@@ -426,8 +501,18 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           summary: "Confirm a command was carried out",
           security: [{ zoneApiKey: [] }],
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
-            { name: "commandId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
+            {
+              name: "commandId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           requestBody: {
             required: true,
@@ -454,24 +539,49 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Incidents"],
           summary: "Search incidents",
           parameters: [
-            { name: "from", in: "query", schema: { type: "string", format: "date-time" } },
-            { name: "to", in: "query", schema: { type: "string", format: "date-time" } },
+            {
+              name: "from",
+              in: "query",
+              schema: { type: "string", format: "date-time" },
+            },
+            {
+              name: "to",
+              in: "query",
+              schema: { type: "string", format: "date-time" },
+            },
             { name: "zoneId", in: "query", schema: { type: "string" } },
             {
               name: "status",
               in: "query",
-              schema: { type: "string", enum: ["OPEN", "ACKNOWLEDGED", "RESOLVED"] },
+              schema: {
+                type: "string",
+                enum: ["OPEN", "ACKNOWLEDGED", "RESOLVED"],
+              },
             },
             {
               name: "hazardType",
               in: "query",
-              schema: { type: "string", enum: ["FIRE", "GAS", "WATER", "OCCUPANCY"] },
+              schema: {
+                type: "string",
+                enum: ["FIRE", "GAS", "WATER", "OCCUPANCY"],
+              },
             },
             { name: "acknowledgedBy", in: "query", schema: { type: "string" } },
-            { name: "page", in: "query", schema: { type: "integer", default: 1 } },
-            { name: "pageSize", in: "query", schema: { type: "integer", default: 25 } },
+            {
+              name: "page",
+              in: "query",
+              schema: { type: "integer", default: 1 },
+            },
+            {
+              name: "pageSize",
+              in: "query",
+              schema: { type: "integer", default: 25 },
+            },
           ],
-          responses: { 200: { description: "Paginated incidents" }, ...commonResponses },
+          responses: {
+            200: { description: "Paginated incidents" },
+            ...commonResponses,
+          },
         },
       },
 
@@ -480,9 +590,17 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Incidents"],
           summary: "Incident detail with timeline, readings and actuation",
           parameters: [
-            { name: "incidentId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "incidentId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
-          responses: { 200: { description: "Incident detail" }, ...commonResponses },
+          responses: {
+            200: { description: "Incident detail" },
+            ...commonResponses,
+          },
         },
       },
 
@@ -491,7 +609,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Incidents"],
           summary: "Ordered timeline events",
           parameters: [
-            { name: "incidentId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "incidentId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           responses: { 200: { description: "Timeline" }, ...commonResponses },
         },
@@ -504,7 +627,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           description:
             "Concurrency-safe: exactly one of N simultaneous requests returns 200; the rest return 409 ALREADY_ACKNOWLEDGED.",
           parameters: [
-            { name: "incidentId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "incidentId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           requestBody: {
             content: {
@@ -614,7 +742,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Admin"],
           summary: "Update a zone (ADMIN)",
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           requestBody: {
             content: {
@@ -630,7 +763,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Admin"],
           summary: "Apply a manual override (ADMIN)",
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           requestBody: {
             required: true,
@@ -662,7 +800,10 @@ export function buildOpenApiDocument(): Record<string, unknown> {
               },
             },
           },
-          responses: { 201: { description: "Override recorded" }, ...commonResponses },
+          responses: {
+            201: { description: "Override recorded" },
+            ...commonResponses,
+          },
         },
       },
 
@@ -671,7 +812,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Admin"],
           summary: "Update a sensor (ADMIN)",
           parameters: [
-            { name: "sensorId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "sensorId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           responses: { 200: { description: "Updated" }, ...commonResponses },
         },
@@ -693,9 +839,16 @@ export function buildOpenApiDocument(): Record<string, unknown> {
             { name: "userId", in: "query", schema: { type: "string" } },
             { name: "action", in: "query", schema: { type: "string" } },
             { name: "entityType", in: "query", schema: { type: "string" } },
-            { name: "page", in: "query", schema: { type: "integer", default: 1 } },
+            {
+              name: "page",
+              in: "query",
+              schema: { type: "integer", default: 1 },
+            },
           ],
-          responses: { 200: { description: "Audit entries" }, ...commonResponses },
+          responses: {
+            200: { description: "Audit entries" },
+            ...commonResponses,
+          },
         },
       },
 
@@ -712,7 +865,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Admin"],
           summary: "Change a user's role (ADMIN)",
           parameters: [
-            { name: "userId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "userId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           requestBody: {
             required: true,
@@ -737,7 +895,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Simulator"],
           summary: "Start streaming for a zone (ADMIN)",
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           responses: { 200: { description: "Started" }, ...commonResponses },
         },
@@ -748,7 +911,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Simulator"],
           summary: "Stop streaming for a zone (ADMIN)",
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           responses: { 200: { description: "Stopped" }, ...commonResponses },
         },
@@ -759,7 +927,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Simulator"],
           summary: "Patch a simulated zone's sensor state (ADMIN)",
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           requestBody: {
             content: {
@@ -784,7 +957,10 @@ export function buildOpenApiDocument(): Record<string, unknown> {
               schema: { type: "integer", minimum: 1, maximum: 11 },
             },
           ],
-          responses: { 200: { description: "Scenario result" }, ...commonResponses },
+          responses: {
+            200: { description: "Scenario result" },
+            ...commonResponses,
+          },
         },
       },
 
@@ -804,7 +980,10 @@ export function buildOpenApiDocument(): Record<string, unknown> {
               },
             },
           },
-          responses: { 201: { description: "Report recorded" }, ...commonResponses },
+          responses: {
+            201: { description: "Report recorded" },
+            ...commonResponses,
+          },
         },
       },
 
@@ -813,7 +992,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           tags: ["Reports"],
           summary: "Confirm a report (ADMIN)",
           parameters: [
-            { name: "reportId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "reportId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           responses: { 200: { description: "Confirmed" }, ...commonResponses },
         },
@@ -826,7 +1010,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           description:
             "Advisory only. Trend never influences state, incidents, priority or actuation.",
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           responses: { 200: { description: "Trend" }, ...commonResponses },
         },
@@ -839,7 +1028,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
           description:
             "Advisory only, trained on explicitly synthetic data. The prediction module has no import path to actuation or incidents.",
           parameters: [
-            { name: "zoneId", in: "path", required: true, schema: { type: "string" } },
+            {
+              name: "zoneId",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+            },
           ],
           responses: { 200: { description: "Prediction" }, ...commonResponses },
         },

@@ -27,7 +27,9 @@ function latest(overrides: Partial<SensorReading> = {}): SensorReading {
   } as SensorReading
 }
 
-function payload(overrides: Partial<SensorReadingInput> = {}): SensorReadingInput {
+function payload(
+  overrides: Partial<SensorReadingInput> = {}
+): SensorReadingInput {
   return {
     readingId: "iot-lab-101",
     sequenceNumber: 101,
@@ -97,7 +99,13 @@ describe("isRedundantReading", () => {
   it("is false when a sensor value changed", () => {
     expect(
       isRedundantReading(
-        payload({ sensors: { fireDetected: true, gasLevel: 0.2, occupancyDetected: true } }),
+        payload({
+          sensors: {
+            fireDetected: true,
+            gasLevel: 0.2,
+            occupancyDetected: true,
+          },
+        }),
         latest()
       )
     ).toBe(false)
@@ -106,7 +114,13 @@ describe("isRedundantReading", () => {
   it("treats an omitted value and an explicit null as the same", () => {
     expect(
       isRedundantReading(
-        payload({ sensors: { fireDetected: false, gasLevel: 0.2, occupancyDetected: true } }),
+        payload({
+          sensors: {
+            fireDetected: false,
+            gasLevel: 0.2,
+            occupancyDetected: true,
+          },
+        }),
         latest({ waterLevel: null })
       )
     ).toBe(true)

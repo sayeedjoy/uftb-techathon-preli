@@ -27,7 +27,8 @@ export const verifyApiKey = verifyPassword
  * Burns roughly the same time as a real comparison so an unknown email and a
  * wrong password are indistinguishable by response latency.
  */
-const DUMMY_HASH = "$2b$12$C6UzMDM.H6dfI/f/IKcEe.cVfB6dJfvTPRvC4pBd8FbLpZmm7Sa1u"
+const DUMMY_HASH =
+  "$2b$12$C6UzMDM.H6dfI/f/IKcEe.cVfB6dJfvTPRvC4pBd8FbLpZmm7Sa1u"
 
 export async function fakeVerifyPassword(plaintext: string): Promise<void> {
   await bcrypt.compare(plaintext, DUMMY_HASH)

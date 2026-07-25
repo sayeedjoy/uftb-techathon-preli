@@ -1,6 +1,9 @@
 import { Card } from "@/components/ui/card"
 import { ZoneCard } from "@/components/zones/zone-card"
-import { useLiveDashboardSync, useZones } from "@/features/dashboard/use-dashboard-data"
+import {
+  useLiveDashboardSync,
+  useZones,
+} from "@/features/dashboard/use-dashboard-data"
 
 export function ZoneListPage() {
   useLiveDashboardSync()
@@ -11,16 +14,22 @@ export function ZoneListPage() {
       <header>
         <h1 className="text-lg font-semibold">Zone details</h1>
         <p className="text-sm text-muted-foreground">
-          Select a zone to see its sensor history, transitions and configuration.
+          Select a zone to see its sensor history, transitions and
+          configuration.
         </p>
       </header>
 
       {zones.isLoading && (
-        <Card className="p-6 text-sm text-muted-foreground">Loading zones…</Card>
+        <Card className="p-6 text-sm text-muted-foreground">
+          Loading zones…
+        </Card>
       )}
 
       {zones.error != null && (
-        <Card role="alert" className="border-critical-border p-6 text-sm text-critical">
+        <Card
+          role="alert"
+          className="border-critical-border p-6 text-sm text-critical"
+        >
           Could not load zones.
         </Card>
       )}

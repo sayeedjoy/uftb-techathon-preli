@@ -9,7 +9,7 @@ Base path `/api/v1`. Interactive documentation with live examples:
 Every response, without exception:
 
 ```json
-{ "success": true, "data": { }, "meta": { } }
+{ "success": true, "data": {}, "meta": {} }
 ```
 
 ```json
@@ -18,7 +18,9 @@ Every response, without exception:
   "error": {
     "code": "VALUE_OUT_OF_RANGE",
     "message": "Gas level must be between 0 and 1 — received 1.5.",
-    "details": [{ "path": "sensors.gasLevel", "message": "Value outside the 0–1 range" }]
+    "details": [
+      { "path": "sensors.gasLevel", "message": "Value outside the 0–1 range" }
+    ]
   }
 }
 ```
@@ -28,23 +30,23 @@ Every response, without exception:
 
 ## Status codes
 
-| Code | Meaning here |
-|---|---|
-| `200` | OK |
-| `201` | Created — including an accepted sensor reading |
+| Code  | Meaning here                                                    |
+| ----- | --------------------------------------------------------------- |
+| `200` | OK                                                              |
+| `201` | Created — including an accepted sensor reading                  |
 | `400` | Malformed input. Wrong shape, wrong types, or a forbidden field |
-| `401` | Unauthenticated, or an invalid/revoked zone key |
-| `403` | Authenticated but not permitted, or a deactivated zone |
-| `404` | Not found |
-| `409` | Conflict — duplicate reading, already acknowledged |
-| `413` | Body over the 1 MB limit |
-| `422` | Valid shape, impossible values |
-| `429` | Rate limited |
-| `500` | Unexpected |
+| `401` | Unauthenticated, or an invalid/revoked zone key                 |
+| `403` | Authenticated but not permitted, or a deactivated zone          |
+| `404` | Not found                                                       |
+| `409` | Conflict — duplicate reading, already acknowledged              |
+| `413` | Body over the 1 MB limit                                        |
+| `422` | Valid shape, impossible values                                  |
+| `429` | Rate limited                                                    |
+| `500` | Unexpected                                                      |
 
 The `400` / `422` distinction is load-bearing. `{"gasLevel": "high"}` is the
-wrong *shape* — 400. `{"gasLevel": 1.5}` is the right shape carrying an
-impossible *value* — 422. They mean different things to whoever is debugging a
+wrong _shape_ — 400. `{"gasLevel": 1.5}` is the right shape carrying an
+impossible _value_ — 422. They mean different things to whoever is debugging a
 node.
 
 ## Error codes
@@ -59,30 +61,30 @@ node.
 
 ### Auth
 
-| Method & path | Auth | Notes |
-|---|---|---|
+| Method & path      | Auth   | Notes                                        |
+| ------------------ | ------ | -------------------------------------------- |
 | `POST /auth/login` | public | Rate-limited 5/min/IP. Returns token + user. |
-| `GET /auth/me` | JWT | Current user and role. |
+| `GET /auth/me`     | JWT    | Current user and role.                       |
 
 ### Zones
 
-| Method & path | Auth | Notes |
-|---|---|---|
-| `GET /zones` | JWT | **All** zone statuses in one request. |
-| `GET /zones/:zoneId` | JWT | Detail incl. configuration. Accepts an id *or* a code (`iot-lab`). |
-| `GET /zones/:zoneId/readings` | **ADMIN** | Paginated, date-filterable raw history. |
-| `GET /zones/:zoneId/timeline` | JWT | Transitions and incidents merged. |
-| `GET /zones/:zoneId/transitions` | JWT | State-change history. |
-| `GET /zones/:zoneId/system-health` | **ADMIN** | Per-zone connectivity. |
+| Method & path                      | Auth      | Notes                                                              |
+| ---------------------------------- | --------- | ------------------------------------------------------------------ |
+| `GET /zones`                       | JWT       | **All** zone statuses in one request.                              |
+| `GET /zones/:zoneId`               | JWT       | Detail incl. configuration. Accepts an id _or_ a code (`iot-lab`). |
+| `GET /zones/:zoneId/readings`      | **ADMIN** | Paginated, date-filterable raw history.                            |
+| `GET /zones/:zoneId/timeline`      | JWT       | Transitions and incidents merged.                                  |
+| `GET /zones/:zoneId/transitions`   | JWT       | State-change history.                                              |
+| `GET /zones/:zoneId/system-health` | **ADMIN** | Per-zone connectivity.                                             |
 
 ### Ingestion — zone API key only
 
-| Method & path | Notes |
-|---|---|
-| `POST /ingestion/zones/:zoneId/readings` | The full pipeline. Returns the backend's own verdict. |
-| `POST /ingestion/zones/:zoneId/heartbeat` | Liveness without a reading. |
-| `GET /ingestion/zones/:zoneId/commands` | Pending actuation commands. |
-| `POST /ingestion/zones/:zoneId/commands/:commandId/complete` | Confirm execution. |
+| Method & path                                                | Notes                                                 |
+| ------------------------------------------------------------ | ----------------------------------------------------- |
+| `POST /ingestion/zones/:zoneId/readings`                     | The full pipeline. Returns the backend's own verdict. |
+| `POST /ingestion/zones/:zoneId/heartbeat`                    | Liveness without a reading.                           |
+| `GET /ingestion/zones/:zoneId/commands`                      | Pending actuation commands.                           |
+| `POST /ingestion/zones/:zoneId/commands/:commandId/complete` | Confirm execution.                                    |
 
 **Request** — raw values only:
 
@@ -139,31 +141,31 @@ state, creating a transition, opening an incident or issuing actuation.
 
 ### Incidents
 
-| Method & path | Auth | Notes |
-|---|---|---|
-| `GET /incidents` | JWT | Filters: `from`, `to`, `zoneId`, `status`, `active`, `hazardType`, `acknowledgedBy`; paginated. |
-| `GET /incidents/:incidentId` | JWT | Detail with timeline, surrounding readings and actuation. `404` on unknown id. |
-| `GET /incidents/:incidentId/timeline` | JWT | Ordered events. |
-| `POST /incidents/:incidentId/acknowledge` | JWT | `200` / `409`. Optional `note`. |
+| Method & path                             | Auth | Notes                                                                                           |
+| ----------------------------------------- | ---- | ----------------------------------------------------------------------------------------------- |
+| `GET /incidents`                          | JWT  | Filters: `from`, `to`, `zoneId`, `status`, `active`, `hazardType`, `acknowledgedBy`; paginated. |
+| `GET /incidents/:incidentId`              | JWT  | Detail with timeline, surrounding readings and actuation. `404` on unknown id.                  |
+| `GET /incidents/:incidentId/timeline`     | JWT  | Ordered events.                                                                                 |
+| `POST /incidents/:incidentId/acknowledge` | JWT  | `200` / `409`. Optional `note`.                                                                 |
 
 ### Priority and dashboard
 
-| Method & path | Auth | Notes |
-|---|---|---|
-| `GET /priority-queue` | JWT | Ranked active incidents **with breakdown and reasons**. Empty is `[]`, never `null`. |
-| `GET /dashboard/summary` | JWT | Everything the top summary bar needs, in one request. |
+| Method & path            | Auth | Notes                                                                                |
+| ------------------------ | ---- | ------------------------------------------------------------------------------------ |
+| `GET /priority-queue`    | JWT  | Ranked active incidents **with breakdown and reasons**. Empty is `[]`, never `null`. |
+| `GET /dashboard/summary` | JWT  | Everything the top summary bar needs, in one request.                                |
 
 ### Admin — all `ADMIN`
 
-| Method & path | Notes |
-|---|---|
-| `POST /admin/zones` | Returns the plaintext API key **once**. |
-| `PATCH /admin/zones/:zoneId` | Update; `isActive: false` is the only removal path. |
-| `POST /admin/zones/:zoneId/credentials` | Rotate the API key; revokes the previous one. |
-| `POST /admin/zones/:zoneId/overrides` | Requires a `reason` of ≥ 5 characters. |
-| `PATCH /admin/sensors/:sensorId` | Sensor configuration and status. |
-| `GET /admin/system-health` | Full health picture. |
-| `GET /admin/audit-logs` | Paginated, filterable. |
+| Method & path                                          | Notes                                                     |
+| ------------------------------------------------------ | --------------------------------------------------------- |
+| `POST /admin/zones`                                    | Returns the plaintext API key **once**.                   |
+| `PATCH /admin/zones/:zoneId`                           | Update; `isActive: false` is the only removal path.       |
+| `POST /admin/zones/:zoneId/credentials`                | Rotate the API key; revokes the previous one.             |
+| `POST /admin/zones/:zoneId/overrides`                  | Requires a `reason` of ≥ 5 characters.                    |
+| `PATCH /admin/sensors/:sensorId`                       | Sensor configuration and status.                          |
+| `GET /admin/system-health`                             | Full health picture.                                      |
+| `GET /admin/audit-logs`                                | Paginated, filterable.                                    |
 | `GET /admin/users` · `PATCH /admin/users/:userId/role` | Role management; the last admin cannot demote themselves. |
 
 ### Simulator — all `ADMIN`
@@ -174,19 +176,19 @@ state, creating a transition, opening an incident or issuing actuation.
 
 ### Reports (bonus 3)
 
-| Method & path | Auth | Notes |
-|---|---|---|
-| `POST /reports/natural-language` | JWT | Deterministic extraction. Result is `PENDING` and influences nothing. |
-| `GET /reports` | JWT | List, filterable by status. |
-| `POST /reports/:reportId/confirm` | **ADMIN** | Only now can it contribute a bounded priority bonus. |
-| `POST /reports/:reportId/reject` | **ADMIN** | |
+| Method & path                     | Auth      | Notes                                                                                                                            |
+| --------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /reports/natural-language`  | JWT       | Extraction via the configured AI chain, falling back to the deterministic extractor. Result is `PENDING` and influences nothing. |
+| `GET /reports`                    | JWT       | List, filterable by status.                                                                                                      |
+| `POST /reports/:reportId/confirm` | **ADMIN** | Only now can it contribute a bounded priority bonus. `409` if the report was already ruled on.                                    |
+| `POST /reports/:reportId/reject`  | **ADMIN** | Files the report as rejected; it keeps influencing nothing. `409` if the report was already ruled on.                             |
 
 ### Advisory (bonuses 1 and 2)
 
-| Method & path | Auth | Notes |
-|---|---|---|
-| `GET /trend/:zoneId` | JWT | Moving average and slope. Never affects state. |
-| `GET /prediction/:zoneId` | JWT | P(CRITICAL within 60s). Cannot actuate. |
+| Method & path             | Auth | Notes                                          |
+| ------------------------- | ---- | ---------------------------------------------- |
+| `GET /trend/:zoneId`      | JWT  | Moving average and slope. Never affects state. |
+| `GET /prediction/:zoneId` | JWT  | P(CRITICAL within 60s). Cannot actuate.        |
 
 ### Health
 

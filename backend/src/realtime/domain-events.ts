@@ -25,7 +25,8 @@ function toReadingDto(reading: SensorReading): SensorReadingDto {
     riskScore: reading.riskScore,
     calculatedState: reading.calculatedState,
     contributions:
-      typeof reading.contributions === "object" && reading.contributions !== null
+      typeof reading.contributions === "object" &&
+      reading.contributions !== null
         ? (reading.contributions as SensorReadingDto["contributions"])
         : { fire: 0, gas: 0, water: 0, occupancy: 0 },
     reasons: Array.isArray(reading.reasons)

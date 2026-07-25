@@ -35,7 +35,9 @@ async function main(): Promise<void> {
   console.log(
     "\n  Zone API keys were written to backend/.dev-zone-keys.json and"
   )
-  console.log("  backend/.env.simulator (both gitignored). They are shown once:")
+  console.log(
+    "  backend/.env.simulator (both gitignored). They are shown once:"
+  )
   for (const [code, key] of Object.entries(zoneKeys)) {
     console.log(`  ${code.padEnd(15)} ${key}`)
   }

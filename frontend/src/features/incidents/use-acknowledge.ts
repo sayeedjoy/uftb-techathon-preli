@@ -43,7 +43,9 @@ export function useAcknowledgeIncident() {
     },
 
     onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.incidents.all() })
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.incidents.all(),
+      })
       void queryClient.invalidateQueries({
         queryKey: queryKeys.priorityQueue.all(),
       })

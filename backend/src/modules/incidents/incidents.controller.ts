@@ -37,7 +37,9 @@ export async function listIncidentsController(
     ...(filters.status ? { status: filters.status } : {}),
     ...(filters.active ? { active: true } : {}),
     ...(filters.hazardType ? { hazardType: filters.hazardType } : {}),
-    ...(filters.acknowledgedBy ? { acknowledgedBy: filters.acknowledgedBy } : {}),
+    ...(filters.acknowledgedBy
+      ? { acknowledgedBy: filters.acknowledgedBy }
+      : {}),
     skip: (filters.page - 1) * filters.pageSize,
     take: filters.pageSize,
   })

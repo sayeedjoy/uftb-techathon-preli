@@ -37,7 +37,10 @@ function Metric({
 
   return (
     <div className="flex items-start gap-2.5 px-3 py-2.5" title={hint}>
-      <Icon aria-hidden className={cn("mt-0.5 size-4 shrink-0", classes.icon)} />
+      <Icon
+        aria-hidden
+        className={cn("mt-0.5 size-4 shrink-0", classes.icon)}
+      />
       <div className="min-w-0">
         <p
           data-numeric

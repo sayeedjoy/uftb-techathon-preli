@@ -63,7 +63,11 @@ export async function completeCommandController(
   res: Response
 ): Promise<void> {
   const zone = requireZone(req)
-  const commandId = requiredPathParam(req, "commandId", "No command was specified.")
+  const commandId = requiredPathParam(
+    req,
+    "commandId",
+    "No command was specified."
+  )
 
   const body = commandCompletionSchema.parse(req.body ?? {})
   const result = await completeCommand(

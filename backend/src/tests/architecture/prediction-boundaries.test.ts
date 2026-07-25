@@ -44,7 +44,9 @@ describe("prediction module boundaries", () => {
   ]
 
   it("imports nothing from actuation, incidents or zone state", () => {
-    const files = collectTypeScriptFiles(path.join(SRC_ROOT, "modules/prediction"))
+    const files = collectTypeScriptFiles(
+      path.join(SRC_ROOT, "modules/prediction")
+    )
     expect(files.length).toBeGreaterThan(0)
 
     const violations: string[] = []
@@ -60,12 +62,15 @@ describe("prediction module boundaries", () => {
   })
 
   it("imports no Prisma client, so it cannot write anything at all", () => {
-    const files = collectTypeScriptFiles(path.join(SRC_ROOT, "modules/prediction"))
+    const files = collectTypeScriptFiles(
+      path.join(SRC_ROOT, "modules/prediction")
+    )
 
     const violations = files.filter((file) =>
       importsOf(file).some(
         (specifier) =>
-          specifier === "@prisma/client" || specifier.includes("database/prisma")
+          specifier === "@prisma/client" ||
+          specifier.includes("database/prisma")
       )
     )
 
@@ -84,7 +89,9 @@ describe("prediction module boundaries", () => {
 
     const violations: string[] = []
     for (const directory of hazardDirectories) {
-      for (const file of collectTypeScriptFiles(path.join(SRC_ROOT, directory))) {
+      for (const file of collectTypeScriptFiles(
+        path.join(SRC_ROOT, directory)
+      )) {
         for (const specifier of importsOf(file)) {
           if (specifier.includes("trend") || specifier.includes("prediction")) {
             violations.push(`${path.relative(SRC_ROOT, file)} → ${specifier}`)

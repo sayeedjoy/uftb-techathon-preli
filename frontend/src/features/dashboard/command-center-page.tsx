@@ -127,7 +127,10 @@ export function CommandCenterPage() {
 
           {!zones.isLoading && !zones.error && zoneCount === 0 && (
             <Card className="flex flex-col items-center gap-2 p-10 text-center">
-              <LayoutGrid aria-hidden className="size-8 text-muted-foreground" />
+              <LayoutGrid
+                aria-hidden
+                className="size-8 text-muted-foreground"
+              />
               <p className="text-sm font-medium">No zones are configured yet</p>
               <p className="max-w-[40ch] text-xs text-muted-foreground">
                 An administrator can add one from the Administration page. Zones

@@ -25,10 +25,7 @@ export function markCredentialUsed(
   })
 }
 
-export function revokeCredentials(
-  zoneId: string,
-  db: DbHandle = prisma
-) {
+export function revokeCredentials(zoneId: string, db: DbHandle = prisma) {
   return db.zoneCredential.updateMany({
     where: { zoneId, revokedAt: null },
     data: { revokedAt: new Date() },

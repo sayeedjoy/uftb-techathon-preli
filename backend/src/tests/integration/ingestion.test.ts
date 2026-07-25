@@ -2,7 +2,12 @@ import { beforeEach, describe, expect, it } from "vitest"
 
 import { prisma } from "../../database/prisma.js"
 import { createZoneFixture, type SeededZone } from "../fixtures/zone.fixture.js"
-import { api, createAdmin, createUser, readingPayload } from "../helpers/request.js"
+import {
+  api,
+  createAdmin,
+  createUser,
+  readingPayload,
+} from "../helpers/request.js"
 import { pushReading, pushReadings, resetSequence } from "../helpers/ingest.js"
 
 describe("POST /ingestion/zones/:zoneId/readings", () => {
@@ -10,7 +15,10 @@ describe("POST /ingestion/zones/:zoneId/readings", () => {
 
   beforeEach(async () => {
     resetSequence()
-    seeded = await createZoneFixture({ code: "ingest-zone", assetImportance: 5 })
+    seeded = await createZoneFixture({
+      code: "ingest-zone",
+      assetImportance: 5,
+    })
   })
 
   function post(body: object, apiKey = seeded.apiKey) {
@@ -24,7 +32,11 @@ describe("POST /ingestion/zones/:zoneId/readings", () => {
     const response = await post(
       readingPayload({
         sequenceNumber: 1,
-        sensors: { fireDetected: false, gasLevel: 0.7, occupancyDetected: true },
+        sensors: {
+          fireDetected: false,
+          gasLevel: 0.7,
+          occupancyDetected: true,
+        },
       })
     )
 
@@ -179,16 +191,24 @@ describe("POST /ingestion/zones/:zoneId/readings", () => {
       where: { id: seeded.zone.id },
     })
     expect(zoneAfterStale.state).toBe(zoneAfterFresh.state)
-    expect(zoneAfterStale.currentRiskScore).toBe(zoneAfterFresh.currentRiskScore)
+    expect(zoneAfterStale.currentRiskScore).toBe(
+      zoneAfterFresh.currentRiskScore
+    )
 
     expect(
-      await prisma.zoneStateTransition.count({ where: { zoneId: seeded.zone.id } })
+      await prisma.zoneStateTransition.count({
+        where: { zoneId: seeded.zone.id },
+      })
     ).toBe(transitionsBefore)
     expect(await prisma.incident.count()).toBe(0)
   })
 
   it("marks a byte-identical follow-up reading as redundant", async () => {
-    const sensors = { fireDetected: false, gasLevel: 0.2, occupancyDetected: true }
+    const sensors = {
+      fireDetected: false,
+      gasLevel: 0.2,
+      occupancyDetected: true,
+    }
     await post(readingPayload({ readingId: "r1", sequenceNumber: 1, sensors }))
     await post(readingPayload({ readingId: "r2", sequenceNumber: 2, sensors }))
 

@@ -260,7 +260,9 @@ describe("manual overrides", () => {
 
     const refreshed = {
       ...zone,
-      zone: await prisma.zone.findUniqueOrThrow({ where: { id: zone.zone.id } }),
+      zone: await prisma.zone.findUniqueOrThrow({
+        where: { id: zone.zone.id },
+      }),
     }
     await pushReadings(refreshed, 6, {
       fireDetected: true,

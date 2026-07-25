@@ -43,7 +43,10 @@ export function loadZoneKeys(refresh = false): Record<string, string> {
   // 2. Environment overrides — SIM_ZONE_KEY_IOT_LAB=… for containerised runs.
   for (const [name, value] of Object.entries(process.env)) {
     if (!name.startsWith("SIM_ZONE_KEY_") || !value) continue
-    const code = name.slice("SIM_ZONE_KEY_".length).toLowerCase().replace(/_/g, "-")
+    const code = name
+      .slice("SIM_ZONE_KEY_".length)
+      .toLowerCase()
+      .replace(/_/g, "-")
     keys[code] = value
   }
 

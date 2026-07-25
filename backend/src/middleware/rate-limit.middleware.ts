@@ -29,7 +29,10 @@ function build(limit: number, name: string): RateLimitRequestHandler {
 }
 
 /** 5/min/IP — protects login from credential stuffing. */
-export const authRateLimit = build(env.RATE_LIMIT_AUTH_PER_MIN, "authentication")
+export const authRateLimit = build(
+  env.RATE_LIMIT_AUTH_PER_MIN,
+  "authentication"
+)
 
 /** Test-only variant that ignores the NODE_ENV bypass above. */
 export function buildAuthRateLimitForTest(limit: number) {
@@ -43,7 +46,8 @@ export function buildAuthRateLimitForTest(limit: number) {
         success: false,
         error: {
           code: ERROR_CODE.RATE_LIMITED,
-          message: "Too many requests to authentication. Try again in a minute.",
+          message:
+            "Too many requests to authentication. Try again in a minute.",
         },
       }),
   })

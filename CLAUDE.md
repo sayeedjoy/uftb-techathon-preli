@@ -42,7 +42,7 @@ pnpm --filter frontend exec vitest run src/features/dashboard/command-center.tes
 Integration tests run against a dedicated `scsrg_test` database (`src/tests/global-setup.ts` runs
 `prisma migrate deploy` against it and overrides env: `BCRYPT_ROUNDS=4`, `GAS_WARMUP_MS=0`, short
 offline timeout, sweeper pushed out of reach). They are deliberately **single-threaded** and truncate
-all tables *before* each test — a failed test leaves its rows for inspection. Order-independence is
+all tables _before_ each test — a failed test leaves its rows for inspection. Order-independence is
 a hard requirement; do not add parallelism.
 
 ## Non-negotiable invariants
@@ -67,11 +67,17 @@ not a refactor.
    goes with it.
 6. **Every in-memory map is a cache, never the only copy.** Debounce counters, gas warm-up, occupancy,
    water phase, recovery counters each expose `rehydrate()`; `src/bootstrap/` rebuilds all of them from
-   Postgres *before* the HTTP listener binds.
+   Postgres _before_ the HTTP listener binds.
 7. **Offline means unknown, not safe.** A silent zone keeps its incident open and its actuators on.
 8. **The prediction module (bonus 2) may not touch the hazard path.** `src/tests/architecture/prediction-boundaries.test.ts`
    scans the import graph — adding an import of actuation/incidents/zone-state there fails the build.
    Trend, prediction and NL field reports are advisory only.
+9. **An AI provider is never on the hazard path and never authors user-facing safety text.**
+   `AI_PROVIDER` (OpenRouter primary → Groq fallback → deterministic floor) only affects how free
+   text is _read_. Every extraction — LLM or deterministic — passes the identical
+   `applyValidationGate`, the confirmation message is always composed by `buildConfirmation()`
+   locally, and the result is a `PENDING` report that cannot open an incident or actuate. Keys and
+   model names live in `backend/.env` and never reach the browser. See `docs/ai-provider.md`.
 
 ## Where things live
 
@@ -98,7 +104,7 @@ cache and are never a parallel source of truth. Two subtleties worth preserving:
   events fan out through `lib/event-bus.ts`. Doing it per subscriber looks equivalent and is not: the
   first hook to register would consume the `eventId` and every other hook would silently miss the
   event. `features/dashboard/command-center.test.tsx` exists because that regression happened.
-- On connect *and every reconnect*, the four snapshot queries (`SNAPSHOT_QUERY_KEYS`) are refetched,
+- On connect _and every reconnect_, the four snapshot queries (`SNAPSHOT_QUERY_KEYS`) are refetched,
   so a client that missed events while disconnected converges rather than showing a stale picture.
   Events predating the current connection are applied but raise no toast (`isBackdated`).
 
@@ -133,6 +139,7 @@ Seeded dev logins (local demo only): `admin@scsrg.local` / `Admin123!` and
 ## Deeper reference
 
 `docs/` is current and worth reading before non-trivial changes: `architecture.md`, `api.md`,
-`database-schema.md`, `risk-fusion.md` (the formula and *why* those weights), `priority-ranking.md`,
-`security.md`, `resilience.md`, `demo-scenarios.md`, `data-retention.md`, `ml-model.md`.
+`database-schema.md`, `risk-fusion.md` (the formula and _why_ those weights), `priority-ranking.md`,
+`security.md`, `resilience.md`, `demo-scenarios.md`, `data-retention.md`, `ml-model.md`,
+`ai-provider.md` (the OpenRouter → Groq → deterministic extraction chain).
 `specs-and-planning/` holds the original spec, plan and task breakdown.

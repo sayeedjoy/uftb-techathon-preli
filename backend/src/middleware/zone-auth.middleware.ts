@@ -47,7 +47,11 @@ function digestOf(apiKey: string): Buffer {
   return createHash("sha256").update(apiKey).digest()
 }
 
-function findCached(zoneId: string, digest: Buffer, now: number): string | null {
+function findCached(
+  zoneId: string,
+  digest: Buffer,
+  now: number
+): string | null {
   const entries = verifiedKeys.get(zoneId)
   if (!entries) return null
 

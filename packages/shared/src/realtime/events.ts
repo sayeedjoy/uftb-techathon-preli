@@ -75,9 +75,7 @@ export type ServerToClientEvents = {
   "sensor:offline": (payload: WithEnvelope<SensorOfflinePayload>) => void
   "system:health": (payload: WithEnvelope<SystemHealthPayload>) => void
   "actuation:command": (payload: WithEnvelope<ActuationCommandPayload>) => void
-  "simulator:payload": (
-    payload: WithEnvelope<SimulatorPayloadEventDto>
-  ) => void
+  "simulator:payload": (payload: WithEnvelope<SimulatorPayloadEventDto>) => void
   "simulator:response": (
     payload: WithEnvelope<SimulatorResponseEventDto>
   ) => void

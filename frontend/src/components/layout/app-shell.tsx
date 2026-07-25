@@ -1,6 +1,12 @@
 import * as React from "react"
 import { Link, Outlet, useLocation } from "react-router"
-import { LogOut, Menu, PanelLeftClose, PanelLeftOpen, Siren } from "lucide-react"
+import {
+  LogOut,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Siren,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -13,6 +19,7 @@ import {
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 import { useSidebarCollapsed } from "@/hooks/use-sidebar-collapsed"
+import { ReportChat } from "@/features/reports/report-chat"
 import { ConnectionBadge } from "./connection-badge"
 import { SidebarNav } from "./sidebar-nav"
 import { ThemeToggle } from "./theme-toggle"
@@ -29,7 +36,7 @@ function ClockReadout() {
   return (
     <time
       dateTime={now.toISOString()}
-      className="hidden font-mono text-sm tabular-nums text-muted-foreground sm:inline"
+      className="hidden font-mono text-sm text-muted-foreground tabular-nums sm:inline"
     >
       {now.toLocaleTimeString([], { hour12: false })}
     </time>
@@ -194,6 +201,10 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
+
+      {/* Mounted on the shell, not a page: a report is something an operator
+          needs to file *while* watching the grid, from wherever they are. */}
+      <ReportChat />
     </div>
   )
 }

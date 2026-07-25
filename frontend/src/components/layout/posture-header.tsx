@@ -98,7 +98,8 @@ function StateDistribution({ summary }: { summary: DashboardSummaryDto }) {
       <div
         role="img"
         aria-label={DISTRIBUTION_ORDER.map(
-          (state) => `${ZONE_STATE_PRESENTATION[state].label} ${summary.stateCounts[state]}`
+          (state) =>
+            `${ZONE_STATE_PRESENTATION[state].label} ${summary.stateCounts[state]}`
         ).join(", ")}
         className="flex h-2 w-full gap-0.5 overflow-hidden rounded-full bg-muted"
       >
@@ -210,7 +211,11 @@ export function PostureHeader({
     <Card
       data-testid="posture-header"
       data-posture={state.key}
-      className={cn("flex flex-col gap-4 border p-4", state.border, state.surface)}
+      className={cn(
+        "flex flex-col gap-4 border p-4",
+        state.border,
+        state.surface
+      )}
     >
       <div className="flex flex-wrap items-start gap-4">
         <state.Icon

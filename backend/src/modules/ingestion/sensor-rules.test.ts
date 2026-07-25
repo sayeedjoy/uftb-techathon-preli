@@ -83,13 +83,17 @@ describe("GasWarmupService", () => {
     service.evaluate("zone-a", 0.5, clock.nowMs())
     clock.advance(1_500)
 
-    expect(service.evaluate("zone-a", 0.5, clock.nowMs()).remainingMs).toBe(3_500)
+    expect(service.evaluate("zone-a", 0.5, clock.nowMs()).remainingMs).toBe(
+      3_500
+    )
   })
 
   it("restarts the window on reconnection", () => {
     service.evaluate("zone-a", 0.5, clock.nowMs())
     clock.advance(10_000)
-    expect(service.evaluate("zone-a", 0.5, clock.nowMs()).suppressed).toBe(false)
+    expect(service.evaluate("zone-a", 0.5, clock.nowMs()).suppressed).toBe(
+      false
+    )
 
     service.start("zone-a", clock.nowMs())
     expect(service.evaluate("zone-a", 0.5, clock.nowMs()).suppressed).toBe(true)
@@ -104,7 +108,9 @@ describe("GasWarmupService", () => {
     const startedAt = new Date(clock.nowMs() - 2_000)
     service.rehydrate("zone-a", startedAt, clock.nowMs())
 
-    expect(service.evaluate("zone-a", 0.5, clock.nowMs()).remainingMs).toBe(3_000)
+    expect(service.evaluate("zone-a", 0.5, clock.nowMs()).remainingMs).toBe(
+      3_000
+    )
   })
 
   it("restarts the window when the stored start time is unknown", () => {

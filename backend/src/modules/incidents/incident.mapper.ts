@@ -11,7 +11,10 @@ function durationSeconds(
   resolvedAt: Date | null
 ): number | null {
   if (!resolvedAt) return null
-  return Math.max(0, Math.floor((resolvedAt.getTime() - startedAt.getTime()) / 1000))
+  return Math.max(
+    0,
+    Math.floor((resolvedAt.getTime() - startedAt.getTime()) / 1000)
+  )
 }
 
 export function asPriorityExplanation(

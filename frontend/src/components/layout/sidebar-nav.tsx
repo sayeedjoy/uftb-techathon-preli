@@ -69,7 +69,12 @@ const NAV_GROUPS: NavGroup[] = [
         Icon: ClipboardList,
         requiresRole: "ADMIN",
       },
-      { to: "/simulator", label: "Simulator", Icon: Cpu, requiresRole: "ADMIN" },
+      {
+        to: "/simulator",
+        label: "Simulator",
+        Icon: Cpu,
+        requiresRole: "ADMIN",
+      },
       {
         to: "/audit-logs",
         label: "Audit Logs",

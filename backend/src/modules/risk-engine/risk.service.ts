@@ -1,4 +1,8 @@
-import { ZONE_STATE, type RiskContributions, type ZoneState } from "@scsrg/shared"
+import {
+  ZONE_STATE,
+  type RiskContributions,
+  type ZoneState,
+} from "@scsrg/shared"
 
 import { riskConfig, type RiskConfig } from "../../config/risk.config.js"
 import { explain } from "./explain.js"
@@ -111,9 +115,7 @@ export function dominantHazards(
 
 /** ≥2 active hazard signals — feeds the priority engine's multi-hazard bonus. */
 export function activeHazardCount(contributions: RiskContributions): number {
-  return [
-    contributions.fire,
-    contributions.gas,
-    contributions.water,
-  ].filter((value) => value > 0).length
+  return [contributions.fire, contributions.gas, contributions.water].filter(
+    (value) => value > 0
+  ).length
 }

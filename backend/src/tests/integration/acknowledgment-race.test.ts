@@ -128,7 +128,9 @@ describe("acknowledgment concurrency", () => {
     const officer = await createUser("SECURITY_STAFF")
 
     const response = await api()
-      .post("/api/v1/incidents/00000000-0000-0000-0000-000000000000/acknowledge")
+      .post(
+        "/api/v1/incidents/00000000-0000-0000-0000-000000000000/acknowledge"
+      )
       .set("authorization", `Bearer ${officer.token}`)
       .send({})
 

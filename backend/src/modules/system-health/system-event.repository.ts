@@ -42,7 +42,10 @@ export async function recordSystemEvent(
       },
     })
   } catch (error) {
-    logger.warn({ err: error, event: input.type }, "Could not persist system event")
+    logger.warn(
+      { err: error, event: input.type },
+      "Could not persist system event"
+    )
   }
 }
 

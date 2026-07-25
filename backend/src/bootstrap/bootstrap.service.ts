@@ -24,9 +24,7 @@ export async function runBootstrap(): Promise<void> {
   }
 
   // 2–7. Reconstruct live state, rehydrate in-memory counters, restart jobs.
-  const { reconstructState } = await import(
-    "./state-reconstruction.service.js"
-  )
+  const { reconstructState } = await import("./state-reconstruction.service.js")
   const summary = await reconstructState()
 
   logger.info(
@@ -38,9 +36,8 @@ export async function runBootstrap(): Promise<void> {
 /** Called from the SIGTERM path so timers cannot keep the process alive. */
 export function stopBackgroundJobs(): void {
   void (async () => {
-    const { stopHeartbeatMonitor } = await import(
-      "../jobs/heartbeat-monitor.js"
-    )
+    const { stopHeartbeatMonitor } =
+      await import("../jobs/heartbeat-monitor.js")
     stopHeartbeatMonitor()
   })()
 }

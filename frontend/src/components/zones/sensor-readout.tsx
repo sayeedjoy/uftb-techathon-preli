@@ -130,7 +130,9 @@ export function SensorReadout({
               : values.waterLevel === null
                 ? "No reading"
                 : `${Math.round(values.waterLevel * 100)}%${
-                    values.waterPhase ? ` · ${values.waterPhase.toLowerCase()}` : ""
+                    values.waterPhase
+                      ? ` · ${values.waterPhase.toLowerCase()}`
+                      : ""
                   }`
           }
           emphasis={
