@@ -1,11 +1,19 @@
 import * as React from "react"
-import { Link, Outlet } from "react-router"
-import { LogOut, Siren } from "lucide-react"
+import { Link, Outlet, useLocation } from "react-router"
+import { LogOut, Menu, Siren } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import { ConnectionBadge } from "./connection-badge"
 import { SidebarNav } from "./sidebar-nav"
+import { ThemeToggle } from "./theme-toggle"
 import { useAuth } from "@/features/auth/auth-provider"
 
 function ClockReadout() {
@@ -19,10 +27,26 @@ function ClockReadout() {
   return (
     <time
       dateTime={now.toISOString()}
-      className="font-mono text-sm tabular-nums text-muted-foreground"
+      className="hidden font-mono text-sm tabular-nums text-muted-foreground sm:inline"
     >
       {now.toLocaleTimeString([], { hour12: false })}
     </time>
+  )
+}
+
+function BrandMark({ className }: { className?: string }) {
+  return (
+    <div className={className}>
+      <div className="flex items-center gap-2">
+        <Siren aria-hidden className="size-5 shrink-0 text-critical" />
+        <div className="min-w-0">
+          <p className="truncate text-sm leading-tight font-semibold">SCS-RG</p>
+          <p className="truncate text-xs text-muted-foreground">
+            Campus Safety Grid
+          </p>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -30,41 +54,82 @@ function ClockReadout() {
  * The command-centre chrome: a persistent sidebar, a status-bearing top bar and
  * the routed page. Information-dense and quiet — the page content is what
  * should draw the eye, not the frame around it.
+ *
+ * Below `md` the sidebar collapses into a sheet. It is not simply hidden: an
+ * operator on a phone still needs every destination, and a nav that disappears
+ * at a breakpoint strands them on whatever page they happened to load.
  */
 export function AppShell() {
   const { user, logout } = useAuth()
+  const [mobileNavOpen, setMobileNavOpen] = React.useState(false)
+  const location = useLocation()
+
+  // Any navigation closes the sheet, including a browser back/forward that the
+  // NavLink click handler never sees. Adjusted during render rather than in an
+  // effect: React re-runs this component before committing, so the sheet never
+  // paints open on the new route — an effect would show one frame of the old
+  // state and cost a cascading render.
+  const [renderedPath, setRenderedPath] = React.useState(location.pathname)
+  if (renderedPath !== location.pathname) {
+    setRenderedPath(location.pathname)
+    setMobileNavOpen(false)
+  }
 
   return (
     <div className="flex min-h-svh bg-background">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-popover focus:px-3 focus:py-2 focus:text-sm focus:ring-2 focus:ring-ring"
+      >
+        Skip to main content
+      </a>
+
       <aside className="hidden w-60 shrink-0 flex-col border-r border-border/60 md:flex">
-        <div className="flex items-center gap-2 px-4 py-4">
-          <Siren aria-hidden className="size-5 text-red-500" />
-          <div className="min-w-0">
-            <p className="truncate text-sm leading-tight font-semibold">SCS-RG</p>
-            <p className="truncate text-xs text-muted-foreground">
-              Campus Safety Grid
-            </p>
-          </div>
-        </div>
+        <BrandMark className="px-4 py-4" />
         <Separator />
         <SidebarNav />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border/60 px-4">
+        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-border/60 bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:gap-3 sm:px-4">
+          <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
+            <SheetTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="md:hidden"
+                  aria-label="Open navigation"
+                />
+              }
+            >
+              <Menu aria-hidden className="size-4" />
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 p-0">
+              <SheetTitle className="sr-only">Navigation</SheetTitle>
+              <SheetDescription className="sr-only">
+                Command centre destinations available to your role.
+              </SheetDescription>
+              <BrandMark className="px-4 py-4" />
+              <Separator />
+              <SidebarNav onNavigate={() => setMobileNavOpen(false)} />
+            </SheetContent>
+          </Sheet>
+
           <Link
             to="/"
-            className="flex items-center gap-2 md:hidden"
+            className="flex items-center gap-2 rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none md:hidden"
             aria-label="Command Center"
           >
-            <Siren aria-hidden className="size-5 text-red-500" />
+            <Siren aria-hidden className="size-5 text-critical" />
             <span className="text-sm font-semibold">SCS-RG</span>
           </Link>
 
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2 sm:gap-3">
             <ClockReadout />
             <ConnectionBadge />
-            <Separator orientation="vertical" className="h-6" />
+            <Separator orientation="vertical" className="hidden h-6 sm:block" />
+            <ThemeToggle />
             <div className="hidden text-right sm:block">
               <p className="text-xs leading-tight font-medium">{user?.name}</p>
               <p className="text-[11px] leading-tight text-muted-foreground uppercase">
@@ -83,7 +148,10 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="min-w-0 flex-1 p-4 lg:p-6">
+        <main
+          id="main-content"
+          className="min-w-0 flex-1 p-3 sm:p-4 lg:p-6"
+        >
           <Outlet />
         </main>
       </div>

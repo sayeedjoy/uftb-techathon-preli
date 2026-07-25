@@ -101,15 +101,15 @@ export function ReportsPage() {
         {lastReport && (
           <div
             role="status"
-            className="rounded border border-sky-500/40 bg-sky-950/20 px-3 py-2 text-xs"
+            className="rounded border border-info-border bg-info-surface px-3 py-2 text-xs"
           >
-            <p className="font-medium text-sky-200">
+            <p className="font-medium text-info">
               {lastReport.zoneCode ?? "Zone not identified"} ·{" "}
               {lastReport.hazardType?.toLowerCase() ?? "hazard unclassified"} ·
               severity {lastReport.estimatedSeverity}/5 · confidence{" "}
               {Math.round(lastReport.confidence * 100)}%
             </p>
-            <p className="mt-1 text-sky-200/80">
+            <p className="mt-1 text-info/80">
               {lastReport.confirmationMessage}
             </p>
           </div>
@@ -156,10 +156,10 @@ export function ReportsPage() {
                 <span
                   className={
                     report.status === "CONFIRMED"
-                      ? "rounded border border-emerald-600/40 bg-emerald-950/30 px-1.5 py-0.5 text-[11px] text-emerald-300"
+                      ? "rounded border border-safe-border bg-safe-surface px-1.5 py-0.5 text-[11px] text-safe"
                       : report.status === "REJECTED"
-                        ? "rounded border border-zinc-600/50 px-1.5 py-0.5 text-[11px] text-zinc-400"
-                        : "rounded border border-amber-500/50 bg-amber-950/30 px-1.5 py-0.5 text-[11px] text-amber-300"
+                        ? "rounded border border-offline-border px-1.5 py-0.5 text-[11px] text-offline"
+                        : "rounded border border-warning-border bg-warning-surface px-1.5 py-0.5 text-[11px] text-warning"
                   }
                 >
                   {report.status.toLowerCase()}

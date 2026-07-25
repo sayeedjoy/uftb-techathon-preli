@@ -21,10 +21,10 @@ export type InspectorEntry =
     }
 
 function statusClass(status: number): string {
-  if (status === 0) return "border-zinc-500/50 text-zinc-300"
-  if (status < 300) return "border-emerald-600/50 text-emerald-300"
-  if (status < 500) return "border-amber-500/50 text-amber-300"
-  return "border-red-500/50 text-red-300"
+  if (status === 0) return "border-offline-border text-offline"
+  if (status < 300) return "border-safe-border text-safe"
+  if (status < 500) return "border-warning-border text-warning"
+  return "border-critical-border text-critical"
 }
 
 /**
@@ -54,7 +54,7 @@ export function PayloadInspector({ entries }: { entries: InspectorEntry[] }) {
             <li key={entry.id} className="px-4 py-2">
               <div className="flex flex-wrap items-center gap-2 text-[11px]">
                 {entry.kind === "payload" ? (
-                  <ArrowUpRight aria-hidden className="size-3.5 text-sky-400" />
+                  <ArrowUpRight aria-hidden className="size-3.5 text-info" />
                 ) : (
                   <ArrowDownLeft
                     aria-hidden

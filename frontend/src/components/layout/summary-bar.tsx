@@ -10,39 +10,68 @@ import type { DashboardSummaryDto } from "@scsrg/shared"
 
 import { cn } from "@/lib/utils"
 import { Card } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+
+type Tone = "danger" | "warning" | "ok" | "muted"
+
+const TONE_CLASS: Record<Tone, { icon: string; value: string }> = {
+  danger: { icon: "text-critical", value: "text-critical" },
+  warning: { icon: "text-warning", value: "text-warning" },
+  ok: { icon: "text-safe", value: "text-foreground" },
+  muted: { icon: "text-muted-foreground", value: "text-foreground" },
+}
 
 function Metric({
   Icon,
   label,
   value,
-  tone,
+  tone = "muted",
 }: {
   Icon: typeof Radio
   label: string
   value: number | string
-  tone?: "danger" | "warning" | "ok" | "muted"
+  tone?: Tone
 }) {
+  const classes = TONE_CLASS[tone]
+
   return (
-    <div className="flex items-center gap-2.5 px-3 py-2">
-      <Icon
-        aria-hidden
-        className={cn(
-          "size-4 shrink-0",
-          tone === "danger" && "text-red-400",
-          tone === "warning" && "text-amber-400",
-          tone === "ok" && "text-emerald-400",
-          (!tone || tone === "muted") && "text-muted-foreground"
-        )}
-      />
+    <div className="flex items-center gap-2.5 px-3 py-2.5">
+      <Icon aria-hidden className={cn("size-4 shrink-0", classes.icon)} />
       <div className="min-w-0">
-        <p className="font-mono text-base leading-none font-semibold tabular-nums">
+        <p
+          data-numeric
+          className={cn(
+            "font-mono text-base leading-none font-semibold",
+            classes.value
+          )}
+        >
           {value}
         </p>
-        <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
+        <p className="mt-1 truncate text-[11px] text-muted-foreground">
           {label}
         </p>
       </div>
     </div>
+  )
+}
+
+function SummaryBarSkeleton() {
+  return (
+    <Card
+      aria-busy
+      aria-label="Loading system summary"
+      className="grid grid-cols-2 divide-x divide-y divide-border/40 p-0 sm:grid-cols-3 lg:grid-cols-6 lg:divide-y-0"
+    >
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div key={index} className="flex items-center gap-2.5 px-3 py-2.5">
+          <Skeleton className="size-4 shrink-0 rounded-sm" />
+          <div className="min-w-0 flex-1">
+            <Skeleton className="h-4 w-10" />
+            <Skeleton className="mt-1.5 h-2.5 w-16" />
+          </div>
+        </div>
+      ))}
+    </Card>
   )
 }
 
@@ -54,13 +83,11 @@ export function SummaryBar({
   summary: DashboardSummaryDto | undefined
   isLoading: boolean
 }) {
-  if (isLoading || !summary) {
-    return (
-      <Card className="px-4 py-3 text-sm text-muted-foreground">
-        Loading system summary…
-      </Card>
-    )
-  }
+  // A skeleton in the final layout, not a line of text: the bar keeps its
+  // height, so nothing below it jumps when the first payload lands.
+  if (isLoading || !summary) return <SummaryBarSkeleton />
+
+  const allReporting = summary.connectedZones === summary.totalZones
 
   return (
     <Card
@@ -71,7 +98,7 @@ export function SummaryBar({
         Icon={Radio}
         label="Zones reporting"
         value={`${summary.connectedZones}/${summary.totalZones}`}
-        tone={summary.connectedZones === summary.totalZones ? "ok" : "warning"}
+        tone={allReporting ? "ok" : "warning"}
       />
       <Metric
         Icon={CheckCircle2}

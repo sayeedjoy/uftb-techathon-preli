@@ -21,7 +21,7 @@ function Stat({
     <Card className="flex items-center gap-3 p-4">
       <Icon
         aria-hidden
-        className={ok ? "size-5 text-emerald-400" : "size-5 text-amber-400"}
+        className={ok ? "size-5 text-safe" : "size-5 text-warning"}
       />
       <div>
         <p className="font-mono text-lg leading-none font-semibold tabular-nums">
@@ -50,7 +50,7 @@ export function SystemHealthPage() {
 
   if (health.error != null || !health.data) {
     return (
-      <Card role="alert" className="border-red-500/50 p-6 text-sm text-red-300">
+      <Card role="alert" className="border-critical-border p-6 text-sm text-critical">
         Could not load system health.
       </Card>
     )
@@ -112,7 +112,7 @@ export function SystemHealthPage() {
           </thead>
           <tbody className="divide-y divide-border/30">
             {data.zones.map((zone) => (
-              <tr key={zone.zoneId} className={zone.isOffline ? "bg-amber-950/20" : ""}>
+              <tr key={zone.zoneId} className={zone.isOffline ? "bg-warning-surface" : ""}>
                 <td className="px-4 py-2">{zone.zoneName}</td>
                 <td className="px-4 py-2">{zone.state.toLowerCase()}</td>
                 <td className="px-4 py-2 text-xs">
@@ -197,9 +197,9 @@ export function SystemHealthPage() {
               <span
                 className={
                   event.severity === "ERROR"
-                    ? "text-red-300"
+                    ? "text-critical"
                     : event.severity === "WARN"
-                      ? "text-amber-300"
+                      ? "text-warning"
                       : "text-muted-foreground"
                 }
               >

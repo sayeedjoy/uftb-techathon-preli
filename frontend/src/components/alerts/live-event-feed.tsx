@@ -29,9 +29,9 @@ export type FeedEntry = {
 
 const SEVERITY_PRESENTATION = {
   info: { Icon: CircleDot, className: "text-muted-foreground" },
-  ok: { Icon: CheckCircle2, className: "text-emerald-400" },
-  warn: { Icon: AlertOctagon, className: "text-amber-400" },
-  critical: { Icon: Siren, className: "text-red-400" },
+  ok: { Icon: CheckCircle2, className: "text-safe" },
+  warn: { Icon: AlertOctagon, className: "text-warning" },
+  critical: { Icon: Siren, className: "text-critical" },
 } as const satisfies Record<
   Severity,
   { Icon: typeof CircleDot; className: string }
@@ -197,7 +197,7 @@ export function LiveEventFeed() {
       </ul>
 
       {paused && (
-        <p className="border-t border-border/60 px-4 py-2 text-[11px] text-amber-300">
+        <p className="border-t border-border/60 bg-warning-surface px-4 py-2 text-[11px] text-warning">
           <Power aria-hidden className="mr-1 inline size-3" />
           Feed paused — new events are not being collected.
         </p>

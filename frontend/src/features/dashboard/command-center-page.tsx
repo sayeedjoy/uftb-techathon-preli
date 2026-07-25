@@ -1,4 +1,5 @@
 import * as React from "react"
+import { LayoutGrid, TriangleAlert } from "lucide-react"
 import type { ZoneSummaryDto } from "@scsrg/shared"
 
 import { CriticalBanner } from "@/components/alerts/critical-banner"
@@ -6,6 +7,7 @@ import { LiveEventFeed } from "@/components/alerts/live-event-feed"
 import { SummaryBar } from "@/components/layout/summary-bar"
 import { PriorityQueuePanel } from "@/components/priority/priority-queue"
 import { ZoneCard } from "@/components/zones/zone-card"
+import { ZoneCardSkeleton } from "@/components/zones/zone-card-skeleton"
 import { STATE_SORT_ORDER } from "@/components/zones/zone-presentation"
 import { Card } from "@/components/ui/card"
 import { useAlertStream } from "@/hooks/use-alert-stream"
@@ -57,6 +59,7 @@ export function CommandCenterPage() {
     (entry) => !entry.acknowledged
   )
   const topAlert = unacknowledged[0]
+  const zoneCount = zones.data?.length ?? 0
 
   return (
     <div className="flex flex-col gap-4">
@@ -73,30 +76,60 @@ export function CommandCenterPage() {
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <section aria-label="Zone grid" className="flex flex-col gap-3">
-          <h2 className="text-sm font-semibold text-muted-foreground">
-            Campus zones
-          </h2>
+          <div className="flex items-baseline gap-2">
+            <h2 className="text-sm font-semibold text-muted-foreground">
+              Campus zones
+            </h2>
+            {!zones.isLoading && !zones.error && zoneCount > 0 && (
+              <span
+                data-numeric
+                className="font-mono text-[11px] text-muted-foreground"
+              >
+                {zoneCount}
+              </span>
+            )}
+          </div>
 
           {zones.isLoading && (
-            <Card className="p-6 text-sm text-muted-foreground">
-              Loading zones…
-            </Card>
+            <div
+              aria-busy
+              aria-label="Loading zones"
+              className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3"
+            >
+              {Array.from({ length: 3 }).map((_, index) => (
+                <ZoneCardSkeleton key={index} />
+              ))}
+            </div>
           )}
 
           {!zones.isLoading && zones.error != null && (
             <Card
               role="alert"
-              className="border-red-500/50 p-6 text-sm text-red-300"
+              className="flex items-start gap-3 border-critical-border bg-critical-surface p-6"
             >
-              Could not load zones. The dashboard is showing no data rather than
-              stale data.
+              <TriangleAlert
+                aria-hidden
+                className="mt-0.5 size-5 shrink-0 text-critical"
+              />
+              <div>
+                <p className="text-sm font-medium text-critical">
+                  Could not load zones
+                </p>
+                <p className="mt-0.5 text-sm text-critical/80">
+                  The dashboard is showing no data rather than stale data.
+                </p>
+              </div>
             </Card>
           )}
 
-          {!zones.isLoading && !zones.error && (zones.data?.length ?? 0) === 0 && (
-            <Card className="p-6 text-sm text-muted-foreground">
-              No zones are configured yet. An administrator can add one from the
-              Administration page.
+          {!zones.isLoading && !zones.error && zoneCount === 0 && (
+            <Card className="flex flex-col items-center gap-2 p-10 text-center">
+              <LayoutGrid aria-hidden className="size-8 text-muted-foreground" />
+              <p className="text-sm font-medium">No zones are configured yet</p>
+              <p className="max-w-[40ch] text-xs text-muted-foreground">
+                An administrator can add one from the Administration page. Zones
+                need no code change — a row is enough.
+              </p>
             </Card>
           )}
 

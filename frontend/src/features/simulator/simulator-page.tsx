@@ -57,8 +57,8 @@ function ZoneSimulatorCard({
         <span
           className={
             zone.hasCredential
-              ? "rounded border border-emerald-600/40 bg-emerald-950/30 px-1.5 py-0.5 text-[10px] text-emerald-300"
-              : "rounded border border-red-500/50 bg-red-950/30 px-1.5 py-0.5 text-[10px] text-red-300"
+              ? "rounded border border-safe-border bg-safe-surface px-1.5 py-0.5 text-[10px] text-safe"
+              : "rounded border border-critical-border bg-critical-surface px-1.5 py-0.5 text-[10px] text-critical"
           }
         >
           {zone.hasCredential ? "key loaded" : "no key — run pnpm db:seed"}
@@ -336,7 +336,7 @@ export function SimulatorPage() {
         </div>
 
         {status.data?.activeScenario && !status.data.activeScenario.finished && (
-          <p className="text-xs text-amber-300">
+          <p className="text-xs text-warning">
             Running “{status.data.activeScenario.name}” —{" "}
             {status.data.activeScenario.progress}% complete.
           </p>
@@ -348,7 +348,7 @@ export function SimulatorPage() {
               {scenarioResult.name} ·{" "}
               <span
                 className={
-                  scenarioResult.passed ? "text-emerald-300" : "text-amber-300"
+                  scenarioResult.passed ? "text-safe" : "text-warning"
                 }
               >
                 {scenarioResult.passed ? "passed" : "needs review"}
@@ -359,7 +359,7 @@ export function SimulatorPage() {
                 <li key={assertion.description}>
                   <span
                     className={
-                      assertion.passed ? "text-emerald-400" : "text-red-400"
+                      assertion.passed ? "text-safe" : "text-critical"
                     }
                   >
                     {assertion.passed ? "✓" : "✗"}

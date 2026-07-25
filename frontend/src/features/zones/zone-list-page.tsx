@@ -20,7 +20,7 @@ export function ZoneListPage() {
       )}
 
       {zones.error != null && (
-        <Card role="alert" className="border-red-500/50 p-6 text-sm text-red-300">
+        <Card role="alert" className="border-critical-border p-6 text-sm text-critical">
           Could not load zones.
         </Card>
       )}

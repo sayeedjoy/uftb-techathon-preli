@@ -1,10 +1,17 @@
 import { Link } from "react-router"
-import { Clock, TrendingDown, TrendingUp, Minus, AlertOctagon } from "lucide-react"
+import {
+  Clock,
+  TrendingDown,
+  TrendingUp,
+  Minus,
+  AlertOctagon,
+} from "lucide-react"
 import type { RiskTrend, ZoneSummaryDto } from "@scsrg/shared"
 
 import { cn } from "@/lib/utils"
 import { Card } from "@/components/ui/card"
 import { ActuatorStrip } from "./actuator-strip"
+import { RiskMeter } from "./risk-meter"
 import { SensorReadout } from "./sensor-readout"
 import { StateBadge } from "./state-badge"
 import { stateBorderClass } from "./zone-presentation"
@@ -21,12 +28,12 @@ function relativeTime(iso: string | null): string {
 
 const TREND_PRESENTATION = {
   STABLE: { label: "Stable", Icon: Minus, className: "text-muted-foreground" },
-  RISING: { label: "Rising", Icon: TrendingUp, className: "text-amber-400" },
-  FALLING: { label: "Falling", Icon: TrendingDown, className: "text-emerald-400" },
+  RISING: { label: "Rising", Icon: TrendingUp, className: "text-warning" },
+  FALLING: { label: "Falling", Icon: TrendingDown, className: "text-safe" },
   TRENDING_CRITICAL: {
     label: "Trending critical",
     Icon: TrendingUp,
-    className: "text-red-400",
+    className: "text-critical",
   },
 } as const satisfies Record<
   RiskTrend,
@@ -48,7 +55,11 @@ export function ZoneCard({ zone }: { zone: ZoneSummaryDto }) {
       data-testid={`zone-card-${zone.code}`}
       data-state={zone.state}
       className={cn(
-        "flex flex-col gap-3 border-2 p-4 transition-colors",
+        "group flex flex-col gap-3 border-2 p-4 transition-colors",
+        // A CRITICAL card lifts out of the grid rather than merely changing
+        // hue, so the most urgent zone is findable at a glance across a wall
+        // display — and still findable in greyscale.
+        zone.state === "CRITICAL" && "shadow-sm",
         stateBorderClass(zone.state)
       )}
     >
@@ -56,7 +67,7 @@ export function ZoneCard({ zone }: { zone: ZoneSummaryDto }) {
         <div className="min-w-0">
           <Link
             to={`/zones/${zone.id}`}
-            className="truncate text-sm font-semibold hover:underline"
+            className="truncate rounded-sm text-sm font-semibold hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
           >
             {zone.name}
           </Link>
@@ -68,29 +79,36 @@ export function ZoneCard({ zone }: { zone: ZoneSummaryDto }) {
         <StateBadge state={zone.state} />
       </div>
 
-      <div className="flex items-end justify-between gap-3">
-        <div>
-          <p className="text-[11px] tracking-wide text-muted-foreground uppercase">
-            Risk score
-          </p>
-          <p className="font-mono text-2xl leading-none font-semibold tabular-nums">
-            {zone.currentRiskScore.toFixed(1)}
-          </p>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <p className="text-[11px] tracking-wide text-muted-foreground uppercase">
+              Risk score
+            </p>
+            <p
+              data-numeric
+              className="font-mono text-2xl leading-none font-semibold"
+            >
+              {zone.currentRiskScore.toFixed(1)}
+            </p>
+          </div>
+          {trend && (
+            // Trend is advisory and visually separate from the state badge; it
+            // never influences state, incidents, priority or actuation.
+            <span
+              className={cn(
+                "inline-flex items-center gap-1 rounded border border-border/60 px-1.5 py-0.5 text-[11px]",
+                trend.className
+              )}
+              title="Advisory trend — does not affect zone state"
+            >
+              <trend.Icon aria-hidden className="size-3" />
+              {trend.label}
+            </span>
+          )}
         </div>
-        {trend && (
-          // Trend is advisory and visually separate from the state badge; it
-          // never influences state, incidents, priority or actuation.
-          <span
-            className={cn(
-              "inline-flex items-center gap-1 rounded border border-border/60 px-1.5 py-0.5 text-[11px]",
-              trend.className
-            )}
-            title="Advisory trend — does not affect zone state"
-          >
-            <trend.Icon aria-hidden className="size-3" />
-            {trend.label}
-          </span>
-        )}
+
+        <RiskMeter score={zone.currentRiskScore} state={zone.state} />
       </div>
 
       <SensorReadout values={zone.sensorValues} sensors={zone.sensors} />
@@ -100,7 +118,7 @@ export function ZoneCard({ zone }: { zone: ZoneSummaryDto }) {
       {zone.activeIncident && (
         <Link
           to={`/incidents?incidentId=${zone.activeIncident.id}`}
-          className="flex items-center gap-1.5 rounded border border-red-500/40 bg-red-950/30 px-2 py-1 text-[11px] text-red-300 hover:bg-red-950/50"
+          className="flex items-center gap-1.5 rounded border border-critical-border bg-critical-surface px-2 py-1 text-[11px] text-critical transition-colors hover:brightness-110 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         >
           <AlertOctagon aria-hidden className="size-3 shrink-0" />
           <span className="truncate">

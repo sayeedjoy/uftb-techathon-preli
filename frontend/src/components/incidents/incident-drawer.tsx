@@ -65,7 +65,7 @@ export function IncidentDrawer({
         )}
 
         {incident.error != null && (
-          <p role="alert" className="px-5 py-8 text-sm text-red-300">
+          <p role="alert" className="px-5 py-8 text-sm text-critical">
             Could not load this incident.
           </p>
         )}
@@ -124,11 +124,11 @@ export function IncidentDrawer({
             </dl>
 
             {detail.acknowledgment && (
-              <section className="rounded-md border border-sky-500/40 bg-sky-950/20 px-3 py-2 text-sm">
-                <p className="font-medium text-sky-200">
+              <section className="rounded-md border border-info-border bg-info-surface px-3 py-2 text-sm">
+                <p className="font-medium text-info">
                   Acknowledged by {detail.acknowledgment.userName}
                 </p>
-                <p className="text-xs text-sky-200/80">
+                <p className="text-xs text-info/80">
                   {new Date(detail.acknowledgment.acknowledgedAt).toLocaleString(
                     [],
                     { hour12: false }

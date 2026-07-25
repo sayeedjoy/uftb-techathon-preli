@@ -1,10 +1,10 @@
 import type { RiskContributions } from "@scsrg/shared"
 
 const SEGMENTS = [
-  { key: "fire", label: "Fire", className: "bg-red-500" },
-  { key: "gas", label: "Gas", className: "bg-amber-500" },
-  { key: "water", label: "Water", className: "bg-sky-500" },
-  { key: "occupancy", label: "Occupancy", className: "bg-violet-500" },
+  { key: "fire", label: "Fire", className: "bg-critical-solid" },
+  { key: "gas", label: "Gas", className: "bg-warning" },
+  { key: "water", label: "Water", className: "bg-info" },
+  { key: "occupancy", label: "Occupancy", className: "bg-occupancy" },
 ] as const satisfies ReadonlyArray<{
   key: keyof RiskContributions
   label: string

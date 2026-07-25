@@ -48,7 +48,7 @@ export function RequireRole({
   if (user?.role !== role) {
     return (
       <div className="flex min-h-[60svh] flex-col items-center justify-center gap-3 p-8 text-center">
-        <ShieldAlert aria-hidden className="size-10 text-amber-500" />
+        <ShieldAlert aria-hidden className="size-10 text-warning" />
         <h1 className="text-lg font-semibold">Restricted area</h1>
         <p className="max-w-md text-sm text-muted-foreground">
           This page is available to administrators only. Your account has the{" "}

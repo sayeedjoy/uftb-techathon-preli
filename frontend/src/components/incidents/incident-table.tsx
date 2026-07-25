@@ -16,9 +16,9 @@ function formatDuration(seconds: number | null): string {
 }
 
 const STATUS_CLASS = {
-  OPEN: "border-red-500/50 bg-red-950/40 text-red-300",
-  ACKNOWLEDGED: "border-sky-500/50 bg-sky-950/40 text-sky-300",
-  RESOLVED: "border-emerald-600/40 bg-emerald-950/30 text-emerald-300",
+  OPEN: "border-critical-border bg-critical-surface text-critical",
+  ACKNOWLEDGED: "border-info-border bg-info-surface text-info",
+  RESOLVED: "border-safe-border bg-safe-surface text-safe",
 } as const satisfies Record<IncidentSummaryDto["status"], string>
 
 export function IncidentTable({
@@ -42,7 +42,7 @@ export function IncidentTable({
 
   if (error != null) {
     return (
-      <Card role="alert" className="border-red-500/50 p-6 text-sm text-red-300">
+      <Card role="alert" className="border-critical-border p-6 text-sm text-critical">
         Could not load incidents.
       </Card>
     )

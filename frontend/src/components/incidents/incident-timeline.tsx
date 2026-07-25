@@ -6,14 +6,14 @@ import type {
 import { cn } from "@/lib/utils"
 
 const EVENT_TONE = {
-  CREATED: "border-red-500/60",
+  CREATED: "border-critical-border",
   RISK_UPDATED: "border-border",
-  STATE_CHANGED: "border-amber-500/60",
-  ACKNOWLEDGED: "border-sky-500/60",
+  STATE_CHANGED: "border-warning-border",
+  ACKNOWLEDGED: "border-info-border",
   ACTUATION_ISSUED: "border-violet-500/60",
   OVERRIDE_APPLIED: "border-violet-500/60",
-  ZONE_OFFLINE: "border-zinc-500/60",
-  RESOLVED: "border-emerald-500/60",
+  ZONE_OFFLINE: "border-offline-border",
+  RESOLVED: "border-safe-border",
 } as const satisfies Record<IncidentTimelineEventType, string>
 
 /** The full ordered narrative, so history can reconstruct what happened. */

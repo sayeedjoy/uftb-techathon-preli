@@ -28,11 +28,12 @@ function Row({
         {label}
       </span>
       <span
+        data-numeric
         className={cn(
-          "font-mono tabular-nums",
-          emphasis === "danger" && "font-semibold text-red-300",
-          emphasis === "warning" && "text-amber-300",
-          emphasis === "muted" && "text-zinc-500 italic"
+          "font-mono",
+          emphasis === "danger" && "font-semibold text-critical",
+          emphasis === "warning" && "text-warning",
+          emphasis === "muted" && "text-offline italic"
         )}
       >
         {value}

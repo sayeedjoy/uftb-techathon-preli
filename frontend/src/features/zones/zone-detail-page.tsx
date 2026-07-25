@@ -76,7 +76,7 @@ export function ZoneDetailPage() {
 
   if (zone.error != null || !zone.data || !current) {
     return (
-      <Card role="alert" className="border-red-500/50 p-6 text-sm text-red-300">
+      <Card role="alert" className="border-critical-border p-6 text-sm text-critical">
         Could not load this zone.{" "}
         <Link to="/" className="underline">
           Back to the Command Center
@@ -140,7 +140,7 @@ export function ZoneDetailPage() {
                 <span>
                   {sensor.name}
                   {sensor.isCritical && (
-                    <span className="ml-1 rounded border border-amber-500/50 px-1 text-[10px] text-amber-300">
+                    <span className="ml-1 rounded border border-warning-border px-1 text-[10px] text-warning">
                       critical
                     </span>
                   )}

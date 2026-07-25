@@ -4,12 +4,12 @@ import type { ActuatorStateDto, LedColor } from "@scsrg/shared"
 import { cn } from "@/lib/utils"
 
 const LED_PRESENTATION = {
-  GREEN: { label: "LED green", className: "text-emerald-400" },
-  YELLOW: { label: "LED yellow", className: "text-amber-400" },
-  RED: { label: "LED red", className: "text-red-400" },
+  GREEN: { label: "LED green", className: "text-safe" },
+  YELLOW: { label: "LED yellow", className: "text-warning" },
+  RED: { label: "LED red", className: "text-critical" },
   AMBER_PULSE: {
     label: "LED amber (pulsing)",
-    className: "text-amber-500 animate-pulse",
+    className: "text-warning animate-alert",
   },
 } as const satisfies Record<LedColor, { label: string; className: string }>
 
@@ -30,7 +30,7 @@ function Chip({
       className={cn(
         "inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[11px]",
         active
-          ? "border-red-500/50 bg-red-950/40 text-red-300"
+          ? "border-critical-border bg-critical-surface text-critical"
           : "border-border/60 bg-muted/30 text-muted-foreground",
         className
       )}

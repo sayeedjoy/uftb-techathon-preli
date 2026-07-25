@@ -8,19 +8,19 @@ const PRESENTATION = {
   LIVE: {
     label: "Live",
     Icon: RadioTower,
-    className: "border-emerald-600/50 bg-emerald-950/40 text-emerald-300",
+    className: "border-safe-border bg-safe-surface text-safe",
     description: "Receiving real-time updates",
   },
   RECONNECTING: {
     label: "Reconnecting",
     Icon: RefreshCw,
-    className: "border-amber-500/60 bg-amber-950/40 text-amber-300",
+    className: "border-warning-border bg-warning-surface text-warning",
     description: "Connection dropped — retrying with backoff",
   },
   OFFLINE: {
     label: "Offline",
     Icon: WifiOff,
-    className: "border-zinc-600/60 bg-zinc-900/60 text-zinc-400",
+    className: "border-offline-border bg-offline-surface text-offline",
     description: "No live connection; data may be stale",
   },
 } as const satisfies Record<

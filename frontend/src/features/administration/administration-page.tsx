@@ -108,7 +108,7 @@ function OverrideConsole({ zones }: { zones: ZoneSummaryDto[] }) {
           placeholder="Why is this override necessary?"
         />
         {reason.length > 0 && reason.trim().length < MIN_REASON_LENGTH && (
-          <p className="text-xs text-amber-400">
+          <p className="text-xs text-warning">
             At least {MIN_REASON_LENGTH} characters are required.
           </p>
         )}
@@ -273,8 +273,8 @@ function CreateZoneForm() {
       </Button>
 
       {issuedKey && (
-        <div className="rounded border border-amber-500/50 bg-amber-950/20 px-3 py-2 text-xs">
-          <p className="font-medium text-amber-200">
+        <div className="rounded border border-warning-border bg-warning-surface px-3 py-2 text-xs">
+          <p className="font-medium text-warning">
             API key — shown once, never retrievable again
           </p>
           <p className="mt-1 font-mono break-all">{issuedKey}</p>
