@@ -3,6 +3,7 @@ import type {
   DashboardSummaryDto,
   IncidentSummaryDto,
   PriorityQueueEntryDto,
+  ZoneDetailDto,
   ZoneSummaryDto,
 } from "@scsrg/shared"
 
@@ -67,7 +68,23 @@ export function useLiveDashboardSync(): void {
         return { zones }
       }
     )
-    queryClient.setQueryData(queryKeys.zones.detail(zone.id), { zone })
+    // Merge, never replace.
+    //
+    // The socket carries a `ZoneSummaryDto`, but this cache slot holds a
+    // `ZoneDetailDto` — a superset with `configuration`, `createdAt` and
+    // `updatedAt`. Writing the summary straight in silently dropped
+    // `configuration`, so the detail page's `detail.configuration.sensors`
+    // threw on the next render. Patching preserves the detail-only fields
+    // while still applying the live values.
+    //
+    // Returning `previous` when nothing is cached is deliberate: a detail
+    // entry must be born from the detail endpoint, never fabricated from a
+    // summary that is missing half the type.
+    queryClient.setQueryData<{ zone: ZoneDetailDto }>(
+      queryKeys.zones.detail(zone.id),
+      (previous) =>
+        previous ? { zone: { ...previous.zone, ...zone } } : previous
+    )
   }
 
   useSocketEvent("zone:updated", (payload) => patchZone(payload.zone))
