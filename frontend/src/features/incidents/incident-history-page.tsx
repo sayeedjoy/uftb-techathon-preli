@@ -9,12 +9,30 @@ import type {
 
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { DateField } from "@/components/filters/date-field"
+import { FilterSelect } from "@/components/filters/filter-select"
 import { apiGet, request } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
 import { IncidentDrawer } from "@/components/incidents/incident-drawer"
 import { IncidentTable } from "@/components/incidents/incident-table"
+
+/** Sentinel for "no filter" — see the note in `FilterSelect`. */
+const ANY = "__any__"
+
+const STATUS_OPTIONS = [
+  { value: ANY, label: "Any status" },
+  { value: "OPEN", label: "Open" },
+  { value: "ACKNOWLEDGED", label: "Acknowledged" },
+  { value: "RESOLVED", label: "Resolved" },
+] as const
+
+const HAZARD_OPTIONS = [
+  { value: ANY, label: "Any hazard" },
+  { value: "FIRE", label: "Fire" },
+  { value: "GAS", label: "Gas" },
+  { value: "WATER", label: "Water" },
+  { value: "OCCUPANCY", label: "Occupancy" },
+] as const
 
 const FILTER_KEYS = [
   "from",
@@ -84,87 +102,57 @@ export function IncidentHistoryPage() {
       </header>
 
       <Card className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="filter-from">From</Label>
-          <Input
-            id="filter-from"
-            type="date"
-            value={(filters.from ?? "").slice(0, 10)}
-            onChange={(event) =>
-              setFilter(
-                "from",
-                event.target.value
-                  ? new Date(`${event.target.value}T00:00:00`).toISOString()
-                  : ""
-              )
-            }
-          />
-        </div>
+        <DateField
+          id="filter-from"
+          label="From"
+          boundary="start"
+          value={filters.from ?? ""}
+          onChange={(value) => setFilter("from", value)}
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="filter-to">To</Label>
-          <Input
-            id="filter-to"
-            type="date"
-            value={(filters.to ?? "").slice(0, 10)}
-            onChange={(event) =>
-              setFilter(
-                "to",
-                event.target.value
-                  ? new Date(`${event.target.value}T23:59:59`).toISOString()
-                  : ""
-              )
-            }
-          />
-        </div>
+        <DateField
+          id="filter-to"
+          label="To"
+          boundary="end"
+          value={filters.to ?? ""}
+          onChange={(value) => setFilter("to", value)}
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="filter-zone">Zone</Label>
-          <select
-            id="filter-zone"
-            className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
-            value={filters.zoneId ?? ""}
-            onChange={(event) => setFilter("zoneId", event.target.value)}
-          >
-            <option value="">All zones</option>
-            {zones.data?.map((zone) => (
-              <option key={zone.id} value={zone.id}>
-                {zone.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <FilterSelect
+          id="filter-zone"
+          label="Zone"
+          value={filters.zoneId ?? ANY}
+          onValueChange={(value) =>
+            setFilter("zoneId", value === ANY ? "" : value)
+          }
+          options={[
+            { value: ANY, label: "All zones" },
+            ...(zones.data ?? []).map((zone) => ({
+              value: zone.id,
+              label: zone.name,
+            })),
+          ]}
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="filter-status">Status</Label>
-          <select
-            id="filter-status"
-            className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
-            value={filters.status ?? ""}
-            onChange={(event) => setFilter("status", event.target.value)}
-          >
-            <option value="">Any status</option>
-            <option value="OPEN">Open</option>
-            <option value="ACKNOWLEDGED">Acknowledged</option>
-            <option value="RESOLVED">Resolved</option>
-          </select>
-        </div>
+        <FilterSelect
+          id="filter-status"
+          label="Status"
+          value={filters.status ?? ANY}
+          onValueChange={(value) =>
+            setFilter("status", value === ANY ? "" : value)
+          }
+          options={STATUS_OPTIONS}
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="filter-hazard">Hazard</Label>
-          <select
-            id="filter-hazard"
-            className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
-            value={filters.hazardType ?? ""}
-            onChange={(event) => setFilter("hazardType", event.target.value)}
-          >
-            <option value="">Any hazard</option>
-            <option value="FIRE">Fire</option>
-            <option value="GAS">Gas</option>
-            <option value="WATER">Water</option>
-            <option value="OCCUPANCY">Occupancy</option>
-          </select>
-        </div>
+        <FilterSelect
+          id="filter-hazard"
+          label="Hazard"
+          value={filters.hazardType ?? ANY}
+          onValueChange={(value) =>
+            setFilter("hazardType", value === ANY ? "" : value)
+          }
+          options={HAZARD_OPTIONS}
+        />
       </Card>
 
       <IncidentTable

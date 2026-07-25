@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Link, Outlet, useLocation } from "react-router"
-import { LogOut, Menu, Siren } from "lucide-react"
+import { LogOut, Menu, PanelLeftClose, PanelLeftOpen, Siren } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -11,6 +11,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { cn } from "@/lib/utils"
+import { useSidebarCollapsed } from "@/hooks/use-sidebar-collapsed"
 import { ConnectionBadge } from "./connection-badge"
 import { SidebarNav } from "./sidebar-nav"
 import { ThemeToggle } from "./theme-toggle"
@@ -34,25 +36,38 @@ function ClockReadout() {
   )
 }
 
-function BrandMark({ className }: { className?: string }) {
+/**
+ * The brand block.
+ *
+ * `h-14` is load-bearing, not cosmetic: it matches the header's height exactly,
+ * so the rule beneath it continues the header's bottom border into the sidebar
+ * as one unbroken line. Padding-derived height put it ~10px low and the seam
+ * was visible at every zoom level.
+ */
+function BrandMark({ collapsed = false }: { collapsed?: boolean }) {
   return (
-    <div className={className}>
-      <div className="flex items-center gap-2">
-        <Siren aria-hidden className="size-5 shrink-0 text-critical" />
+    <div
+      className={cn(
+        "flex h-14 shrink-0 items-center gap-2",
+        collapsed ? "justify-center px-0" : "px-4"
+      )}
+    >
+      <Siren aria-hidden className="size-5 shrink-0 text-critical" />
+      {!collapsed && (
         <div className="min-w-0">
           <p className="truncate text-sm leading-tight font-semibold">SCS-RG</p>
-          <p className="truncate text-xs text-muted-foreground">
+          <p className="truncate text-xs leading-tight text-muted-foreground">
             Campus Safety Grid
           </p>
         </div>
-      </div>
+      )}
     </div>
   )
 }
 
 /**
- * The command-centre chrome: a persistent sidebar, a status-bearing top bar and
- * the routed page. Information-dense and quiet — the page content is what
+ * The command-centre chrome: a collapsible sidebar, a status-bearing top bar
+ * and the routed page. Information-dense and quiet — the page content is what
  * should draw the eye, not the frame around it.
  *
  * Below `md` the sidebar collapses into a sheet. It is not simply hidden: an
@@ -62,6 +77,7 @@ function BrandMark({ className }: { className?: string }) {
 export function AppShell() {
   const { user, logout } = useAuth()
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false)
+  const [collapsed, toggleCollapsed] = useSidebarCollapsed()
   const location = useLocation()
 
   // Any navigation closes the sheet, including a browser back/forward that the
@@ -84,10 +100,17 @@ export function AppShell() {
         Skip to main content
       </a>
 
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-border/60 md:flex">
-        <BrandMark className="px-4 py-4" />
+      <aside
+        id="sidebar"
+        data-collapsed={collapsed}
+        className={cn(
+          "hidden shrink-0 flex-col border-r border-border/60 transition-[width] duration-200 ease-out md:flex",
+          collapsed ? "w-14" : "w-60"
+        )}
+      >
+        <BrandMark collapsed={collapsed} />
         <Separator />
-        <SidebarNav />
+        <SidebarNav collapsed={collapsed} />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -110,11 +133,30 @@ export function AppShell() {
               <SheetDescription className="sr-only">
                 Command centre destinations available to your role.
               </SheetDescription>
-              <BrandMark className="px-4 py-4" />
+              <BrandMark />
               <Separator />
               <SidebarNav onNavigate={() => setMobileNavOpen(false)} />
             </SheetContent>
           </Sheet>
+
+          {/* The collapse control lives in the header rather than the sidebar so
+              it stays in one place in both states. */}
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={toggleCollapsed}
+            className="hidden md:inline-flex"
+            aria-expanded={!collapsed}
+            aria-controls="sidebar"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? (
+              <PanelLeftOpen aria-hidden className="size-4" />
+            ) : (
+              <PanelLeftClose aria-hidden className="size-4" />
+            )}
+          </Button>
 
           <Link
             to="/"
@@ -148,10 +190,7 @@ export function AppShell() {
           </div>
         </header>
 
-        <main
-          id="main-content"
-          className="min-w-0 flex-1 p-3 sm:p-4 lg:p-6"
-        >
+        <main id="main-content" className="min-w-0 flex-1 p-3 sm:p-4 lg:p-6">
           <Outlet />
         </main>
       </div>

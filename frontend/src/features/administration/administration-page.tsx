@@ -8,10 +8,13 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { FilterSelect } from "@/components/filters/filter-select"
 import { ApiError, apiGet, apiPatch, apiPost } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
 
 const MIN_REASON_LENGTH = 5
+/** Base UI reads "" as unselected, so the empty choice needs a real token. */
+const UNSELECTED = "__none__"
 
 function OverrideConsole({ zones }: { zones: ZoneSummaryDto[] }) {
   const queryClient = useQueryClient()
@@ -62,38 +65,27 @@ function OverrideConsole({ zones }: { zones: ZoneSummaryDto[] }) {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="override-zone">Zone</Label>
-          <select
-            id="override-zone"
-            className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
-            value={zoneId}
-            onChange={(event) => setZoneId(event.target.value)}
-          >
-            <option value="">Select a zone…</option>
-            {zones.map((zone) => (
-              <option key={zone.id} value={zone.id}>
-                {zone.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <FilterSelect
+          id="override-zone"
+          label="Zone"
+          value={zoneId || UNSELECTED}
+          onValueChange={(value) => setZoneId(value === UNSELECTED ? "" : value)}
+          options={[
+            { value: UNSELECTED, label: "Select a zone…" },
+            ...zones.map((zone) => ({ value: zone.id, label: zone.name })),
+          ]}
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="override-action">Action</Label>
-          <select
-            id="override-action"
-            className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
-            value={action}
-            onChange={(event) => setAction(event.target.value)}
-          >
-            {OVERRIDE_ACTIONS.map((value) => (
-              <option key={value} value={value}>
-                {value.replace(/_/g, " ").toLowerCase()}
-              </option>
-            ))}
-          </select>
-        </div>
+        <FilterSelect
+          id="override-action"
+          label="Action"
+          value={action}
+          onValueChange={setAction}
+          options={OVERRIDE_ACTIONS.map((value) => ({
+            value,
+            label: value.replace(/_/g, " ").toLowerCase(),
+          }))}
+        />
       </div>
 
       <div className="flex flex-col gap-1.5">

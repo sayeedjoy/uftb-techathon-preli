@@ -19,7 +19,10 @@ export default defineConfig({
     // time Vite sees it, so it stops to re-optimize and forces a full reload —
     // which presents as a blank page that "works after a refresh". Declaring
     // it here bundles it when the dev server boots instead of mid-navigation.
-    include: ["recharts"],
+    //
+    // `react-day-picker` and `date-fns` reach the browser the same way, via the
+    // date filters on `/incidents`.
+    include: ["recharts", "react-day-picker", "date-fns"],
   },
   server: {
     port: 5173,
