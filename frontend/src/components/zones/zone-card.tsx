@@ -11,6 +11,8 @@ import type { RiskTrend, ZoneSummaryDto } from "@scsrg/shared"
 import { cn } from "@/lib/utils"
 import { Card } from "@/components/ui/card"
 import { ActuatorStrip } from "./actuator-strip"
+import { HAZARD_SEGMENTS } from "./hazard-segments"
+import { ContributionBar } from "./zone-contributions"
 import { RiskMeter } from "./risk-meter"
 import { SensorReadout } from "./sensor-readout"
 import { StateBadge } from "./state-badge"
@@ -109,6 +111,31 @@ export function ZoneCard({ zone }: { zone: ZoneSummaryDto }) {
         </div>
 
         <RiskMeter score={zone.currentRiskScore} state={zone.state} />
+
+        {/* Magnitude (the meter, against its thresholds) and composition (the
+            contribution bar) answer different questions, so they are separate
+            marks rather than one overloaded bar. */}
+        <ContributionBar contributions={zone.contributions} />
+
+        <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+          {HAZARD_SEGMENTS.filter(
+            (segment) => zone.contributions[segment.key] > 0
+          ).map((segment) => (
+            <span
+              key={segment.key}
+              className="inline-flex items-center gap-1 text-[11px] text-muted-foreground"
+            >
+              <span
+                aria-hidden
+                className={cn("inline-block size-2 rounded-sm", segment.fill)}
+              />
+              {segment.label}
+              <span data-numeric className="font-mono text-foreground">
+                {zone.contributions[segment.key].toFixed(1)}
+              </span>
+            </span>
+          ))}
+        </div>
       </div>
 
       <SensorReadout values={zone.sensorValues} sensors={zone.sensors} />

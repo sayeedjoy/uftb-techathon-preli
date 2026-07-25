@@ -12,7 +12,7 @@ const BASE = "/api/v1"
 
 export const STAFF_USER: AuthUserDto = {
   id: "user-staff",
-  name: "Noel Ferreira",
+  name: "Security Mama",
   email: "security@scsrg.local",
   role: "SECURITY_STAFF",
   createdAt: new Date().toISOString(),
@@ -20,7 +20,7 @@ export const STAFF_USER: AuthUserDto = {
 
 export const ADMIN_USER: AuthUserDto = {
   id: "user-admin",
-  name: "Ava Rahman",
+  name: "Sayeed Joy",
   email: "admin@scsrg.local",
   role: "ADMIN",
   createdAt: new Date().toISOString(),

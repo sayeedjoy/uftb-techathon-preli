@@ -172,7 +172,7 @@ export function buildOpenApiDocument(): Record<string, unknown> {
                       expiresIn: "60m",
                       user: {
                         id: "6f0…",
-                        name: "Ava Rahman",
+                        name: "Sayeed Joy",
                         email: "admin@scsrg.local",
                         role: "ADMIN",
                         createdAt: "2026-07-25T10:00:00.000Z",

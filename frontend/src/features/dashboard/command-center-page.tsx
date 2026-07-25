@@ -4,6 +4,7 @@ import type { ZoneSummaryDto } from "@scsrg/shared"
 
 import { CriticalBanner } from "@/components/alerts/critical-banner"
 import { LiveEventFeed } from "@/components/alerts/live-event-feed"
+import { PostureHeader } from "@/components/layout/posture-header"
 import { SummaryBar } from "@/components/layout/summary-bar"
 import { PriorityQueuePanel } from "@/components/priority/priority-queue"
 import { ZoneCard } from "@/components/zones/zone-card"
@@ -63,7 +64,7 @@ export function CommandCenterPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <SummaryBar summary={summary.data} isLoading={summary.isLoading} />
+      <PostureHeader summary={summary.data} isLoading={summary.isLoading} />
 
       {topAlert && (
         <CriticalBanner
@@ -73,6 +74,8 @@ export function CommandCenterPage() {
           isAcknowledging={acknowledgingId === topAlert.incidentId}
         />
       )}
+
+      <SummaryBar summary={summary.data} isLoading={summary.isLoading} />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <section aria-label="Zone grid" className="flex flex-col gap-3">

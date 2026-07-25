@@ -11,13 +11,13 @@ import { hashPassword } from "../../src/modules/auth/password.util.js"
  */
 export const DEV_USERS = [
   {
-    name: "Ava Rahman",
+    name: "Sayeed Joy",
     email: "admin@scsrg.local",
     password: "Admin123!",
     role: "ADMIN" as const,
   },
   {
-    name: "Noel Ferreira",
+    name: "Security Mama",
     email: "security@scsrg.local",
     password: "Security123!",
     role: "SECURITY_STAFF" as const,

@@ -55,10 +55,27 @@
     --color-info-surface: var(--info-surface);
     --color-info-border: var(--info-border);
 
-    /* The fourth hazard in the contribution bar. Occupancy is not a severity —
-     * it is a category — so it gets a hue outside the safe→critical ramp
-     * rather than borrowing one and implying a rank. */
-    --color-occupancy: var(--occupancy);
+    /* ---------------------------------------------------------------------
+     * Hazard categorical series — fire, gas, water, occupancy.
+     *
+     * Deliberately NOT the status tokens above. Status colours are reserved
+     * for state (safe/warning/critical); reusing them as a four-series
+     * categorical set both overloads their meaning and fails colour-vision
+     * separation — measured, not guessed: the status-derived set scored
+     * ΔE 2.3 (protan) between fire and gas, and 14.1 normal-vision between
+     * water and occupancy, under `dataviz/scripts/validate_palette.js`.
+     *
+     * These steps pass all six checks in both modes (light band 0.43–0.77,
+     * dark band 0.48–0.67, chroma floor, adjacent CVD, normal-vision floor,
+     * contrast vs surface). Re-run the validator before changing any of them:
+     *   light #bb0916,#b98a00,#0052a6,#c252bb
+     *   dark  #d73431,#b68700,#0064b9,#ca61d1
+     * Fixed order, never cycled — colour follows the hazard, not its rank.
+     * ------------------------------------------------------------------- */
+    --color-hazard-fire: var(--hazard-fire);
+    --color-hazard-gas: var(--hazard-gas);
+    --color-hazard-water: var(--hazard-water);
+    --color-hazard-occupancy: var(--hazard-occupancy);
 
     --color-ring: var(--ring);
     --color-input: var(--input);
@@ -147,7 +164,10 @@
     --info-surface: oklch(0.966 0.023 256);
     --info-border: oklch(0.842 0.076 256);
 
-    --occupancy: oklch(0.548 0.184 302);
+    --hazard-fire: oklch(0.5 0.2 27);
+    --hazard-gas: oklch(0.66 0.14 85);
+    --hazard-water: oklch(0.44 0.16 250);
+    --hazard-occupancy: oklch(0.62 0.19 330);
 }
 
 .dark {
@@ -207,7 +227,13 @@
     --info-surface: oklch(0.278 0.058 245);
     --info-border: oklch(0.462 0.098 240);
 
-    --occupancy: oklch(0.688 0.168 302);
+    /* Selected for the dark surface, not flipped from light: the validator's
+     * dark band is 0.48–0.67, far narrower than light's, so these are their
+     * own steps. */
+    --hazard-fire: oklch(0.58 0.2 27);
+    --hazard-gas: oklch(0.65 0.14 85);
+    --hazard-water: oklch(0.5 0.16 250);
+    --hazard-occupancy: oklch(0.66 0.19 325);
 }
 
 @layer base {
