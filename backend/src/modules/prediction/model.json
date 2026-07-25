@@ -1,0 +1,22 @@
+{
+  "version": "logreg-20260725",
+  "trainedAt": "2026-07-24T20:26:05.901Z",
+  "trainingData": "synthetic",
+  "intercept": -0.3123,
+  "coefficients": {
+    "currentRisk": 2.9865,
+    "fireStreak": 2.0104,
+    "gasSlope": 2.8932,
+    "waterSlope": 1.5169,
+    "occupancy": 0.2114,
+    "secondsSinceTransition": -2.1004,
+    "assetImportance": -0.1962
+  },
+  "metrics": {
+    "accuracy": 0.8446,
+    "precision": 0.8974,
+    "recall": 0.7622,
+    "f1": 0.8243,
+    "auc": 0.8925
+  }
+}

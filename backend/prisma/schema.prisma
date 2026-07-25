@@ -1,0 +1,519 @@
+// SCS-RG — Multi-Hazard Smart Campus Safety & Response Grid
+//
+// Normalised PostgreSQL schema. Two constraints are load-bearing and cannot be
+// expressed in this DSL, so they live in hand-written migrations:
+//
+//   1. incident_one_active_per_zone
+//      CREATE UNIQUE INDEX incident_one_active_per_zone
+//        ON "Incident"("zoneId") WHERE status IN ('OPEN','ACKNOWLEDGED');
+//      This *is* the "at most one active incident per zone" guarantee. It must
+//      never be reduced to application logic.
+//
+//   2. SensorReading(zoneId, capturedAt DESC) — descending composite index used
+//      by the "latest accepted reading" hot path.
+//
+// See prisma/migrations/*_partial_unique_indexes/migration.sql.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums — names mirror @scsrg/shared exactly.
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  SECURITY_STAFF
+  ADMIN
+}
+
+enum ZoneState {
+  SAFE
+  WARNING
+  CRITICAL
+  OFFLINE
+}
+
+enum SensorType {
+  FLAME
+  GAS
+  WATER
+  OCCUPANCY
+}
+
+enum SensorStatus {
+  ONLINE
+  WARMING_UP
+  UNAVAILABLE
+  MAINTENANCE
+  OFFLINE
+}
+
+enum ValidationStatus {
+  ACCEPTED
+  ACCEPTED_OUT_OF_ORDER
+  REJECTED
+}
+
+enum IncidentStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+enum HazardType {
+  FIRE
+  GAS
+  WATER
+  OCCUPANCY
+}
+
+enum IncidentTimelineEventType {
+  CREATED
+  RISK_UPDATED
+  STATE_CHANGED
+  ACKNOWLEDGED
+  ACTUATION_ISSUED
+  OVERRIDE_APPLIED
+  ZONE_OFFLINE
+  RESOLVED
+}
+
+enum ActuationType {
+  SET_LED
+  ACTIVATE_BUZZER
+  DEACTIVATE_BUZZER
+  ACTIVATE_RELAY
+  DEACTIVATE_RELAY
+}
+
+enum ActuationSource {
+  SENSOR_TRIGGERED
+  MANUAL_OVERRIDE
+  SYSTEM_RECOVERY
+}
+
+enum ActuationStatus {
+  PENDING
+  DISPATCHED
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+enum LedColor {
+  GREEN
+  YELLOW
+  RED
+  AMBER_PULSE
+}
+
+enum OverrideAction {
+  FORCE_MAINTENANCE_MODE
+  CLEAR_MAINTENANCE_MODE
+  TEST_ACTUATION
+  SILENCE_BUZZER
+  RESET_ACTUATION
+  MARK_SENSOR_MAINTENANCE
+  CLEAR_SENSOR_MAINTENANCE
+}
+
+enum SystemEventType {
+  ZONE_OFFLINE
+  ZONE_ONLINE
+  VALIDATION_FAILURE
+  DUPLICATE_READING
+  OUT_OF_ORDER_READING
+  SENSOR_UNAVAILABLE
+  SENSOR_MAINTENANCE
+  ACTUATION_FAILED
+  BACKEND_STARTED
+  STATE_RECONSTRUCTED
+  MAINTENANCE_MODE
+  AUTH_FAILURE
+}
+
+enum SystemEventSeverity {
+  INFO
+  WARN
+  ERROR
+}
+
+enum RiskTrend {
+  STABLE
+  RISING
+  FALLING
+  TRENDING_CRITICAL
+}
+
+enum ReportStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+// ---------------------------------------------------------------------------
+// Configuration entities
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(SECURITY_STAFF)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  acknowledgments Acknowledgment[]
+  overrides       ManualOverride[]
+  auditLogs       AuditLog[]
+  reports         IncidentReport[]
+
+  @@index([role])
+}
+
+model Zone {
+  id          String  @id @default(uuid())
+  code        String  @unique
+  name        String
+  description String?
+  location    String?
+
+  /// 0–8. Feeds the priority engine's asset-importance bonus.
+  assetImportance Int @default(0)
+
+  state            ZoneState @default(OFFLINE)
+  currentRiskScore Float     @default(0)
+  /// Latest computed per-signal contributions: { fire, gas, water, occupancy }.
+  contributions    Json      @default("{}")
+  /// Human-readable reasons behind the current state.
+  reasons          Json      @default("[]")
+
+  /// Last accepted reading OR heartbeat. Drives offline detection.
+  lastSeenAt    DateTime?
+  lastReadingAt DateTime?
+
+  isActive        Boolean @default(true)
+  /// Still ingests and stores readings, but suppresses incidents and actuation.
+  maintenanceMode Boolean @default(false)
+
+  // --- Simulated actuator state (rebuildable from ActuationCommand rows) ---
+  ledColor           LedColor  @default(GREEN)
+  buzzerActive       Boolean   @default(false)
+  relayCutoffActive  Boolean   @default(false)
+  actuatorsUpdatedAt DateTime?
+
+  // --- Bonus 1: advisory trend. Never influences state or actuation. ---
+  trend          RiskTrend?
+  trendSlope     Float?
+  trendUpdatedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  credentials      ZoneCredential[]
+  sensors          Sensor[]
+  readings         SensorReading[]
+  transitions      ZoneStateTransition[]
+  incidents        Incident[]
+  actuationCommands ActuationCommand[]
+  overrides        ManualOverride[]
+  systemEvents     SystemEvent[]
+  reports          IncidentReport[]
+
+  @@index([state])
+  @@index([lastSeenAt])
+  @@index([isActive])
+}
+
+model ZoneCredential {
+  id     String @id @default(uuid())
+  zoneId String
+  zone   Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  /// bcrypt hash. The plaintext exists only at seed time.
+  apiKeyHash String
+  /// Non-secret prefix so an operator can tell two keys apart in the UI.
+  label      String?
+
+  createdAt  DateTime  @default(now())
+  revokedAt  DateTime?
+  lastUsedAt DateTime?
+
+  @@index([zoneId, revokedAt])
+}
+
+model Sensor {
+  id     String     @id @default(uuid())
+  zoneId String
+  zone   Zone       @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  type   SensorType
+  name   String
+
+  status SensorStatus @default(OFFLINE)
+  /// Flame sensors are critical: their unavailability alone forces OFFLINE.
+  isCritical Boolean @default(false)
+
+  lastSeenAt   DateTime?
+  /// Per-sensor tuning (ranges, warm-up overrides). Keeps new zones code-free.
+  configuration Json @default("{}")
+
+  /// Gas warm-up window start; null once the sensor has warmed up.
+  warmupStartedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  systemEvents SystemEvent[]
+
+  @@unique([zoneId, type])
+  @@index([zoneId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Event entities
+// ---------------------------------------------------------------------------
+
+model SensorReading {
+  id String @id @default(uuid())
+
+  /// Client-supplied idempotency key. Unique: a repeat is a 409, not a row.
+  readingId      String @unique
+  zoneId         String
+  /// Unique per zone. The second duplicate-detection mechanism.
+  sequenceNumber Int
+
+  zone Zone @relation(fields: [zoneId], references: [id], onDelete: Restrict)
+
+  capturedAt DateTime
+  receivedAt DateTime @default(now())
+
+  // --- Raw sensor values exactly as submitted (null = not reported) ---
+  fireDetected      Boolean?
+  gasLevel          Float?
+  waterLevel        Float?
+  occupancyDetected Boolean?
+  /// Per-sensor availability the node self-reported.
+  sensorHealth      Json     @default("{}")
+
+  // --- Backend-computed. Never accepted from a client. ---
+  riskScore      Float
+  calculatedState ZoneState
+  contributions  Json
+  reasons        Json      @default("[]")
+
+  /// True when this accepted reading is byte-identical to the previous one.
+  isDuplicate      Boolean          @default(false)
+  validationStatus ValidationStatus @default(ACCEPTED)
+
+  @@unique([zoneId, sequenceNumber])
+  @@index([zoneId, capturedAt(sort: Desc)])
+  @@index([zoneId, receivedAt(sort: Desc)])
+  @@index([capturedAt])
+}
+
+model ZoneStateTransition {
+  id     String @id @default(uuid())
+  zoneId String
+  zone   Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  previousState ZoneState?
+  newState      ZoneState
+  riskScore     Float
+  reason        String
+  createdAt     DateTime  @default(now())
+
+  @@index([zoneId, createdAt])
+  @@index([createdAt])
+}
+
+model Incident {
+  id     String @id @default(uuid())
+  zoneId String
+  zone   Zone   @relation(fields: [zoneId], references: [id], onDelete: Restrict)
+
+  status IncidentStatus @default(OPEN)
+
+  startedAt      DateTime  @default(now())
+  acknowledgedAt DateTime?
+  resolvedAt     DateTime?
+
+  /// Monotonic high-water mark; never decreases.
+  maximumRiskScore Float
+  currentRiskScore Float
+  dominantHazards  HazardType[]
+
+  priorityScore       Float?
+  /// { priorityScore, breakdown, reasons } as computed by the priority engine.
+  priorityExplanation Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  acknowledgment    Acknowledgment?
+  timelineEvents    IncidentTimelineEvent[]
+  actuationCommands ActuationCommand[]
+
+  // NOTE: the partial unique index enforcing one active incident per zone is
+  // created in a hand-written migration — Prisma's DSL cannot express it.
+  @@index([status, createdAt])
+  @@index([zoneId, startedAt])
+  @@index([status, zoneId])
+}
+
+model Acknowledgment {
+  id         String   @id @default(uuid())
+  /// Unique: the second guard behind the conditional UPDATE.
+  incidentId String   @unique
+  incident   Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  acknowledgedAt DateTime @default(now())
+  note           String?
+
+  @@index([userId])
+}
+
+model IncidentTimelineEvent {
+  id         String   @id @default(uuid())
+  incidentId String
+  incident   Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  eventType IncidentTimelineEventType
+  message   String
+  metadata  Json                      @default("{}")
+  createdAt DateTime                  @default(now())
+
+  @@index([incidentId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Operational & audit entities
+// ---------------------------------------------------------------------------
+
+model ActuationCommand {
+  id     String @id @default(uuid())
+  zoneId String
+  zone   Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  incidentId String?
+  incident   Incident? @relation(fields: [incidentId], references: [id], onDelete: SetNull)
+
+  type    ActuationType
+  payload Json          @default("{}")
+  source  ActuationSource
+  status  ActuationStatus @default(PENDING)
+
+  requestedAt DateTime  @default(now())
+  executedAt  DateTime?
+  message     String?
+
+  @@index([zoneId, requestedAt])
+  @@index([status])
+  @@index([zoneId, status])
+}
+
+model ManualOverride {
+  id     String @id @default(uuid())
+  zoneId String
+  zone   Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  action    OverrideAction
+  reason    String
+  metadata  Json           @default("{}")
+  createdAt DateTime       @default(now())
+
+  @@index([zoneId, createdAt])
+  @@index([userId, createdAt])
+}
+
+model AuditLog {
+  id     String  @id @default(uuid())
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json    @default("{}")
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+model SystemEvent {
+  id       String  @id @default(uuid())
+  zoneId   String?
+  zone     Zone?   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  sensorId String?
+  sensor   Sensor? @relation(fields: [sensorId], references: [id], onDelete: SetNull)
+
+  type      SystemEventType
+  severity  SystemEventSeverity @default(INFO)
+  message   String
+  metadata  Json                @default("{}")
+  createdAt DateTime            @default(now())
+
+  @@index([createdAt])
+  @@index([type, severity])
+  @@index([zoneId, createdAt])
+}
+
+/// Bonus 3 — modelled up front so the bonus needs no extra migration.
+model IncidentReport {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  zoneId String?
+  zone   Zone?   @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+
+  rawText           String
+  hazardType        HazardType?
+  estimatedSeverity Int         @default(1)
+  confidence        Float       @default(0)
+  confirmationMessage String    @default("")
+  extractorProvider String      @default("deterministic")
+
+  status      ReportStatus @default(PENDING)
+  confirmedAt DateTime?
+  confirmedBy String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([zoneId, status])
+}
+
+/// Bonus / retention — hourly rollups replacing raw readings beyond 90 days.
+model ReadingHourlyAggregate {
+  id       String   @id @default(uuid())
+  zoneId   String
+  hour     DateTime
+  readings Int
+  avgRisk  Float
+  maxRisk  Float
+  avgGas   Float?
+  avgWater Float?
+  fireReadings Int  @default(0)
+
+  @@unique([zoneId, hour])
+  @@index([hour])
+}

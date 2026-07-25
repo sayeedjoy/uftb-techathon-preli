@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+backups
+pnpm-lock.yaml
+backend/prisma/migrations
+docs/openapi.json
+frontend/src/components/ui

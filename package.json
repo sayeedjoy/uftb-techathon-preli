@@ -1,0 +1,42 @@
+{
+  "name": "scsrg",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Multi-Hazard Smart Campus Safety & Response Grid (SCS-RG)",
+  "packageManager": "pnpm@11.5.2",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -n shared,backend,frontend -c magenta,cyan,green \"pnpm --filter @scsrg/shared dev\" \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
+    "build": "pnpm --filter @scsrg/shared build && pnpm --filter backend build && pnpm --filter frontend build",
+    "test": "pnpm --filter @scsrg/shared test && pnpm --filter backend test && pnpm --filter frontend test",
+    "test:unit": "pnpm --filter backend test:unit",
+    "test:integration": "pnpm --filter backend test:integration",
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json,yaml,yml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json,yaml,yml}\"",
+    "typecheck": "pnpm -r typecheck",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:reset": "pnpm --filter backend exec prisma migrate reset --force",
+    "db:migrate": "pnpm --filter backend exec prisma migrate dev",
+    "db:deploy": "pnpm --filter backend exec prisma migrate deploy",
+    "db:studio": "pnpm --filter backend exec prisma studio",
+    "db:seed": "pnpm --filter backend seed",
+    "db:seed:load": "pnpm --filter backend seed:load",
+    "db:explain": "pnpm --filter backend db:explain",
+    "db:backup": "bash backend/scripts/backup.sh",
+    "sim:scenario": "pnpm --filter backend sim:scenario",
+    "sim:load": "pnpm --filter backend sim:load",
+    "ml:train": "pnpm --filter backend ml:train",
+    "docs:openapi": "pnpm --filter backend docs:openapi"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.8.0"
+  }
+}

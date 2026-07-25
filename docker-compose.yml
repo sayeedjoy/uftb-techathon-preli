@@ -1,0 +1,75 @@
+name: scsrg
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: scsrg-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: scsrg
+      POSTGRES_PASSWORD: scsrg
+      POSTGRES_DB: scsrg
+    # Host 5433 on purpose: a local PostgreSQL 18 install commonly owns 5432.
+    ports:
+      - "5433:5432"
+    volumes:
+      # Postgres 18+ images expect a single mount at /var/lib/postgresql and
+      # place the cluster in a major-version subdirectory beneath it.
+      - scsrg-postgres-data:/var/lib/postgresql
+      - ./backend/prisma/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scsrg -d scsrg"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Optional: `docker compose --profile tools up -d pgadmin`
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: scsrg-pgadmin
+    profiles: ["tools"]
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@scsrg.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Optional: `docker compose --profile app up -d --build backend`
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: scsrg-backend
+    profiles: ["app"]
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "4000"
+      DATABASE_URL: postgresql://scsrg:scsrg@postgres:5432/scsrg?schema=public
+      JWT_SECRET: change-me-in-production-min-32-characters-long
+      CORS_ORIGINS: http://localhost:5173
+      SIM_INGESTION_BASE_URL: http://localhost:4000/api/v1
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  scsrg-postgres-data:

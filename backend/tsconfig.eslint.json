@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Scripts and seeds live beside src rather than inside it, so this
+    // check-only project widens the root. Nothing here is ever emitted.
+    "rootDir": ".",
+    "noEmit": true
+  },
+  "include": ["src/**/*", "scripts/**/*", "prisma/**/*"]
+}

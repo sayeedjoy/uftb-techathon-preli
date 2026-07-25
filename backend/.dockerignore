@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+.env
+.env.*
+!.env.example
+.dev-zone-keys.json
+.env.simulator
+*.log
