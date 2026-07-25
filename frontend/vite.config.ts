@@ -11,6 +11,16 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    // Pre-bundle dependencies that no route on the entry path imports.
+    //
+    // `recharts` is reachable only from `/zones/:zoneId` and the incident
+    // drawer. Landing *directly* on one of those URLs is therefore the first
+    // time Vite sees it, so it stops to re-optimize and forces a full reload —
+    // which presents as a blank page that "works after a refresh". Declaring
+    // it here bundles it when the dev server boots instead of mid-navigation.
+    include: ["recharts"],
+  },
   server: {
     port: 5173,
     // Same-origin in development: the API and the socket are proxied to the
