@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { X } from "lucide-react"
 import type { IncidentDetailDto } from "@scsrg/shared"
@@ -28,6 +29,18 @@ export function IncidentDrawer({
     select: (data) => data.incident,
     enabled: Boolean(incidentId),
   })
+
+  // A modal dialog has to be dismissible from the keyboard. Without this the
+  // only way out is tabbing to the close button, which for a screen-reader or
+  // keyboard-only operator reads as being trapped mid-incident.
+  useEffect(() => {
+    if (!incidentId) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose()
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [incidentId, onClose])
 
   if (!incidentId) return null
 
