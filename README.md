@@ -130,6 +130,17 @@ pnpm docs:openapi                        # emit docs/openapi.json
 pnpm --filter backend retention          # retention dry run
 ```
 
+### Firmware
+
+```bash
+pnpm firmware:config                     # zone UUID + API key block for app_config.h
+pnpm firmware:config -- server-room      # …for another seeded zone
+cd firmware && pio run                   # build the ESP32 binary
+```
+
+Zone credentials rotate on every `pnpm db:seed`, so re-run `firmware:config`
+after a reseed. Details in [firmware/README.md](firmware/README.md).
+
 ---
 
 ## Layout
@@ -150,8 +161,14 @@ frontend/          React 19 · Vite 8 · Tailwind 4 · shadcn/ui (base-maia)
                    TanStack Query owns server data; sockets patch or invalidate
                    that cache and are never a parallel source of truth.
 
+firmware/          ESP32 zone node — PlatformIO + Wokwi. Outside the pnpm
+                   workspace; build with `pio run`. Posts raw readings and
+                   pulls actuation commands over the same HTTP API any node
+                   uses, so invariant 1 binds it too.
+
 docs/              Architecture, risk fusion, priority ranking, security,
-                   resilience, database schema, demo scenarios, retention, ML.
+                   resilience, database schema, demo scenarios, retention, ML,
+                   firmware.
 ```
 
 ---
@@ -258,5 +275,6 @@ key. `JWT_SECRET` must be at least 32 characters.
 | [demo-scenarios.md](docs/demo-scenarios.md)     | All eleven scenarios and what to expect               |
 | [data-retention.md](docs/data-retention.md)     | Retention policy, backup, recovery window             |
 | [ml-model.md](docs/ml-model.md)                 | Bonus 2 — model, synthetic data, metrics, boundary    |
+| [firmware.md](docs/firmware.md)                 | ESP32 node — wire contract, units, fallback boundary  |
 
 Interactive API docs: **`http://localhost:4000/api/v1/docs`**.

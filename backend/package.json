@@ -25,7 +25,8 @@
     "ml:train": "tsx scripts/train-risk-model.ts",
     "docs:openapi": "tsx scripts/emit-openapi.ts",
     "retention": "tsx scripts/retention.ts",
-    "print-zone-keys": "tsx scripts/print-zone-keys.ts"
+    "print-zone-keys": "tsx scripts/print-zone-keys.ts",
+    "firmware:config": "tsx scripts/print-firmware-config.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

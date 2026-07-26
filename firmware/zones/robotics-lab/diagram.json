@@ -1,0 +1,473 @@
+{
+  "version": 1,
+  "author": "Industrial Smart Safety Node",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-text",
+      "id": "title",
+      "top": -355,
+      "left": -82,
+      "attrs": {
+        "text": "ROBOTICS LAB - SCS-RG ZONE NODE",
+        "fontSize": "18",
+        "color": "#1565c0"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "subtitle",
+      "top": -325,
+      "left": -82,
+      "attrs": {
+        "text": "Fabrication fire | battery off-gassing | moderate occupancy",
+        "fontSize": "13",
+        "color": "#455a64"
+      }
+    },
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp",
+      "top": -135,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-breadboard-half",
+      "id": "breadboard",
+      "top": -326,
+      "left": 303,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-ir-receiver",
+      "id": "flameIr",
+      "top": -264,
+      "left": -300,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-ir-remote",
+      "id": "flameRemote",
+      "top": -320,
+      "left": -480,
+      "rotate": 90,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-text",
+      "id": "flameLabel",
+      "top": -312,
+      "left": -316,
+      "attrs": {
+        "text": "IR FLAME SENSOR",
+        "fontSize": "12",
+        "color": "#c62828"
+      }
+    },
+    {
+      "type": "wokwi-gas-sensor",
+      "id": "gas",
+      "top": -119,
+      "left": -327,
+      "attrs": {
+        "ppm": "400",
+        "threshold": "4.4"
+      }
+    },
+    {
+      "type": "wokwi-pir-motion-sensor",
+      "id": "pir",
+      "top": 189,
+      "left": -321,
+      "attrs": {
+        "delayTime": "3",
+        "inhibitTime": "0.5"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "greenLed",
+      "top": -286,
+      "left": 358,
+      "attrs": {
+        "color": "green",
+        "label": "NORMAL"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "greenResistor",
+      "top": -206,
+      "left": 354,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "yellowLed",
+      "top": -286,
+      "left": 444,
+      "attrs": {
+        "color": "yellow",
+        "label": "WARNING"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "yellowResistor",
+      "top": -206,
+      "left": 440,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "redLed",
+      "top": -286,
+      "left": 530,
+      "attrs": {
+        "color": "red",
+        "label": "DANGER"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "redResistor",
+      "top": -206,
+      "left": 526,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "buzzer",
+      "top": 31,
+      "left": 373,
+      "attrs": {
+        "volume": "0.2"
+      }
+    },
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay",
+      "top": 174,
+      "left": 391,
+      "attrs": {
+        "transistor": "npn"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "loadResistor",
+      "top": 210,
+      "left": 570,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "loadLed",
+      "top": 200,
+      "left": 685,
+      "rotate": 90,
+      "attrs": {
+        "color": "blue",
+        "label": "POWERED LOAD"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "relayLabel",
+      "top": 281,
+      "left": 395,
+      "attrs": {
+        "text": "EMERGENCY POWER CUTOFF",
+        "fontSize": "12",
+        "color": "#c62828"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "hint",
+      "top": 345,
+      "left": -305,
+      "attrs": {
+        "text": "IR remote key: fire | Adjust MQ-2: gas | Click PIR: occupancy",
+        "fontSize": "13",
+        "color": "#37474f"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "esp:TX0",
+      "$serialMonitor:RX",
+      "",
+      []
+    ],
+    [
+      "esp:RX0",
+      "$serialMonitor:TX",
+      "",
+      []
+    ],
+    [
+      "flameIr:DAT",
+      "esp:D34",
+      "orange",
+      [
+        "h80",
+        "v126",
+        "h110"
+      ]
+    ],
+    [
+      "flameIr:VCC",
+      "esp:3V3",
+      "red",
+      [
+        "v-28",
+        "h275",
+        "v44"
+      ]
+    ],
+    [
+      "flameIr:GND",
+      "esp:GND.2",
+      "black",
+      [
+        "v48",
+        "h205",
+        "v90"
+      ]
+    ],
+    [
+      "gas:AOUT",
+      "esp:D35",
+      "green",
+      [
+        "h118",
+        "v-28",
+        "h87"
+      ]
+    ],
+    [
+      "gas:DOUT",
+      "esp:D27",
+      "orange",
+      [
+        "h92",
+        "v-62",
+        "h93"
+      ]
+    ],
+    [
+      "gas:VCC",
+      "esp:VIN",
+      "red",
+      [
+        "v-25",
+        "h211",
+        "v175"
+      ]
+    ],
+    [
+      "gas:GND",
+      "esp:GND.2",
+      "black",
+      [
+        "v27",
+        "h200",
+        "v61"
+      ]
+    ],
+    [
+      "pir:OUT",
+      "esp:D33",
+      "purple",
+      [
+        "h88",
+        "v-196",
+        "h111"
+      ]
+    ],
+    [
+      "pir:VCC",
+      "esp:3V3",
+      "red",
+      [
+        "v-24",
+        "h278",
+        "v-320"
+      ]
+    ],
+    [
+      "pir:GND",
+      "esp:GND.2",
+      "black",
+      [
+        "v27",
+        "h220",
+        "v-226"
+      ]
+    ],
+    [
+      "esp:D18",
+      "greenResistor:2",
+      "green",
+      [
+        "h97",
+        "v-78",
+        "h103"
+      ]
+    ],
+    [
+      "greenResistor:1",
+      "greenLed:A",
+      "green",
+      []
+    ],
+    [
+      "greenLed:C",
+      "breadboard:bn.3",
+      "black",
+      []
+    ],
+    [
+      "esp:D19",
+      "yellowResistor:2",
+      "gold",
+      [
+        "h112",
+        "v-97",
+        "h168"
+      ]
+    ],
+    [
+      "yellowResistor:1",
+      "yellowLed:A",
+      "gold",
+      []
+    ],
+    [
+      "yellowLed:C",
+      "breadboard:bn.5",
+      "black",
+      []
+    ],
+    [
+      "esp:D21",
+      "redResistor:2",
+      "red",
+      [
+        "h127",
+        "v-116",
+        "h232"
+      ]
+    ],
+    [
+      "redResistor:1",
+      "redLed:A",
+      "red",
+      []
+    ],
+    [
+      "redLed:C",
+      "breadboard:bn.7",
+      "black",
+      []
+    ],
+    [
+      "esp:D22",
+      "buzzer:1",
+      "cyan",
+      [
+        "h102",
+        "v123",
+        "h168"
+      ]
+    ],
+    [
+      "buzzer:2",
+      "breadboard:bn.9",
+      "black",
+      []
+    ],
+    [
+      "breadboard:bn.1",
+      "esp:GND.1",
+      "black",
+      [
+        "h-91",
+        "v162"
+      ]
+    ],
+    [
+      "esp:D23",
+      "relay:IN",
+      "limegreen",
+      [
+        "h121",
+        "v224",
+        "h143"
+      ]
+    ],
+    [
+      "relay:VCC",
+      "esp:VIN",
+      "red",
+      [
+        "v-26",
+        "h-357",
+        "v-40"
+      ]
+    ],
+    [
+      "relay:GND",
+      "esp:GND.1",
+      "black",
+      [
+        "v-45",
+        "h-326",
+        "v-7"
+      ]
+    ],
+    [
+      "esp:VIN",
+      "relay:COM",
+      "red",
+      [
+        "h-40",
+        "v320",
+        "h350"
+      ]
+    ],
+    [
+      "relay:NO",
+      "loadResistor:1",
+      "blue",
+      []
+    ],
+    [
+      "loadResistor:2",
+      "loadLed:A",
+      "blue",
+      []
+    ],
+    [
+      "loadLed:C",
+      "breadboard:bn.11",
+      "black",
+      []
+    ]
+  ],
+  "dependencies": {}
+}

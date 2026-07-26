@@ -29,6 +29,7 @@
     "db:seed:load": "pnpm --filter backend seed:load",
     "db:explain": "pnpm --filter backend db:explain",
     "db:backup": "bash backend/scripts/backup.sh",
+    "firmware:config": "pnpm --filter backend firmware:config",
     "sim:scenario": "pnpm --filter backend sim:scenario",
     "sim:load": "pnpm --filter backend sim:load",
     "ml:train": "pnpm --filter backend ml:train",

@@ -1,0 +1,40 @@
+name: Boot, sample and fall back safely
+version: 1
+author: SCS-RG
+
+# Runs the real firmware on a simulated ESP32 and asserts the behaviour that
+# cannot be checked by compiling or by replaying payloads at the backend.
+#
+#   wokwi-cli . --scenario test/boot.scenario.yaml --timeout 60000
+#
+# It deliberately does NOT assume the backend is reachable: `host.wokwi.internal`
+# needs Wokwi's paid Private IoT Gateway. With no gateway the node cannot reach
+# the API, which is exactly the condition this scenario is written to verify —
+# a node that loses the backend must keep working and must not report "safe".
+
+steps:
+  - wait-serial: "Industrial Smart Safety Node starting"
+
+  # Wi-Fi must come up before anything else is meaningful.
+  - wait-serial: "[WiFi] Connected"
+
+  # The sequence counter must anchor to the wall clock before the node
+  # publishes. A counter restarting at 1 each boot would sit below the zone's
+  # latest accepted reading and every send would be rejected as out of order.
+  - wait-serial: "[SEQ] Sequence base anchored at"
+
+  # Sensors are being sampled and converted. The banner carries the zone code,
+  # so match only the rule around it — this scenario runs for every zone.
+  - wait-serial: "========"
+  - wait-serial: "Sent as        : "
+
+  # The local risk score must be labelled advisory. It is computed on-device but
+  # never transmitted — the backend is the sole authority for risk and state.
+  - wait-serial: "advisory only"
+
+  # With no backend reachable the node must take its actuators back rather than
+  # obey stale commands or go dark. Offline is unknown, not safe.
+  - wait-serial: "Actuators      : LOCAL FALLBACK"
+
+  # Unsent readings are buffered rather than dropped.
+  - wait-serial: "Buffered       : "
