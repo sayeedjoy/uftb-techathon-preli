@@ -80,7 +80,7 @@ sequenceDiagram
   API->>Risk: 8. computeRisk(inputs, config)
   Risk-->>API: score, state, contributions, reasons
 
-  rect rgb(30,40,55)
+  rect rgb(228,236,246)
     note over API,DB: 9–14 — one transaction
     API->>DB: persist reading
     API->>DB: update live zone state

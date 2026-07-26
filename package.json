@@ -33,7 +33,8 @@
     "sim:scenario": "pnpm --filter backend sim:scenario",
     "sim:load": "pnpm --filter backend sim:load",
     "ml:train": "pnpm --filter backend ml:train",
-    "docs:openapi": "pnpm --filter backend docs:openapi"
+    "docs:openapi": "pnpm --filter backend docs:openapi",
+    "docs:pdf": "node scripts/build-docs-pdf.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
