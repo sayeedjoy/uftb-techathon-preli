@@ -1,0 +1,20 @@
+# Used by the Wokwi VS Code extension when you press "Start Simulator".
+#
+# Points at the multi-room build, so one click gives a board that can be any of
+# the three rooms — press the blue ZONE button to switch. Build it with:
+#
+#   pnpm firmware:config -- --registry
+#   pio run -e multi-room
+#
+# To simulate a single dedicated room instead, change these two paths to that
+# environment (iot-lab / robotics-lab / server-room) and rebuild. The root
+# diagram.json is the superset board and works with every environment: a build
+# that does not report a channel simply never reads that pin.
+#
+# Headless runs ignore this file — they pass --elf and --diagram-file
+# explicitly. See run-all-zones.sh.
+
+[wokwi]
+version = 1
+firmware = ".pio/build/multi-room/firmware.bin"
+elf = ".pio/build/multi-room/firmware.elf"

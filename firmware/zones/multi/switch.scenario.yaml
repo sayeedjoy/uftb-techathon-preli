@@ -1,0 +1,31 @@
+name: Zone toggle cycles all three rooms
+version: 1
+author: SCS-RG
+
+# One board, three rooms. Each press must move credentials, URL and the
+# reported sensor set together.
+#
+# Waits target the per-publish banner rather than the one-shot "ZONE ->" line:
+# that line is emitted the instant the button is read, which is during the
+# press delay, so a wait started afterwards would already have missed it.
+steps:
+  - wait-serial: "Sequence base anchored"
+  - wait-serial: "======== iot-lab ========"
+
+  - set-control: { part-id: zoneBtn, control: pressed, value: 1 }
+  - delay: 300ms
+  - set-control: { part-id: zoneBtn, control: pressed, value: 0 }
+  - wait-serial: "======== robotics-lab ========"
+
+  - set-control: { part-id: zoneBtn, control: pressed, value: 1 }
+  - delay: 300ms
+  - set-control: { part-id: zoneBtn, control: pressed, value: 0 }
+  - wait-serial: "======== server-room ========"
+  # Server Room is the only room reporting water and the only one omitting gas,
+  # so this proves the sensor set moved with the identity, not just the label.
+  - wait-serial: "water="
+
+  - set-control: { part-id: zoneBtn, control: pressed, value: 1 }
+  - delay: 300ms
+  - set-control: { part-id: zoneBtn, control: pressed, value: 0 }
+  - wait-serial: "======== iot-lab ========"

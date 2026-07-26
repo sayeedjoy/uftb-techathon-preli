@@ -33,6 +33,13 @@ backups/
 *.dump
 *.sql.gz
 
+# PlatformIO build output and downloaded library sources (firmware/)
+.pio/
+.piolibdeps/
+
+# Real zone credentials for the ESP32 node — generated, never committed
+firmware/include/zone_secrets.h
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -44,3 +51,6 @@ backups/
 *.sln
 *.sw?
 *.local
+firmware/include/zones/
+firmware/logs/
+firmware/include/zone_registry.h

@@ -27,6 +27,24 @@ async function restart() {
   return summary
 }
 
+/**
+ * Treat every zone as having reported just now.
+ *
+ * The suite runs with ZONE_OFFLINE_TIMEOUT_MS at 300ms, which `offline.test.ts`
+ * needs so it can watch a zone fall silent without a long sleep. That budget is
+ * small enough that the few queries between a test's last reading and its
+ * restart can exceed it on a loaded machine, at which point reconstruction
+ * correctly reports OFFLINE and the assertion fails for a reason unrelated to
+ * restart recovery.
+ *
+ * Only tests asserting on restored *live* state call this. Tests that assert a
+ * zone silent during downtime comes back OFFLINE must not — a stale lastSeenAt
+ * is the input they are testing.
+ */
+async function markAllZonesJustSeen() {
+  await prisma.zone.updateMany({ data: { lastSeenAt: new Date() } })
+}
+
 describe("backend restart recovery", () => {
   let zone: SeededZone
   let quiet: SeededZone
@@ -64,6 +82,9 @@ describe("backend restart recovery", () => {
 
     expect(before.incidents).toHaveLength(1)
 
+    // Both zones were reporting a moment ago; this test is about what survives
+    // a restart, not about offline detection.
+    await markAllZonesJustSeen()
     await restart()
 
     const after = {

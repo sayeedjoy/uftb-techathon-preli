@@ -11,6 +11,12 @@ the live picture over REST snapshots + Socket.IO.
 
 pnpm workspace with three packages: `packages/shared` (`@scsrg/shared`), `backend`, `frontend`.
 
+`firmware/` is an ESP32 zone node (PlatformIO + Wokwi) that drives the real ingestion API. It is
+**not** part of the pnpm workspace and no JS gate touches it — build it with `pio run` from inside
+`firmware/`. It is a client of the wire contract like any other node: it POSTs raw readings and
+pulls actuation commands, and it holds a zone API key, so it is bound by invariant 1 exactly as the
+simulator is. See `docs/firmware.md`.
+
 ## Commands
 
 ```bash
@@ -141,5 +147,6 @@ Seeded dev logins (local demo only): `admin@scsrg.local` / `Admin123!` and
 `docs/` is current and worth reading before non-trivial changes: `architecture.md`, `api.md`,
 `database-schema.md`, `risk-fusion.md` (the formula and _why_ those weights), `priority-ranking.md`,
 `security.md`, `resilience.md`, `demo-scenarios.md`, `data-retention.md`, `ml-model.md`,
-`ai-provider.md` (the OpenRouter → Groq → deterministic extraction chain).
-`specs-and-planning/` holds the original spec, plan and task breakdown.
+`ai-provider.md` (the OpenRouter → Groq → deterministic extraction chain),
+`firmware.md` (the ESP32 node's wire contract and its actuation fallback boundary).
+`specs-and-planning/` holds the original spec, plan and task breakdown, plus the round-1 case PDF.
