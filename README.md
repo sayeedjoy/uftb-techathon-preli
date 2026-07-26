@@ -23,6 +23,14 @@ with `400`, not quietly ignored.
 `psql` is optional but handy. **Docker Postgres binds host port 5433**, not 5432
 — a local PostgreSQL install usually owns 5432 and the two would collide.
 
+Only for the ESP32 node — the rest of the platform runs without them:
+
+| Tool                     | For                                       |
+| ------------------------ | ----------------------------------------- |
+| PlatformIO Core          | building the firmware (`pio run`)         |
+| Wokwi for VS Code        | **Start Simulator** — the one-click board |
+| `wokwi-cli` + a CI token | headless runs and the boot scenario       |
+
 ## First run
 
 ```bash
@@ -54,20 +62,55 @@ fault. Drive them from the **Simulator** page, or run a scenario:
 pnpm sim:scenario -- --id 5         # two zones critical at once, ranked
 ```
 
-### Optional — the ESP32 zone node
+### Optional — the ESP32 zone node in Wokwi
 
 The sensing layer is a separate PlatformIO project and is not part of the pnpm
-workspace, so no JS gate touches it.
+workspace, so no JS gate touches it. It drives the same HTTP API the simulator
+does, with a zone API key of its own — invariant 1 binds it exactly as it binds
+every other node.
 
 ```bash
-pnpm firmware:config -- --registry  # writes gitignored zone credentials
-cd firmware && pio run              # builds all four environments
+pnpm firmware:config -- --all --registry   # zone credentials, all zones
+cd firmware && pio run                     # build all four environments
 ```
 
-Then press **Start Simulator** with the Wokwi VS Code extension. Reaching a
-backend on your own machine needs Wokwi's paid Private IoT Gateway; without it
-the board runs but cannot deliver readings. Full detail in
-[firmware/README.md](firmware/README.md).
+Those two flags do different jobs and `pio run` needs both:
+
+| Flag         | Writes                    | Used by                                           |
+| ------------ | ------------------------- | ------------------------------------------------- |
+| `--all`      | `include/zones/<code>.h`  | the `iot-lab`, `robotics-lab`, `server-room` envs |
+| `--registry` | `include/zone_registry.h` | the `multi-room` env's runtime zone table         |
+
+Both are gitignored — they hold live keys — and both go stale on every
+`pnpm db:seed`, because zone keys rotate by design. Re-run the command after a
+reseed.
+
+**One click in VS Code.** Open the `firmware/` folder and press **Start
+Simulator**. [wokwi.toml](firmware/wokwi.toml) points at the `multi-room`
+binary: one board that can be any of the three rooms. Press the blue **ZONE**
+button (GPIO 13) and the credentials, the URL and the reported sensor set all
+move together — Server Room reports water and no gas, so you can see the
+identity change rather than take it on trust.
+
+**Headless.** Needs a `WOKWI_CLI_TOKEN` from
+[wokwi.com/dashboard/ci](https://wokwi.com/dashboard/ci) — a _different_
+credential from the VS Code extension's licence, which the CLI rejects.
+
+```bash
+export WOKWI_CLI_TOKEN=wok_...
+cd firmware
+wokwi-cli . --scenario test/boot.scenario.yaml --timeout 60000   # boot assertions
+./run-all-zones.sh 60                                           # three zone nodes at once
+```
+
+> **Reaching a backend on your own machine needs Wokwi's paid Private IoT
+> Gateway** — that is what makes `host.wokwi.internal` resolve. Without it the
+> board boots and runs correctly but cannot deliver readings, so the dashboard
+> keeps showing zones OFFLINE. Drive the dashboard from `pnpm sim:scenario`
+> instead, or deploy the API somewhere public and point `API_BASE_URL` at it.
+
+Full detail in [firmware/README.md](firmware/README.md); the schematic and pin
+map are in [docs/circuit-diagram.md](docs/circuit-diagram.md).
 
 ### Development-only credentials
 
@@ -156,9 +199,15 @@ pnpm --filter backend retention          # retention dry run
 ### Firmware
 
 ```bash
-pnpm firmware:config                     # zone UUID + API key block for app_config.h
-pnpm firmware:config -- server-room      # …for another seeded zone
-cd firmware && pio run                   # build the ESP32 binary
+pnpm firmware:config                          # print iot-lab's block, write nothing
+pnpm firmware:config -- server-room --write   # one zone → include/zone_secrets.h
+pnpm firmware:config -- --all --registry      # every zone: per-zone headers + registry
+
+cd firmware
+pio run                                       # all four environments
+pio run -e server-room                        # just one
+pio run -t upload -t monitor                  # flash a physical board
+./run-all-zones.sh 60                         # three Wokwi sessions, one per zone
 ```
 
 Zone credentials rotate on every `pnpm db:seed`, so re-run `firmware:config`
@@ -188,6 +237,11 @@ firmware/          ESP32 zone node — PlatformIO + Wokwi. Outside the pnpm
                    workspace; build with `pio run`. Posts raw readings and
                    pulls actuation commands over the same HTTP API any node
                    uses, so invariant 1 binds it too.
+  src/main.cpp     One firmware, four builds: a dedicated binary per zone plus
+                   `multi-room`, a single board that switches room on a button.
+  zones/<code>/    That zone's diagram.json; `multi/` adds the ZONE button.
+  test/            Wokwi CI scenarios — boot, sensor conversion, local fallback.
+  wokwi.toml       What "Start Simulator" launches in VS Code.
 
 docs/              System architecture, circuit diagram, API reference,
                    database schema, risk fusion formula.
@@ -292,19 +346,27 @@ key. `JWT_SECRET` must be at least 32 characters.
 **Port 4000 already in use.** A previous backend is still running. On Windows:
 `netstat -ano | findstr :4000`, then `taskkill /PID <pid> /F`.
 
+**Wokwi says `firmware.bin not found`.** `wokwi.toml` points at the
+`multi-room` build. Generate its zone table and build it:
+`pnpm firmware:config -- --registry && cd firmware && pio run -e multi-room`.
+
+**The firmware won't compile — no `zone_registry.h` / `zones/<code>.h`.** Those
+are generated, not committed. Run `pnpm firmware:config -- --all --registry`
+(after `pnpm db:seed`, which is what produces the keys).
+
 ---
 
 ## Documentation
 
-| Document                                                          | Covers                                                |
-| ----------------------------------------------------------------- | ----------------------------------------------------- |
-| [architecture.md](docs/architecture.md)                           | System shape, data flow, layering, in-memory state    |
-| [circuit-diagram.md](docs/circuit-diagram.md)                     | ESP32 node — schematic, pin map, per-zone boards      |
-| [api.md](docs/api.md)                                             | Every endpoint, envelope, status codes, socket events |
-| [database-schema.md](docs/database-schema.md)                     | ERD, constraints, indexes, the performance gate       |
-| [risk-fusion.md](docs/risk-fusion.md)                             | The formula, **why these weights**, sensor rules      |
-| [deployment.md](docs/deployment.md)                               | Production config, Docker, proxying, scaling limits   |
-| [troubleshooting.md](docs/troubleshooting.md)                     | Every failure mode we have actually hit, and why      |
+| Document                                                                | Covers                                                |
+| ----------------------------------------------------------------------- | ----------------------------------------------------- |
+| [architecture.md](docs/architecture.md)                                 | System shape, data flow, layering, in-memory state    |
+| [circuit-diagram.md](docs/circuit-diagram.md)                           | ESP32 node — schematic, pin map, per-zone boards      |
+| [api.md](docs/api.md)                                                   | Every endpoint, envelope, status codes, socket events |
+| [database-schema.md](docs/database-schema.md)                           | ERD, constraints, indexes, the performance gate       |
+| [risk-fusion.md](docs/risk-fusion.md)                                   | The formula, **why these weights**, sensor rules      |
+| [deployment.md](docs/deployment.md)                                     | Production config, Docker, proxying, scaling limits   |
+| [troubleshooting.md](docs/troubleshooting.md)                           | Every failure mode we have actually hit, and why      |
 | [SCS-RG-System-Documentation.pdf](docs/SCS-RG-System-Documentation.pdf) | The consolidated submission document                  |
 
 Interactive API docs: **`http://localhost:4000/api/v1/docs`**.

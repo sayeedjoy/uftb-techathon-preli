@@ -60,13 +60,14 @@ for in the database, because reporting a channel the zone lacks is a
 | `robotics-lab` | flame · gas · occupancy       | Fabrication fire, battery off-gassing           |
 | `server-room`  | flame · **water** · occupancy | Electrical fire, AC condensate leak, high asset |
 
-Per-zone circuit diagrams live in [`zones/<code>/diagram.json`](zones).
-Switching zone rewrites both `include/zone_secrets.h` and the active
-`diagram.json`, so credentials and board can never drift apart:
+Per-zone circuit diagrams live in [`zones/<code>/diagram.json`](zones). The root
+[diagram.json](diagram.json) is the superset board and works with every build —
+a zone that does not report a channel simply never reads that pin — so
+`firmware:config` deliberately leaves it alone.
 
 ```bash
 pnpm firmware:config -- server-room --write
-cd firmware && pio run
+cd firmware && pio run -e server-room
 ```
 
 ### 2. Generate the zone identity
@@ -76,26 +77,50 @@ key. Both change on every `pnpm db:seed`, so generate them rather than copying
 by hand:
 
 ```bash
+pnpm firmware:config                         # print without writing
 pnpm firmware:config -- --write              # iot-lab
 pnpm firmware:config -- server-room --write  # any seeded zone
-pnpm firmware:config                         # print without writing
+pnpm firmware:config -- --all --registry     # every zone, both header styles
 ```
 
-That writes [include/zone_secrets.h](include/zone_secrets.example.h) — which is
-**gitignored**, so a live API key never lands in a tracked file — and derives
-the `REPORT_*` flags from the sensors that zone actually has.
+The first three write [include/zone_secrets.h](include/zone_secrets.example.h),
+the single-zone header a plain `pio run` compiles against. The last one writes
+what the four-environment build needs:
+
+| Flag         | Writes                    | Feeds                                             |
+| ------------ | ------------------------- | ------------------------------------------------- |
+| `--all`      | `include/zones/<code>.h`  | the `iot-lab`, `robotics-lab`, `server-room` envs |
+| `--registry` | `include/zone_registry.h` | the `multi-room` env's runtime zone table         |
+
+All of them are **gitignored**, so a live API key never lands in a tracked file,
+and all of them derive the `REPORT_*` flags from the sensors that zone actually
+has. Regenerate after every `pnpm db:seed` — keys rotate by design.
 
 ### 3. Build
 
+Four environments: one dedicated binary per zone, plus `multi-room`. A zone's
+UUID and API key are compiled in, which is what lets three nodes run at once
+rather than one at a time.
+
 ```bash
 cd firmware
-pio run                # or: python -m platformio run
+pio run                # all four   (or: python -m platformio run)
+pio run -e server-room # just one
 ```
 
 ### 4. Run it
 
-**Wokwi (VS Code extension)** — open the `firmware/` folder and start the
-simulator. [wokwi.toml](wokwi.toml) already points at the built binary.
+**Wokwi (VS Code extension)** — open the `firmware/` folder and press **Start
+Simulator**. [wokwi.toml](wokwi.toml) points at the `multi-room` binary, so one
+click gives a board that can be any of the three rooms: press the blue **ZONE**
+button (GPIO 13) to cycle. The switch is total — credentials, URL and reported
+channels move together, and backend authority is dropped on purpose, because
+commands pulled for the old room say nothing about this one. Server Room is the
+only room reporting water and the only one omitting gas, which is what makes the
+change visible in the serial log.
+
+To simulate one dedicated room instead, point both paths in `wokwi.toml` at that
+environment and rebuild.
 
 Reaching a backend on your own machine needs Wokwi's **Private IoT Gateway**;
 that is what makes `host.wokwi.internal` resolve. Without it, deploy the API
@@ -115,6 +140,24 @@ wokwi-cli . --scenario test/boot.scenario.yaml --timeout 60000
 [test/boot.scenario.yaml](test/boot.scenario.yaml) asserts boot, Wi-Fi, the
 sequence anchor, sensor conversion, the advisory-only risk label, the local
 fallback and outbox buffering. It exits non-zero if any of those regress.
+[zones/multi/switch.scenario.yaml](zones/multi/switch.scenario.yaml) does the
+same for the zone button, checking that the sensor set moves with the identity:
+
+```bash
+wokwi-cli . --elf .pio/build/multi-room/firmware.elf \
+            --diagram-file zones/multi/diagram.json \
+            --scenario zones/multi/switch.scenario.yaml --timeout 60000
+```
+
+**All three zones at once** — three separate binaries, three sessions, one
+prefixed serial stream plus `logs/<zone>.log` each:
+
+```bash
+./run-all-zones.sh 60          # seconds; defaults to 60
+```
+
+Three sessions burn simulation minutes three times as fast, and the free CI tier
+is 50 minutes a month.
 
 **Physical board** — `pio run -t upload -t monitor`, after setting `WIFI_SSID`
 and `WIFI_PASSWORD`.
