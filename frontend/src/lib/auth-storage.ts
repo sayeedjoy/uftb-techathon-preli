@@ -4,8 +4,8 @@ import type { AuthUserDto } from "@scsrg/shared"
  * Token storage.
  *
  * `localStorage` keeps the demo simple and survives a reload, at the cost of
- * XSS exposure. The tradeoff — and what an httpOnly refresh-cookie rotation
- * would change — is written up in docs/security.md.
+ * XSS exposure. Production would move the token to an httpOnly cookie with
+ * refresh rotation, which is a backend change as much as a frontend one.
  */
 const TOKEN_KEY = "scsrg.token"
 const USER_KEY = "scsrg.user"

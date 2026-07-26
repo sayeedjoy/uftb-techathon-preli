@@ -191,4 +191,4 @@ the backend has _not_ ordered a cut — so the load is energised exactly when it
 should be. It also fails safe: a dead or unpowered node leaves `IN` low, COM
 falls back to NC, and the load stays de-energised.
 
-Deeper reference: [../docs/firmware.md](../docs/firmware.md).
+Deeper reference: [../docs/circuit-diagram.md](../docs/circuit-diagram.md).

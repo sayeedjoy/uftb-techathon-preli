@@ -80,7 +80,7 @@ sequenceDiagram
   API->>Risk: 8. computeRisk(inputs, config)
   Risk-->>API: score, state, contributions, reasons
 
-  rect rgb(30,40,55)
+  rect rgb(228,236,246)
     note over API,DB: 9–14 — one transaction
     API->>DB: persist reading
     API->>DB: update live zone state
@@ -143,8 +143,9 @@ that is exactly what happened.
 ## What this deliberately is not
 
 - **No queue, cache or second process.** One backend process owns the HTTP
-  server, the socket server, the heartbeat sweeper and the simulator engine.
-  `resilience.md` describes what changes at multi-instance scale.
+  server, the socket server, the heartbeat sweeper and the simulator engine. At
+  multi-instance scale the in-memory caches and the heartbeat sweeper would need
+  to move behind a shared store and a single leader.
 - **No deployment automation.** Compose for local Postgres and a backend
   Dockerfile; production infrastructure is documented, not provisioned.
 - **No hardware integration.** Actuation is a logged command model with a

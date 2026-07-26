@@ -40,8 +40,8 @@ static constexpr int32_t WIFI_CHANNEL = 6;
 // --- Backend -------------------------------------------------------------
 // host.wokwi.internal reaches the development machine when Wokwi's Private IoT
 // Gateway is enabled. For the public gateway, deploy the API publicly and put
-// its public HTTP URL here. Read docs/firmware.md before switching to HTTPS:
-// this client does not configure certificate validation.
+// its public HTTP URL here. Do not switch to HTTPS without adding certificate
+// validation — this client configures none.
 //
 // Port 4000 is the backend, not 3000 — the round-1 example server is gone.
 static constexpr char API_BASE_URL[] = "http://host.wokwi.internal:4000/api/v1";

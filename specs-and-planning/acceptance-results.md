@@ -48,7 +48,7 @@ implementation against a seeded database.
 | Trend provably never affects state                   | `prediction-boundaries.test.ts › keeps the trend module out of every hazard code path` — import-graph scan                                                      | ✅     |
 | ML prediction served and visually distinct           | `GET /prediction/:zoneId`; `PREDICTED` badge in its own panel                                                                                                   | ✅     |
 | ML prediction provably unable to actuate             | `prediction-boundaries.test.ts` — no import of actuation, incidents, zone-state, **or any Prisma client**                                                       | ✅     |
-| ML metrics documented                                | [docs/ml-model.md](../docs/ml-model.md) — accuracy 0.845, precision 0.897, recall 0.762, F1 0.824, AUC 0.893, confusion matrix, synthetic data stated plainly   | ✅     |
+| ML metrics documented                                | `docs/SCS-RG-System-Documentation.pdf` — accuracy 0.845, precision 0.897, recall 0.762, F1 0.824, AUC 0.893, confusion matrix, synthetic data stated plainly   | ✅     |
 | NL report parsed deterministically, no paid service  | `AI_PROVIDER=none` default; zone-alias, hazard and severity lexicons; no network call                                                                           | ✅     |
 | NL report validation-gated and unable to actuate     | `validation-gate.ts` re-parses, discards unknown zones, clamps severity; report is `PENDING` and influences nothing until an admin confirms, then bounded to +5 | ✅     |
 
@@ -109,10 +109,10 @@ cosmetic adjustments:
 
 - **Single process.** One backend owns the HTTP server, socket server,
   heartbeat sweeper and simulator engine. What changes at multi-instance scale
-  is written up in [docs/resilience.md](../docs/resilience.md) rather than built.
+  is written up in `docs/SCS-RG-System-Documentation.pdf` rather than built.
 - **Token in `localStorage`.** The brief's API surface has no refresh endpoint.
   The XSS tradeoff and what would replace it are in
-  [docs/security.md](../docs/security.md).
+  `docs/SCS-RG-System-Documentation.pdf`.
 - **Retention is not scheduled.** `pnpm --filter backend retention` is dry-run
   by default and deliberately not automated.
 - **OpenAPI is hand-authored**, not generated from the Zod schemas — the

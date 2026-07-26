@@ -5,8 +5,8 @@
 #   pnpm db:backup
 #
 # Produces a timestamped custom-format dump under backups/ (gitignored).
-# Restore with the command printed at the end. The recovery process and the
-# possible data-loss window are documented in docs/data-retention.md.
+# Restore with the command printed at the end, which also states the data-loss
+# window. Retention policy itself lives in scripts/retention.ts.
 
 set -euo pipefail
 
@@ -47,4 +47,4 @@ echo "  createdb scsrg_restore"
 echo "  pg_restore --no-owner --dbname=postgresql://scsrg:scsrg@localhost:5433/scsrg_restore \"$ARTEFACT\""
 echo ""
 echo "Data-loss window: everything written since $TIMESTAMP."
-echo "See docs/data-retention.md for the full recovery procedure."
+echo "Verify the scratch database before promoting it over the live one."
