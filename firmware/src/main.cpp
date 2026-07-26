@@ -255,7 +255,7 @@ class PersistentOutbox {
     }
 
     data_ = candidate;
-    Serial.printf("[OUTBOX] Restored %u buffered reading(s)\n", data_.count);
+    Serial.printf("[OUTBOX] Restored %u buffered reading(s)\r\n", data_.count);
   }
 
   bool empty() const { return data_.count == 0; }
@@ -620,7 +620,7 @@ void seedSequenceFromClock() {
     nextSequence[i] = epoch;
   }
   sequenceSeeded = true;
-  Serial.printf("[SEQ] Sequence base anchored at %lu\n",
+  Serial.printf("[SEQ] Sequence base anchored at %lu\r\n",
                 static_cast<unsigned long>(epoch));
 }
 
@@ -800,7 +800,7 @@ bool validBackendAcknowledgement(const String& response) {
   JsonDocument document;
   const DeserializationError error = deserializeJson(document, response);
   if (error) {
-    Serial.printf("[HTTP] Invalid response JSON: %s\n", error.c_str());
+    Serial.printf("[HTTP] Invalid response JSON: %s\r\n", error.c_str());
     return false;
   }
   return document["success"].is<bool>() && document["success"].as<bool>();
@@ -840,23 +840,23 @@ void addStandardHeaders(HTTPClient& http, uint8_t zoneIndex) {
  * useful diagnostic this node ever receives into a silent retry loop.
  */
 void reportRejection(int statusCode, const String& response) {
-  Serial.printf("[HTTP] Rejected with status %d\n", statusCode);
+  Serial.printf("[HTTP] Rejected with status %d\r\n", statusCode);
   if (response.isEmpty()) {
     return;
   }
 
   JsonDocument document;
   if (deserializeJson(document, response)) {
-    Serial.printf("[HTTP] Body: %s\n", response.c_str());
+    Serial.printf("[HTTP] Body: %s\r\n", response.c_str());
     return;
   }
 
   const char* code = document["error"]["code"] | "";
   const char* message = document["error"]["message"] | "";
   if (strlen(code) > 0 || strlen(message) > 0) {
-    Serial.printf("[HTTP] %s: %s\n", code, message);
+    Serial.printf("[HTTP] %s: %s\r\n", code, message);
   } else {
-    Serial.printf("[HTTP] Body: %s\n", response.c_str());
+    Serial.printf("[HTTP] Body: %s\r\n", response.c_str());
   }
 }
 
@@ -884,7 +884,7 @@ bool postJson(const String& url, const String& payload, bool requireAck,
     if (statusCode > 0) {
       reportRejection(statusCode, response);
     } else {
-      Serial.printf("[HTTP] Transport error: %s\n",
+      Serial.printf("[HTTP] Transport error: %s\r\n",
                     HTTPClient::errorToString(statusCode).c_str());
     }
     return false;
@@ -1031,7 +1031,7 @@ void pollCommands(uint32_t now) {
     } else if (strcmp(type, "DEACTIVATE_RELAY") == 0) {
       commandedState.relayCutoff = false;
     } else {
-      Serial.printf("[CMD] Unknown command type '%s'\n", type);
+      Serial.printf("[CMD] Unknown command type '%s'\r\n", type);
       ++unknown;
       continue;
     }
@@ -1041,7 +1041,7 @@ void pollCommands(uint32_t now) {
   }
 
   if (applied > 0) {
-    Serial.printf("[CMD] Applied %u command(s): LED=%s buzzer=%s relay=%s\n",
+    Serial.printf("[CMD] Applied %u command(s): LED=%s buzzer=%s relay=%s\r\n",
                   applied, ledPatternName(commandedState.led),
                   commandedState.buzzer ? "ON" : "OFF",
                   commandedState.relayCutoff ? "CUT" : "CLOSED");
@@ -1072,7 +1072,7 @@ void pollCommands(uint32_t now) {
         acknowledged, total, static_cast<uint16_t>(total - acknowledged));
   }
   if (unknown > 0) {
-    Serial.printf("[CMD] %u command(s) of an unrecognised type\n", unknown);
+    Serial.printf("[CMD] %u command(s) of an unrecognised type\r\n", unknown);
   }
 }
 
@@ -1100,17 +1100,17 @@ void printSerialReport(const ReadingSnapshot& reading, uint32_t now) {
   const auto state = static_cast<SafetyState>(reading.state);
   const bool commanded = backendIsAuthoritative(now) && commandedState.received;
 
-  Serial.printf("\n======== %s ========\n\n", ZONE_CODE_OF);
-  Serial.printf("Fire           : %s\n",
+  Serial.printf("\r\n======== %s ========\r\n\r\n", ZONE_CODE_OF);
+  Serial.printf("Fire           : %s\r\n",
                 (reading.flags & FireFlag) ? "YES" : "NO");
-  Serial.printf("Gas            : %u ppm (ADC %u, DO %s)%s\n",
+  Serial.printf("Gas            : %u ppm (ADC %u, DO %s)%s\r\n",
                 reading.gasPpm, reading.gasRaw,
                 (reading.flags & GasDigitalFlag) ? "ALARM" : "OK",
                 (reading.flags & GasHighFlag) ? " - HIGH" : "");
-  Serial.printf("Water          : %s (%u%%, ADC %u)\n",
+  Serial.printf("Water          : %s (%u%%, ADC %u)\r\n",
                 (reading.flags & FloodFlag) ? "FLOOD" : "LOW",
                 reading.waterPercent, reading.waterRaw);
-  Serial.printf("Motion         : %s\n",
+  Serial.printf("Motion         : %s\r\n",
                 (reading.flags & MotionFlag) ? "YES" : "NO");
   // Mirror the payload exactly, including which channels are omitted. Printing
   // a field the node does not actually send would send someone hunting for a
@@ -1131,30 +1131,30 @@ void printSerialReport(const ReadingSnapshot& reading, uint32_t now) {
                       ? ((reading.flags & MotionFlag) ? "true" : "false")
                       : "null");
   }
-  Serial.printf("(omitted: %s%s%s%s)\n", zoneReportsFire(reading.zoneIndex) ? "" : "fire ",
+  Serial.printf("(omitted: %s%s%s%s)\r\n", zoneReportsFire(reading.zoneIndex) ? "" : "fire ",
                 zoneReportsGas(reading.zoneIndex) ? "" : "gas ",
                 zoneReportsWater(reading.zoneIndex) ? "" : "water ",
                 zoneReportsOccupancy(reading.zoneIndex) ? "" : "occupancy ");
   // Local risk is advisory. The backend scores the zone and this number never
   // leaves the device — it only decides what the alarms do if the link drops.
-  Serial.printf("Local risk     : %u / 100 (%s, advisory only)\n", reading.risk,
+  Serial.printf("Local risk     : %u / 100 (%s, advisory only)\r\n", reading.risk,
                 stateName(state));
-  Serial.printf("Actuators      : %s\n",
+  Serial.printf("Actuators      : %s\r\n",
                 commanded ? "backend-commanded" : "LOCAL FALLBACK");
   if (commanded) {
-    Serial.printf("  LED=%s buzzer=%s relay=%s\n",
+    Serial.printf("  LED=%s buzzer=%s relay=%s\r\n",
                   ledPatternName(commandedState.led),
                   commandedState.buzzer ? "ON" : "OFF",
                   commandedState.relayCutoff ? "CUT" : "CLOSED");
   }
-  Serial.printf("Sensor Health  : %s\n",
+  Serial.printf("Sensor Health  : %s\r\n",
                 reading.sensorsHealthy ? "OK" : "TIMEOUT");
-  Serial.printf("WiFi           : %s\n",
+  Serial.printf("WiFi           : %s\r\n",
                 WiFi.status() == WL_CONNECTED ? "Connected" : "Disconnected");
-  Serial.printf("Backend        : %s\n", backendStateText(now));
-  Serial.printf("Buffered       : %u (dropped: %lu)\n", outbox.size(),
+  Serial.printf("Backend        : %s\r\n", backendStateText(now));
+  Serial.printf("Buffered       : %u (dropped: %lu)\r\n", outbox.size(),
                 static_cast<unsigned long>(outbox.dropped()));
-  Serial.println("\n========================");
+  Serial.println("\r\n========================");
 }
 
 void manageWifi(uint32_t now) {
@@ -1162,7 +1162,7 @@ void manageWifi(uint32_t now) {
   if (connected) {
     if (!wifiWasConnected) {
       wifiWasConnected = true;
-      Serial.printf("[WiFi] Connected, IP=%s, RSSI=%d dBm\n",
+      Serial.printf("[WiFi] Connected, IP=%s, RSSI=%d dBm\r\n",
                     WiFi.localIP().toString().c_str(), WiFi.RSSI());
       if (!timeConfigured) {
         configTime(0, 0, "pool.ntp.org", "time.nist.gov");
@@ -1182,7 +1182,7 @@ void manageWifi(uint32_t now) {
     return;
   }
 
-  Serial.printf("[WiFi] Connecting to %s...\n", AppConfig::WIFI_SSID);
+  Serial.printf("[WiFi] Connecting to %s...\r\n", AppConfig::WIFI_SSID);
   WiFi.disconnect(false, false);
   WiFi.begin(AppConfig::WIFI_SSID, AppConfig::WIFI_PASSWORD,
              AppConfig::WIFI_CHANNEL);
@@ -1225,7 +1225,8 @@ void pollZoneSelectButton(uint32_t now) {
   nextBackendAttemptMs = now;
 
   Serial.printf(
-      "\n***** ZONE -> %s (%u/%u) — reporting%s%s%s%s *****\n\n", ZONE_CODE_OF,
+      "\r\n***** ZONE -> %s (%u/%u) - reporting%s%s%s%s *****\r\n\r\n",
+      ZONE_CODE_OF,
       static_cast<unsigned>(activeZoneIndex + 1),
       static_cast<unsigned>(AppConfig::ZONE_COUNT),
       REPORTS_FIRE ? " fire" : "", REPORTS_GAS ? " gas" : "",
@@ -1265,7 +1266,7 @@ void processOutbox(uint32_t now) {
   const ReadingSnapshot* reading = outbox.front();
   if (reading != nullptr && sendReading(*reading, now)) {
     outbox.pop();
-    Serial.printf("[OUTBOX] Delivered buffered reading; %u remain\n",
+    Serial.printf("[OUTBOX] Delivered buffered reading; %u remain\r\n",
                   outbox.size());
   }
 }
@@ -1336,7 +1337,7 @@ void initializeWatchdog() {
       esp_task_wdt_init(AppConfig::WATCHDOG_TIMEOUT_SECONDS, true);
   const esp_err_t addResult = esp_task_wdt_add(nullptr);
   if (initResult != ESP_OK || addResult != ESP_OK) {
-    Serial.printf("[WDT] Initialization warning: init=%d add=%d\n", initResult,
+    Serial.printf("[WDT] Initialization warning: init=%d add=%d\r\n", initResult,
                   addResult);
   }
 }
@@ -1345,7 +1346,7 @@ void initializeWatchdog() {
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\nIndustrial Smart Safety Node starting...");
+  Serial.println("\r\nIndustrial Smart Safety Node starting...");
 
   configurePins();
   alarmManager.begin();

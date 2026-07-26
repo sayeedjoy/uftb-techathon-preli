@@ -39,13 +39,35 @@ pnpm db:seed                        # users, zones, keys, 10k+ readings, history
 pnpm dev                            # shared --watch + backend :4000 + frontend :5173
 ```
 
-Open **http://localhost:5173**.
+Open **http://localhost:5173** and sign in with the credentials below.
 
 > The seed prints the zone API keys once and writes them to
 > `backend/.dev-zone-keys.json` and `backend/.env.simulator` — both gitignored.
 > The database stores only bcrypt hashes; if you lose the plaintext, rotate the
 > key rather than trying to recover it. Re-print with
 > `pnpm --filter backend print-zone-keys`.
+
+Zones open as **OFFLINE** until something feeds them — that is intentional, not a
+fault. Drive them from the **Simulator** page, or run a scenario:
+
+```bash
+pnpm sim:scenario -- --id 5         # two zones critical at once, ranked
+```
+
+### Optional — the ESP32 zone node
+
+The sensing layer is a separate PlatformIO project and is not part of the pnpm
+workspace, so no JS gate touches it.
+
+```bash
+pnpm firmware:config -- --registry  # writes gitignored zone credentials
+cd firmware && pio run              # builds all four environments
+```
+
+Then press **Start Simulator** with the Wokwi VS Code extension. Reaching a
+backend on your own machine needs Wokwi's paid Private IoT Gateway; without it
+the board runs but cannot deliver readings. Full detail in
+[firmware/README.md](firmware/README.md).
 
 ### Development-only credentials
 
@@ -236,8 +258,19 @@ with truncation between tests, and pass in any order.
 
 ## Troubleshooting
 
+The most common ones are below. For the complete set — including firmware, Wokwi,
+ingestion rejections and test failures — see
+**[docs/troubleshooting.md](docs/troubleshooting.md)**.
+
 **Port 5432 is already in use.** It should be — a local PostgreSQL install owns
 it. Docker binds **5433** deliberately; check `backend/.env` points there.
+
+**Zones show OFFLINE.** Correct behaviour — nothing is feeding them. Start them
+from the Simulator page or run a scenario. Offline means unknown, not safe.
+
+**`@prisma/client did not initialize yet`.** Run
+`pnpm --filter backend exec prisma generate`. `pnpm db:migrate` does this for
+you; `db:deploy` does not.
 
 **`Cannot find module '@scsrg/shared'`.** The shared package builds to `dist/`.
 Run `pnpm --filter @scsrg/shared build` (or `pnpm dev`, which watches it).
@@ -263,12 +296,15 @@ key. `JWT_SECRET` must be at least 32 characters.
 
 ## Documentation
 
-| Document                                      | Covers                                                |
-| --------------------------------------------- | ----------------------------------------------------- |
-| [architecture.md](docs/architecture.md)       | System shape, data flow, layering, in-memory state    |
-| [circuit-diagram.md](docs/circuit-diagram.md) | ESP32 node — schematic, pin map, per-zone boards      |
-| [api.md](docs/api.md)                         | Every endpoint, envelope, status codes, socket events |
-| [database-schema.md](docs/database-schema.md) | ERD, constraints, indexes, the performance gate       |
-| [risk-fusion.md](docs/risk-fusion.md)         | The formula, **why these weights**, sensor rules      |
+| Document                                                          | Covers                                                |
+| ----------------------------------------------------------------- | ----------------------------------------------------- |
+| [architecture.md](docs/architecture.md)                           | System shape, data flow, layering, in-memory state    |
+| [circuit-diagram.md](docs/circuit-diagram.md)                     | ESP32 node — schematic, pin map, per-zone boards      |
+| [api.md](docs/api.md)                                             | Every endpoint, envelope, status codes, socket events |
+| [database-schema.md](docs/database-schema.md)                     | ERD, constraints, indexes, the performance gate       |
+| [risk-fusion.md](docs/risk-fusion.md)                             | The formula, **why these weights**, sensor rules      |
+| [deployment.md](docs/deployment.md)                               | Production config, Docker, proxying, scaling limits   |
+| [troubleshooting.md](docs/troubleshooting.md)                     | Every failure mode we have actually hit, and why      |
+| [SCS-RG-System-Documentation.pdf](docs/SCS-RG-System-Documentation.pdf) | The consolidated submission document                  |
 
 Interactive API docs: **`http://localhost:4000/api/v1/docs`**.
