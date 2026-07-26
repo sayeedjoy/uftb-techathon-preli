@@ -4,7 +4,7 @@
  *   pnpm --filter backend retention              # dry run (default)
  *   pnpm --filter backend retention -- --apply   # actually purge
  *
- * Policy (docs/data-retention.md): raw readings are kept for 90 days, then
+ * Policy: raw readings are kept for 90 days, then
  * rolled into hourly aggregates and deleted. Incident records and their
  * timelines are kept far longer — they are the audit trail.
  *

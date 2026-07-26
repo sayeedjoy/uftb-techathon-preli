@@ -85,7 +85,8 @@ pnpm sim:scenario -- --id 5
 pnpm sim:scenario -- --all
 ```
 
-Full descriptions and expected outcomes: [docs/demo-scenarios.md](docs/demo-scenarios.md).
+Each scenario's script, description and assertions live beside it in
+`backend/src/modules/simulator/scenarios/`.
 
 ---
 
@@ -166,9 +167,8 @@ firmware/          ESP32 zone node — PlatformIO + Wokwi. Outside the pnpm
                    pulls actuation commands over the same HTTP API any node
                    uses, so invariant 1 binds it too.
 
-docs/              Architecture, risk fusion, priority ranking, security,
-                   resilience, database schema, demo scenarios, retention, ML,
-                   firmware.
+docs/              System architecture, circuit diagram, API reference,
+                   database schema, risk fusion formula.
 ```
 
 ---
@@ -189,13 +189,13 @@ docs/              Architecture, risk fusion, priority ranking, security,
   the threshold produces one incident rather than a dozen. Enforced by a partial
   unique index in Postgres, never by application logic.
 - **Deterministic priority ranking** with a total sort order and a visible
-  explanation. ([docs/priority-ranking.md](docs/priority-ranking.md))
+  explanation.
 - **Concurrency-safe acknowledgment** — ten simultaneous requests yield exactly
   one `200`, nine `409`, and one row.
 - **Offline that means unknown, not safe.** A silent zone keeps its incident
   open, keeps its buzzer on and shows when it was last seen.
 - **Restart recovery** — every in-memory cache is rebuilt from Postgres before
-  the listener binds. ([docs/resilience.md](docs/resilience.md))
+  the listener binds.
 - **A simulator that drives the real API** over HTTP with server-held zone keys,
   so a demo exercises the actual pipeline. No API key ever reaches the browser.
 
@@ -207,7 +207,7 @@ All three are implemented and all three are firewalled from the hazard path:
   state badge, never inside it.
 - **Predicted risk** — logistic regression on explicitly synthetic data, with an
   architecture test proving the module cannot import actuation or incidents, and
-  imports no database client at all. ([docs/ml-model.md](docs/ml-model.md))
+  imports no database client at all.
 - **Natural-language field reports** — deterministic extraction, no paid service
   required, `PENDING` until a human confirms, and even then bounded to +5
   priority points.
@@ -263,18 +263,12 @@ key. `JWT_SECRET` must be at least 32 characters.
 
 ## Documentation
 
-| Document                                        | Covers                                                |
-| ----------------------------------------------- | ----------------------------------------------------- |
-| [architecture.md](docs/architecture.md)         | System shape, data flow, layering, in-memory state    |
-| [api.md](docs/api.md)                           | Every endpoint, envelope, status codes, socket events |
-| [database-schema.md](docs/database-schema.md)   | ERD, constraints, indexes, the performance gate       |
-| [risk-fusion.md](docs/risk-fusion.md)           | The formula, **why these weights**, sensor rules      |
-| [priority-ranking.md](docs/priority-ranking.md) | Priority formula, determinism, the race               |
-| [security.md](docs/security.md)                 | Auth, RBAC, hashing, redaction, tradeoffs             |
-| [resilience.md](docs/resilience.md)             | Offline, restart, concurrency, load, scaling          |
-| [demo-scenarios.md](docs/demo-scenarios.md)     | All eleven scenarios and what to expect               |
-| [data-retention.md](docs/data-retention.md)     | Retention policy, backup, recovery window             |
-| [ml-model.md](docs/ml-model.md)                 | Bonus 2 — model, synthetic data, metrics, boundary    |
-| [firmware.md](docs/firmware.md)                 | ESP32 node — wire contract, units, fallback boundary  |
+| Document                                      | Covers                                                |
+| --------------------------------------------- | ----------------------------------------------------- |
+| [architecture.md](docs/architecture.md)       | System shape, data flow, layering, in-memory state    |
+| [circuit-diagram.md](docs/circuit-diagram.md) | ESP32 node — schematic, pin map, per-zone boards      |
+| [api.md](docs/api.md)                         | Every endpoint, envelope, status codes, socket events |
+| [database-schema.md](docs/database-schema.md) | ERD, constraints, indexes, the performance gate       |
+| [risk-fusion.md](docs/risk-fusion.md)         | The formula, **why these weights**, sensor rules      |
 
 Interactive API docs: **`http://localhost:4000/api/v1/docs`**.

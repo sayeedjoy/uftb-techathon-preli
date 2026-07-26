@@ -240,7 +240,7 @@ function main(): void {
   )
   console.log(`\n✓ Wrote ${path.relative(BACKEND_ROOT, modelPath)}`)
   console.log(
-    "  Training data is SYNTHETIC. See docs/ml-model.md for the full write-up.\n"
+    "  Training data is SYNTHETIC — the model is advisory only, never on the hazard path.\n"
   )
 }
 

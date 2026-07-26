@@ -15,7 +15,7 @@ pnpm workspace with three packages: `packages/shared` (`@scsrg/shared`), `backen
 **not** part of the pnpm workspace and no JS gate touches it — build it with `pio run` from inside
 `firmware/`. It is a client of the wire contract like any other node: it POSTs raw readings and
 pulls actuation commands, and it holds a zone API key, so it is bound by invariant 1 exactly as the
-simulator is. See `docs/firmware.md`.
+simulator is. See `docs/circuit-diagram.md` and `firmware/README.md`.
 
 ## Commands
 
@@ -83,7 +83,7 @@ not a refactor.
    text is _read_. Every extraction — LLM or deterministic — passes the identical
    `applyValidationGate`, the confirmation message is always composed by `buildConfirmation()`
    locally, and the result is a `PENDING` report that cannot open an incident or actuate. Keys and
-   model names live in `backend/.env` and never reach the browser. See `docs/ai-provider.md`.
+   model names live in `backend/.env` and never reach the browser.
 
 ## Where things live
 
@@ -144,9 +144,10 @@ Seeded dev logins (local demo only): `admin@scsrg.local` / `Admin123!` and
 
 ## Deeper reference
 
-`docs/` is current and worth reading before non-trivial changes: `architecture.md`, `api.md`,
-`database-schema.md`, `risk-fusion.md` (the formula and _why_ those weights), `priority-ranking.md`,
-`security.md`, `resilience.md`, `demo-scenarios.md`, `data-retention.md`, `ml-model.md`,
-`ai-provider.md` (the OpenRouter → Groq → deterministic extraction chain),
-`firmware.md` (the ESP32 node's wire contract and its actuation fallback boundary).
+`docs/` is the submission documentation set — five documents, current and worth reading before
+non-trivial changes: `architecture.md`, `circuit-diagram.md` (the ESP32 node's schematic, pin map and
+actuation fallback boundary), `api.md` (plus generated `openapi.json`), `database-schema.md` and
+`risk-fusion.md` (the formula and _why_ those weights). Nothing else belongs in `docs/`; deeper notes
+on priority ranking, security, resilience, retention, the ML model and the AI provider live beside
+the code they describe.
 `specs-and-planning/` holds the original spec, plan and task breakdown, plus the round-1 case PDF.
